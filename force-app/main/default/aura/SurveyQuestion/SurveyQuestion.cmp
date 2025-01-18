@@ -1,0 +1,135 @@
+<aura:component implements="flexipage:availableForRecordHome,lightning:availableForFlowScreens,force:hasRecordId"
+                controller = "SurveyQuestionController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="didInit" type="Boolean" default="false" />
+    <aura:attribute name="surveyQuestion" type="Survey_Question__c"/>
+    <aura:attribute name="sectionNumber" type="Integer" />
+    <aura:attribute name="questionNumber" type="Integer" />
+    <aura:attribute name="questionType" type="String" />
+    <aura:attribute name="radioOptions" type="List" default="[
+		{'label': 'Yes', 'value': 'Yes'},
+		{'label': 'No', 'value': 'No'}
+	]"/>
+    <aura:attribute name="radioValue" type="String" />
+    <aura:attribute name="questionText" type="String" />
+    <aura:attribute name="benefitText" type="String" />
+    <aura:attribute name="instructionText" type="String" />
+    <aura:attribute name="surveyRecordId" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="numPicturesRequired" type="Integer" />
+    <aura:attribute name="numPicturesRequiredText" type="String" />
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+	
+    <aura:if isTrue="{!not(v.didInit)}">
+        <div aura:id="spinnerId" class="slds-spinner_container">
+            <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                <span class="slds-assistive-text">Loading...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!v.didInit}">
+    <aura:if isTrue="{!not(empty(v.surveyQuestion.Section_Number__c))}">
+    	<div class="slds-text-heading_large">Question {!v.surveyQuestion.Section_Number__c}.{!v.surveyQuestion.Question_Number__c}</div>
+    </aura:if>
+    
+    <div class="slds-box">
+    <lightning:formattedRichText value="{!v.surveyQuestion.Question_Text__c}"/><br/>
+    <aura:if isTrue="{!v.surveyQuestion.Input_Type__c == 'Picklist (Single Selection)'}">
+        <lightning:radioGroup name="{!radioButtonGroup + v.recordId }"
+                            options="{! v.radioOptions }"
+                            value="{! v.radioValue }"
+                            type="button"
+                            onchange="{! c.isRadioChanged }"/>    
+    </aura:if>
+    <aura:if isTrue="{!v.surveyQuestion.Input_Type__c == 'Multi-Select Picklist'}">
+        <fieldset class="slds-form-element slds-has-error">
+        <legend class="slds-form-element__legend slds-form-element__label">Select all that apply:</legend>
+        <div class="slds-form-element__control">
+        <div class="slds-checkbox_button-group">
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="unique-id-monday-14" value="unique-id-monday-14" name="checkbox" />
+        <label class="slds-checkbox_button__label" for="unique-id-monday-14">
+        <span class="slds-checkbox_faux">Needs Assessment</span>
+        </label>
+        </span>
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="unique-id-tuesday-14" value="unique-id-tuesday-14" name="checkbox" />
+        <label class="slds-checkbox_button__label" for="unique-id-tuesday-14">
+        <span class="slds-checkbox_faux">Product Presentation</span>
+        </label>
+        </span>
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="unique-id-wednesday-14" value="unique-id-wednesday-14" name="checkbox" />
+        <label class="slds-checkbox_button__label" for="unique-id-wednesday-14">
+        <span class="slds-checkbox_faux">Presenting Numbers and Figures</span>
+        </label>
+        </span>
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="unique-id-thursday-14" value="unique-id-thursday-14" name="checkbox" />
+        <label class="slds-checkbox_button__label" for="unique-id-thursday-14">
+        <span class="slds-checkbox_faux">Digital Paperwork and Signatures</span>
+        </label>
+        </span>
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="unique-id-friday-14" value="unique-id-friday-14" name="checkbox" />
+        <label class="slds-checkbox_button__label" for="unique-id-friday-14">
+        <span class="slds-checkbox_faux">F&amp;I Menu and Presentation</span>
+        </label>
+        </span>
+        <span class="slds-button slds-checkbox_button">
+        <input type="checkbox" aria-describedby="error_01" id="none-of-the-above" value="none-of-the-above" name="checkbox"/>
+        <label class="slds-checkbox_button__label" for="none-of-the-above">
+        <span class="slds-checkbox_faux">None of the above</span>
+        </label>
+        </span>
+        </div>
+        </div>
+        </fieldset>
+    </aura:if>
+
+    <br/>
+    <lightning:button variant="brand"
+                          label="Instructions"
+                          title="Instructions"
+                          onclick="{! c.openModal }" />
+	<lightning:button variant="brand"
+                          label="Add Remarks"
+                          title="Add Remarks" />
+
+            <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <aura:if isTrue="{!not(empty(v.surveyQuestion.Benefit_Text__c))}">
+                        	<div class="slds-text-heading_medium">Benefit:</div>
+                        	<lightning:formattedRichText value="{!v.surveyQuestion.Benefit_Text__c}"/><br/>    
+                        </aura:if>
+                        <aura:if isTrue="{!not(empty(v.surveyQuestion.Instruction_Text__c))}">
+                        <div class="slds-text-heading_medium">Instructions:</div>
+    					<lightning:formattedRichText value="{!v.surveyQuestion.Instruction_Text__c}"/>
+                        </aura:if>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral"
+                                          label="OK"
+                                          title="OK"
+                                          onclick="{! c.closeModal }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+        <aura:if isTrue="{!and(v.radioValue=='No', v.surveyQuestion.Photos_Required__c > 0)}">
+            <h1 style="color:red;text-align:left">{!v.surveyQuestion.Photos_Required__c} image(s) required.</h1>
+            <c:ImageManager recordId="{!v.recordId}"/><br/>
+		</aura:if>
+    </div>
+    <br/>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,75 @@
+<aura:component implements="force:lightningQuickActionWithoutHeader,force:hasRecordId" controller="AssignToDealerController">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="showSpinner" type="boolean" default="true"/>
+    <aura:attribute name="evaluationAccountContacts" type="List" default="[]"/>
+    <aura:attribute name="selectedOwnerId" type="String"/>
+    <aura:attribute name="actionPlan" type="Object"/>
+
+    <aura:html tag="style">
+        .cuf-content {
+          padding: 0 0rem !important;
+        }
+
+        .slds-p-around--medium {
+          padding: 0rem !important;
+        }
+
+        .slds-modal__content{
+          overflow: visible !important;
+          height:450px !important;
+          max-height:unset !important;
+        }
+
+        .slds-modal__container{
+            overflow: visible !important;
+            max-height: 450px;
+            height: 450px;
+            max-width: 35% !important;
+            width: 35% !important;
+
+        }
+    </aura:html>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="loading_wheel">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </div>
+        <!--<div class="slds-backdrop slds-backdrop_open"></div>-->
+    </aura:if>
+
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+        <div class="slds-box" style="background-color: #F0F8FF; overflow:visible">
+            <div style="font-weight: bold; font-size:16px;" >
+            Assign Action Plan to the contact selected.
+            </div>
+        </div>
+        <div class="slds-p-top_large"></div>
+        <div class="slds-grid slds-p-top_x-large slds-p-bottom_medium" style="display: unset;">
+            <div class="slds-col slds-size_1-of-2">
+                <lightning:combobox options="{!v.evaluationAccountContacts}" value="{!v.selectedOwnerId}" label="Contact Name"></lightning:combobox>
+            </div>
+        </div>
+
+        <!--<div class="slds-box" style="background-color: #F0F8FF;">
+            <div style="font-weight: bold; font-size:16px;" >
+            Check this box to convert to Self Evaluation
+            </div>
+        </div>
+        <div class="slds-grid slds-p-top_small slds-p-bottom_medium">
+            <lightning:input type="checkbox" checked="{!v.selfEvaluation}" label="Convert to Self Evaluation" aura:id="selfEval"></lightning:input>
+        </div>-->
+    </div>
+
+    <footer>
+        <div class="slds-modal__footer attach-to-bottom">
+            <button class="slds-button slds-button_neutral" onclick="{!c.handleCancel}">Cancel</button>
+            <button class="slds-button slds-button_brand" onclick="{!c.handleAssignToDealer}" disabled="{!v.selectedOwnerId == null}">
+                Assign To Dealer
+            </button>
+        </div>
+    </footer>
+
+</aura:component>

@@ -1,0 +1,24 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:html tag="style">
+        .slds-modal {
+        visibility: hidden!important;
+        display: none!important;
+        }
+        .slds-backdrop{
+        display: none!important;
+        }  
+        
+    </aura:html>
+    <aura:attribute name="recordId" type="String" />
+    <c:hcuvInventoryQuickAction recordId="{!v.recordId}" hmaActionUrl="{!$Label.c.HCUV_Create_RDR}" gmaActionUrl="{!$Label.c.HCUV_GMA_Create_RDR_URL}" target="_blank" errorMsg="{!$Label.c.HCUV_Invalid_CreateRDR_Inv_Status}" onclosepopup ="{!c.closePopup}"></c:hcuvInventoryQuickAction>
+    
+    <!--<aura:attribute name="recordId" type="String" />
+    <aura:attribute name="simpleRecord" type="Object"/>
+    
+    <force:recordData aura:id="recordLoader"
+                      fields="Name"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.simpleRecord}"
+                      recordUpdated="{!c.handleRecordUpdated}"
+                      />-->
+</aura:component>

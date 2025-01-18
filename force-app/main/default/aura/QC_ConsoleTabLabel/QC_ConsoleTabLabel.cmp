@@ -1,0 +1,25 @@
+<!-- 
+ @description : Changed Lab Request Detail page Tab Name
+ @author San, Kang : SanKang@autoeveramerica.com | 2024-09-06
+ @tecket no: SO-462
+-->
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" controller="QC_ConsoleTabLabelController" access="global">
+    <!--Attributes-->
+    <aura:attribute name="QCFields" type="Case"/>
+    <aura:attribute name="Phase" type="String"/>
+    <aura:attribute name="Identification" type="String"/>
+
+    <!--Component Start-->
+     
+    <!--Lightning Workspace API-->
+    <lightning:workspaceAPI aura:id="workspace" />
+    <lightning:utilityBarAPI aura:id="utilityBar" />
+     
+    <!--Lightning Force Data to get Account record-->
+    <force:recordData aura:id="accRecordData"
+                      layoutType="FULL"
+                      recordId="{!v.recordId}"
+                      targetFields="{!v.QCFields}"
+                      recordUpdated="{!c.handleLabelChange}"/>
+    <!--Component End-->
+</aura:component>

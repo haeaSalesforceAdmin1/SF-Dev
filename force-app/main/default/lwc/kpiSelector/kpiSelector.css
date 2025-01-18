@@ -1,0 +1,16 @@
+.slds-modal__content {
+    height: 70vh !important;
+    overflow-y: scroll !important;
+}
+
+.slds-modal__container{
+    max-width: 90rem !important;
+    width:90% !important;
+
+}
+.green{
+    color:green;
+}
+.red{
+    color:rgb(255, 38, 0);
+}

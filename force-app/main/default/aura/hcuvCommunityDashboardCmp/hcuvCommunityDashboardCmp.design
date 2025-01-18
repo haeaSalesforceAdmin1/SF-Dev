@@ -1,0 +1,3 @@
+<design:component>
+    <design:attribute name="dashboardType" label="dashboardType" description="The Dashboard Type to fetch dashboard ID." />	
+</design:component>

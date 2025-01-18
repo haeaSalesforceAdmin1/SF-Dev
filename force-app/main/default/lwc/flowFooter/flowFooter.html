@@ -1,0 +1,11 @@
+<!-- DPM-5633 -->
+
+<template>
+    <lightning-record-edit-form object-api-name="Evlautaion__c" onsuccess={handleSuccess}>
+
+        <footer class="slds-modal__footer">
+                <lightning-button class="slds-m-top_small" onclick={handleNext} name="next" label="Next" disabled={disableButton}>
+                </lightning-button>
+        </footer>
+    </lightning-record-edit-form>
+</template>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>54.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>COPP KPI</masterLabel>
+    <targets>
+        <target>analytics__Dashboard</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="analytics__Dashboard">
+            <hasStep>true</hasStep>
+            <property name="coppKPIData" type="String" required="true" />
+            <property name="brandCode" type="String" required="true" />     
+            <property name="reportingMonth" type="String" />
+            <property name="brandingQuery" type="String" />
+            <property name="coppChecked" type="String" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

@@ -1,0 +1,108 @@
+<!--
+  @description       : 
+  @author            : INFOGAIN
+  @group             : 
+
+  [CCSOM-18] [SF] Reference Materials Link Not Working / KIH / 240207 / change a tag's attribute, use href than onClick
+-->
+<template>
+	<template if:true={showSpinner}>
+		<lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+			size="medium">
+		</lightning-spinner>
+	</template>
+	<template if:true={showFormBrochuresSection}>
+		<div class="slds-p-bottom_small slds-grid slds-wrap">
+			<div class="slds-size_1-of-2 HMA-heading">
+				{formsAndGuides}
+			</div>
+		</div>
+		<div class="custom-table quick-links">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<tbody>
+					<template for:each={formBrochuresList} for:item="formBrochure" for:index="index">
+						<tr key={formBrochure.Id} class="slds-hint-parent">
+							<td>
+								<div class="slds-truncate link-name-desc" title={formBrochure.Name}>
+									<template if:true={formBrochure.isVideo}>
+										<img src={hmaIcons.video} class="left-nav-sub-item-img slds-m-right_x-small">
+									</template>
+									<template if:false={formBrochure.isVideo}>
+										<img src={hmaIcons.pdf} class="left-nav-sub-item-img slds-m-right_x-small">
+									</template>
+									<template if:true={formBrochure.isClickable}>
+										<a data-id={formBrochure.Id} onclick={handleLinkClick}
+											class="slds-m-right_x-small message-text_bold">{formBrochure.Name}</a>
+									</template>
+									<template if:false={formBrochure.isClickable}>
+										<span class="slds-m-right_x-small message-text_bold">{formBrochure.Name}</span>
+									</template>
+
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</template>
+
+	<template if:true={showLinksSection}>
+		<div class="slds-p-top_small slds-p-bottom_small slds-grid slds-wrap">
+			<div class="slds-size_1-of-2 HMA-heading">
+				{links}
+			</div>
+		</div>
+		<div class="custom-table quick-links quick-links-custom">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<tbody>
+					<template for:each={linksList} for:item="link" for:index="index">
+						<tr key={link.Id} class="slds-hint-parent">
+							<td>
+								<div class="slds-truncate link-name-desc" title={link.linkIndex}>
+									{link.Name}
+								</div>
+							</td>
+							<td>
+								<!--<a data-id={link.Link__c} onclick={handleURLClick}
+									class="slds-m-right_x-small message-text_bold">{link.Link__c}</a>-->
+								<a href={link.Link__c} target="_blank" data-id={link.Link__c}
+									class="slds-m-right_x-small message-text_bold">{link.Link__c}</a>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</template>
+
+	<template if:true={showVideosSection}>
+		<div class="slds-p-top_small slds-p-bottom_small slds-grid slds-wrap">
+			<div class="slds-size_1-of-2 HMA-heading">
+				{videos}
+			</div>
+		</div>
+		<div class="custom-table custom-table-video">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<tbody>
+					<template for:each={videosList} for:item="video" for:index="index">
+						<tr key={video.Id} class="slds-hint-parent">
+							<td>
+								<div class="slds-truncate" title={video.Name}>
+									<img src={hmaIcons.video} class="left-nav-sub-item-img slds-m-right_x-small">
+									<template if:true={video.isClickable}>
+										<a data-id={video.Id} onclick={handleLinkClick}
+											class="slds-m-right_x-small message-text_bold">{video.Name}</a>
+									</template>
+									<template if:false={video.isClickable}>
+										<span class="slds-m-right_x-small message-text_bold">{video.Name}</span>
+									</template>
+								</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+	</template>
+</template>

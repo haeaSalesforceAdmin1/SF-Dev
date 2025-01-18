@@ -1,0 +1,29 @@
+<template>
+    <template if:true={isLoading}>
+        <div class="slds-p-around_x-large slds-is-relative">
+            <lightning-spinner alternative-text="Loading" size="large" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+    <div class="slds-grid slds-gutters slds-align_absolute-center slds-m-left_xx-large main-div">
+        
+        
+        <div class="slds-col slds-size_3-of-4">
+                <lightning-combobox
+               name="primaryContact"
+               label="Primary Contact"
+               value={primaryContact}
+               options={evalAccContList}
+               onchange={handleChange} >
+            </lightning-combobox>
+           
+        
+            <lightning-button variant="brand" label="Assign" title="Assign" onclick={handleSaveEvaluationDetailsClick} class="slds-m-left_x-small slds-float_right assign-button"></lightning-button>
+        
+        </div>
+        
+      </div>
+
+
+    
+   
+</template>

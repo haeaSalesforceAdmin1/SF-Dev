@@ -1,0 +1,50 @@
+<template>
+	<div class={leftNavCss}>
+		<div if:true={isMobile} onclick={handleLeftNavBar} class="xs-nav-close">
+			<img src={clearIcon} />
+			</div>
+			<button class={leftArrowCss} onclick={handleLeftNavBar}>
+                    <img class="nav-ico"  src={leftArrow}/>
+                </button>
+			<lightning-layout multiple-rows>
+				<template for:each={navItems} for:item="item" for:index="index">
+					<lightning-layout-item padding="" size="12" key={item.name}>
+						<div class="slds-p-top_x-small">
+							<div class={item.isSelectedClassName}>
+								<div data-id={item.name} data-navigation-type={item.navigationType} data-url={item.url} class="left-nav-item-ref" onclick={handleNavItemClick}>
+									<c-hcuv-portal-icons icon={item.image} title={item.name} width="15" height="12">
+									</c-hcuv-portal-icons>
+									<span if:true={showMenuNames} class="left-nav-item" >
+                                    {item.name}
+                                </span>
+								</div>
+
+								<div class="left-nav-item-ref-img">
+									<template if:true={item.hasSubMenu}>
+										<img src={expandMenu} data-id={item.name} class="left-nav-sub-item" onclick={handleNavItemClick}>
+                                	</template>
+								</div>
+							</div>
+
+							<template if:true={item.isSelected}>
+								<div class={item.subMenucss}>
+									<template for:each={item.subItems} for:item="subItem" for:index="index1">
+										<div key={subItem} class={subItem.isSelectedClassSubMenu}>
+											<c-hcuv-portal-icons icon={subItem.subItemImage} title={subItem.subItemName} width="15" height="12">
+									</c-hcuv-portal-icons>
+											<span data-id={subItem.subItemName} class="left-nav-sub-item" onclick={handleNavSubItemClick} if:true={showMenuNames}>
+                                        &nbsp;{subItem.subItemName}
+                                    </span>
+										</div>
+									</template>
+								</div>
+							</template>
+						</div>
+					</lightning-layout-item>
+				</template>
+			</lightning-layout>
+		</div>
+		<button class={themeChangeCss} onclick={handleThemeChange}>
+                    <img class="slds-m-around_x-small" src={themeChange}/>
+                </button>
+</template>

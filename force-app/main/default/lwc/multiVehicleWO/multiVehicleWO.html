@@ -1,0 +1,218 @@
+<template>
+    <!-- Table -->
+    <lightning-card title="LR Affected Vehicles">
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+<!--        <lightning-button onclick={handleClearAllBtn} label="Clear All" slot="actions" variant="destructive" class="slds-m-left_x-small"></lightning-button>&nbsp;-->
+        <!--
+        <lightning-button onclick={handleNewBtn} label="New" slot="actions" class="slds-m-left_x-small"></lightning-button>
+        -->
+        <template if:true={showNewScreen}>
+            <div class="c-newScreenContainer" >
+                <lightning-layout vertical-align="center" multiple-rows="true" >
+                    <lightning-layout-item padding="around-small" flexibility="auto">
+                        <c-multi-select-picklist-lwc 
+                            if:true={vehicleOptions.make} 
+                            options={vehicleOptions.make}
+                            onvaluechange={handleValueChange} 
+                            label="Make"
+                            disabled={isEdit}
+                            is-required="true"
+                            field-name="make"
+                            showlabel="true">
+                        </c-multi-select-picklist-lwc>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" flexibility="auto">
+                        <c-multi-select-picklist-lwc 
+                            if:true={vehicleOptions.model} 
+                            options={vehicleOptions.model}
+                            onvaluechange={handleValueChange}
+                            label="Model"
+                            disabled={isEdit}
+                            is-required="true"
+                            field-name="model"
+                            showlabel="true">
+                        </c-multi-select-picklist-lwc>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" flexibility="auto">
+                        <c-multi-select-picklist-lwc 
+                            if:true={vehicleOptions.year} 
+                            options={vehicleOptions.year}
+                            onvaluechange={handleValueChange} 
+                            label="Year"
+                            is-required="true"
+                            field-name="year"
+                            showlabel="true">
+                        </c-multi-select-picklist-lwc>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small" flexibility="auto">
+                        <c-multi-select-picklist-lwc 
+                            if:true={vehicleOptions.modelCode}
+                            options={vehicleOptions.modelCode}
+                            onvaluechange={handleValueChange} 
+                            label="Model Code"
+                            field-name="modelCode"
+                            showlabel="true">
+                        </c-multi-select-picklist-lwc>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+                <lightning-layout vertical-align="center" multiple-rows="true">
+                    <lightning-layout-item padding="around-small">
+                        <lightning-button variant="neutral" onclick={handleNewScrCancelBtn} label="Cancel"></lightning-button>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small">
+                        <lightning-button variant="neutral" onclick={handleResetBtn} label="Reset"></lightning-button>
+                    </lightning-layout-item>
+                    <lightning-layout-item padding="around-small">
+                        <lightning-button variant="brand" onclick={handleNewScrSaveBtn} label="Save"></lightning-button>
+                    </lightning-layout-item>
+                </lightning-layout>
+
+                <template if:true={summaryList.length}>
+                    <div>
+                        <br/>
+                        <h2>Summary: </h2>
+                        <ul>
+                            <template for:each={summaryList} for:item="summary">
+                                <li key={summary}>- {summary}</li>
+                            </template>
+                        </ul>
+                        <br/>
+                    </div>
+                </template>
+            </div>
+        </template>
+
+        <div>
+            <template if:true={errorList.length}>
+                <div style="color: red;">
+                    <br/>
+                    <h2>Error: </h2>
+                    <ul>
+                        <template for:each={errorList} for:item="error">
+                            <li key={error}>- {error}</li>
+                        </template>
+                    </ul>
+                    <br/>
+                </div>
+            </template>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped" aria-label=" Example headless table of Opportunities with cell content wrapped ">
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th class="" scope="col" style="text-align:center !important">
+                      <div class="slds-truncate" title="Typical Column Header">Make</div>
+                    </th>
+                    <th class="" scope="col" style="text-align:center !important">
+                        <div class="slds-truncate" title="Wrapped, line clamped">Model</div>
+                      </th>
+                    <th class="" scope="col" style="text-align:center !important">
+                        <div class="slds-truncate" title="Typical Column Header">Year</div>
+                    </th>
+                    <th class="" scope="col" style="text-align:center !important">
+                        <div class="slds-truncate" title="Typical Column Header">Model Code</div>
+                    </th>
+                    <!--
+                    <th class="" scope="col" style="text-align:center !important">
+                        <div class="slds-truncate" title="Typical Column Header">Actions</div>
+                    </th>
+                    -->
+                  </tr>
+                </thead>
+                <tbody>
+                    <template for:each={affectedVehicles} for:item="vehicle">
+                        <!-- When in View only mode -->
+                        <tr class="slds-hint-parent" key={vehicle.id} >
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped" style="text-align:center !important">
+                                <div class="slds-line-clamp" title="">
+                                    {vehicle.make.selectedValue}
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped" style="text-align:center !important">
+                                <div class="slds-line-clamp" title="">
+                                    {vehicle.model.selectedValue}
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped" style="text-align:center !important">
+                                <span>
+                                    {vehicle.formattedYear}
+                                </span>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped" style="text-align:center !important">
+                                <template for:each={vehicle.modelCode.options} for:item="option">
+                                    <span key={option.value}>
+                                        <template if:true={option.isSelected} >
+                                            {option.value};
+                                        </template>
+                                    </span>
+                                </template>
+                            </td>
+                            <!--
+                            <td style="text-align:center !important">
+                                <template if:true={hasMultiRows}>
+                                    <lightning-button-icon-stateful
+                                            icon-name="utility:clear"
+                                            variant="bare"
+                                            data-id={vehicle.id}
+                                            onclick={handleVehicleDelete}
+                                            alternative-text="Remove Vehicle">
+                                    </lightning-button-icon-stateful>
+                                </template>
+                                <template if:false={hasMultiRows}>
+                                    <lightning-button-icon-stateful
+                                            icon-name="utility:clear"
+                                            variant="bare"
+                                            data-id={vehicle.id}
+                                            disabled="true"
+                                            alternative-text="Remove Vehicle">
+                                    </lightning-button-icon-stateful>
+                                </template>
+                                <template if:false= {vehicle.needReview}>
+                                    <lightning-button-icon-stateful
+                                        icon-name="utility:edit"
+                                        variant="bare"
+                                        data-id={vehicle.id}
+                                        onclick={handleVehicleEdit}
+                                        alternative-text="Edit Vehicle">
+                                    </lightning-button-icon-stateful>
+                                </template>
+                                <template if:true= {vehicle.needReview}>
+                                    <lightning-button-icon-stateful
+                                            icon-name="utility:edit"
+                                            variant="bare"
+                                            data-id={vehicle.id}
+                                            disabled="true"
+                                            alternative-text={label.INFO_BAD_DATA_LABEL}>
+                                    </lightning-button-icon-stateful>
+                                </template>
+                                <lightning-button-icon-stateful
+                                        icon-name="utility:right"
+                                        variant="bare"
+                                        data-id={vehicle.id}
+                                        value={vehicle.id}
+                                        onclick={viewRecord}
+                                        alternative-text="View record">
+                                </lightning-button-icon-stateful>
+                            </td>
+                            -->
+                        </tr>
+                    </template>
+                </tbody>
+              </table>
+        </div>
+
+        <c-confirmation-dialog title=''
+                           message='Are you sure you want to delete?'
+                           confirm-label='Yes'
+                           cancel-label='No'
+                           visible={isConfDialogVisible}
+                           original-message=""
+                           name="confirmModal"
+                           onclick={handleConfirmationClick}>
+        </c-confirmation-dialog>
+    </lightning-card>
+</template>

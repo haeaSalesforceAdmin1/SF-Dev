@@ -1,0 +1,271 @@
+<template>
+    
+    <template if:true={showSpinner}>
+        <div class="modalSpinner">
+            <lightning-spinner alternative-text="Loading" size="medium" variant="brand"></lightning-spinner>
+        </div>
+    </template>
+    
+    <div style="overflow: scroll;">
+        <header class="slds-modal__header" >
+            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">KPI Selector</h2>
+        </header>
+
+        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+           <!-- <div class="slds-box" -->
+                <div class="slds-grid slds-p-bottom_small">
+                    <div class="slds-col slds-size_1-of-1 ">
+                        <div class="slds-text-heading_medium" style="font-weight: bold; ">Mandatory KPIs</div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                        <thead>
+                            <tr>
+                                <th><div class="slds-align_absolute-center">Include in PDF Export</div></th>
+                                <th><div class="slds-align_absolute-center">Action Plan Review Required</div></th>
+                                <th><div class="slds-align_absolute-center">KPI Name</div></th>
+                                <th><div class="slds-align_absolute-center">Current Value</div></th>
+                                <th><div class="slds-align_absolute-center">Threshold</div></th>
+                                <th><div class="slds-align_absolute-center">Compliance</div></th>
+                                <th><div class="slds-align_absolute-center">District Value</div></th>
+                                <th><div class="slds-align_absolute-center">Region Value</div></th>
+                               
+                            </tr>
+                        </thead>
+                        <template for:each={mandatoryKPIs} for:item="mandatoryKPI" for:index="mandatoryIndex">
+                            <tr key={mandatoryKPI.Id} class="slds-var-m-around_medium">
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-input data-name={mandatoryKPI.includeInPDFName} type="checkbox" checked={mandatoryKPI.includeinexport} disabled={mandatoryKPI.checkboxeslocked} onchange={handleIncludeInPDFMandatoryChanged}></lightning-input>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:true={mandatoryKPI.actionPlanURL}>
+                                            <a href={mandatoryKPI.actionPlanURL} target="_blank">View</a>
+                                        </template>
+                                        <template if:false={mandatoryKPI.actionPlanURL}>
+                                            <lightning-input data-name={mandatoryKPI.createActionPlanName} type="checkbox" checked={mandatoryKPI.actionplanreview} onchange={handleActionPlanRequiredMandatoryChanged} disabled={mandatoryKPI.checkboxeslocked}></lightning-input>
+                                        </template>    
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-formatted-text value={mandatoryKPI.kpiname}></lightning-formatted-text>   
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:false={mandatoryKPI.missingDetail}>
+                                            <lightning-formatted-text value={mandatoryKPI.keyvalue}></lightning-formatted-text>
+                                        </template>
+        
+                                        <template if:true={mandatoryKPI.missingDetail}>
+                                            <div >No Data Available for this KPI</div>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-formatted-text value={mandatoryKPI.thresholdvalue}></lightning-formatted-text>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:true={mandatoryKPI.thresholdvalue}>
+                                            <template if:true={mandatoryKPI.iconfilepath}>
+                                                <img src={mandatoryKPI.iconfilepath} alt="green" border="0"/>
+                                            </template>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center ">
+                                        <div class={mandatoryKPI.districtKeyValueColor}>
+                                        <lightning-formatted-text value={mandatoryKPI.districtkeyvalue}></lightning-formatted-text>
+                                    </div></div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center mandatoryKPI.regionKeyValueColor">
+                                        <div class={mandatoryKPI.regionKeyValueColor}>
+                                        <lightning-formatted-text value={mandatoryKPI.regionkeyvalue}></lightning-formatted-text>
+                                    </div></div>
+                                </td>
+                                
+                            </tr>
+                        </template>
+
+                    </table>
+                </div>
+
+
+                <div class="slds-grid slds-p-bottom_small slds-p-top_large">
+                    <div class="slds-col slds-size_1-of-1 ">
+                        <div class="slds-text-heading_medium" style="font-weight: bold; ">Optional KPIs</div>
+                    </div>
+                </div>
+
+                <div class="slds-grid">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                        <thead>
+                            <tr>
+                                <th><div class="slds-align_absolute-center">Include in PDF Export</div></th>
+                                <th><div class="slds-align_absolute-center">Action Plan Review Required</div></th>
+                                <th><div class="slds-align_absolute-center">KPI Name</div></th>
+                                <th><div class="slds-align_absolute-center">Current Value</div></th>
+                                <th><div class="slds-align_absolute-center">Threshold</div></th>
+                                <th><div class="slds-align_absolute-center">Compliance</div></th>
+                                <th><div class="slds-align_absolute-center">District Value</div></th>
+                                <th><div class="slds-align_absolute-center">Region Value</div></th>
+                               
+                            </tr>
+                        </thead>
+                        <template for:each={optionalKPIs} for:item="optionalKPI" for:index="optionalIndex">
+                            <tr key={optionalKPI.Id} class="slds-var-m-around_medium">
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-input data-name={optionalKPI.includeInPDFName} type="checkbox" checked={optionalKPI.includeinexport} disabled={optionalKPI.checkboxeslocked} onchange={handleIncludeInPDFOptionalChanged}></lightning-input>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:true={optionalKPI.actionPlanURL}>
+                                            <a href={optionalKPI.actionPlanURL} target="_blank">View</a>
+                                        </template>
+                                        <template if:false={optionalKPI.actionPlanURL}>
+                                            <lightning-input data-name={optionalKPI.createActionPlanName} type="checkbox" checked={optionalKPI.actionplanreview} onchange={handleActionPlanRequiredOptionalChanged} disabled={optionalKPI.checkboxeslocked}></lightning-input>
+                                        </template>    
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-formatted-text value={optionalKPI.kpiname}></lightning-formatted-text>   
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:false={optionalKPI.missingDetail}>
+                                            <lightning-formatted-text value={optionalKPI.keyvalue}></lightning-formatted-text>
+                                        </template>
+        
+                                        <template if:true={optionalKPI.missingDetail}>
+                                            <div >No Data Available for this KPI</div> 
+                                        </template>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-formatted-text value={optionalKPI.thresholdvalue}></lightning-formatted-text>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="slds-align_absolute-center">
+                                        <template if:true={optionalKPI.thresholdvalue}>
+                                            <template if:true={optionalKPI.iconfilepath}>
+                                                <img src={optionalKPI.iconfilepath} alt="green" border="0"/>
+                                            </template>
+                                        </template>
+                                    </div>
+                                </td>
+                                <td class={optionalKPI.districtKeyValueColor}>
+                                    <div class="slds-align_absolute-center">
+                                        <lightning-formatted-text value={optionalKPI.districtkeyvalue} ></lightning-formatted-text>
+                                    </div>
+                                </td>
+                                <td class={optionalKPI.regionKeyValueColor}>
+                                    <div class="slds-align_absolute-center ">
+                                        <lightning-formatted-text value={optionalKPI.regionkeyvalue}></lightning-formatted-text>
+                                    </div>
+                                </td>
+                                
+                            </tr>
+                        </template>
+
+                    </table>
+                </div>
+
+
+                <!--<div class="slds-grid slds-p-top_medium slds-p-bottom_small">
+                    <div class="slds-col slds-size_1-of-1 ">
+                        <div class="slds-text-heading_medium" style="font-weight: bold;">Optional KPIs</div>
+                    </div>
+                </div>
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">Include in PDF Export</div>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">Action Plan Review Required</div>
+                    </div>
+                    <div class="slds-col slds-size_3-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">KPI Name</div>
+                    </div>
+                    <div class="slds-col slds-size_3-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">Current Value</div>
+                    </div>
+                    <div class="slds-col slds-size_2-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">Threshold</div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                        <div class="slds-text-heading_small" style="font-weight: bold; text-align: center;">Compliance</div>
+                    </div>
+                </div>-->
+
+                <!--<template if:true={optionalKPIs}>
+                    <div style="overflow-y: scroll;">
+                        <template for:each={optionalKPIs} for:item="optionalKPI" for:index="optionalIndex">
+                            <div class="slds-grid slds-p-top_small slds-p-bottom_small" key={optionalKPI.id}>
+
+                                <div class="slds-col slds-size_1-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                    <lightning-input data-name={optionalKPI.includeInPDFName} type="checkbox" checked={optionalKPI.includeinexport} onchange={handleIncludeInPDFOptionalChanged} disabled={optionalKPI.checkboxeslocked}></lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_2-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                    <template if:true={optionalKPI.actionPlanURL}>
+                                        <a href={optionalKPI.actionPlanURL} target="_blank">View</a>
+                                    </template>
+                                    <template if:false={optionalKPI.actionPlanURL}>
+                                        <lightning-input data-name={optionalKPI.createActionPlanName} type="checkbox" checked={optionalKPI.actionplanreview} onchange={handleActionPlanRequiredOptionalChanged} disabled={optionalKPI.checkboxeslocked}></lightning-input>
+                                    </template>
+                                </div>
+                                <div class="slds-col slds-size_3-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                    <lightning-formatted-text value={optionalKPI.kpiname}></lightning-formatted-text>
+                                </div>
+                                <template if:false={optionalKPI.missingDetail}>
+                                    <div class="slds-col slds-size_3-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                        <lightning-formatted-text value={optionalKPI.keyvalue}></lightning-formatted-text>
+                                    </div>
+                                    <div class="slds-col slds-size_2-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                        <lightning-formatted-text value={optionalKPI.thresholdvalue}></lightning-formatted-text>
+                                    </div>
+                                    <div class="slds-col slds-size_1-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center">
+                                        <template if:true={optionalKPI.thresholdvalue}>
+                                            <template if:true={optionalKPI.iconfilepath}>
+                                                <img src={optionalKPI.iconfilepath} alt="green" border="0"/>
+                                            </template>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template if:true={optionalKPI.missingDetail}>
+                                    <div class="slds-col slds-size_6-of-12 slds-p-left_small slds-p-right_small slds-align_absolute-center" style="text-align: center;  border: 0px; border-color:rgb(221, 219, 218); border-radius: 6px;">
+                                        <div >No Data Available for this KPI</div>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </template>-->
+
+           <!-- </div> -->
+        </div>
+
+        <footer class="slds-modal__footer" >
+            <button class="slds-button slds-button_neutral" onclick={handleCancel}>Cancel</button>
+            <button class="slds-button slds-button_brand" onclick={handleSaveKPIs}>
+                Save
+            </button>
+        </footer>
+
+    </div>
+</template>

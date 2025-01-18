@@ -1,0 +1,143 @@
+<!--
+  @description       : 
+  @author            : san,kang
+  @group             : 
+  @last modified on  : 11-20-2024
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<template>
+    <lightning-quick-action-panel header="Change Owner" onclick={onClickOutside} class="panel">
+      <div class="slds-m-around_large">
+         <div if:true={isLoaded} class="slds-is-relative">
+            <lightning-spinner
+                alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+      </div>
+      <div class="slds-modal__content slds-p-around_medium" style="height: 300px;" >
+        <div class="slds-form-element" >
+            <div style="text-align: right;">
+                <span style="nav-right:auto; color: red;">*</span> <span> = Required Information</span>
+            </div>
+            <div>
+                <span style="color: red;">*</span> <span>Select New Owner</span>
+            </div>
+            <template if:true={settingUser}>
+            
+                <div class="slds-form-element__control slds-combobox-group">
+
+                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                        <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" id="stacked-combobox-id-01" aria-autocomplete="list" aria-controls="stacked-listbox-id-01" aria-expanded="false" aria-haspopup="listbox"
+                                role="combobox" value={settingUserName} readonly/>
+                        <button class="slds-button slds-button_icon slds-input__icon slds-input__icon_right " title="Clear the text input" onclick ={settingClear}>
+                        <lightning-icon size="x-small" class="slds-button__icon" icon-name="utility:clear">
+                        </lightning-icon>
+                        </button>
+                    </div>
+                </div>
+            </template>
+ 
+        <template if:false={settingUser}>
+
+        <div class="slds-form-element__control slds-combobox-group">
+            
+            <div class="slds-combobox_object-switcher slds-combobox-addon_start" >
+              <div class="slds-combobox_container" onclick ={onDropDown}>
+                <div class="slds-no-flex">
+                  <lightning-combobox
+                    name="combobox-id-24-selected-value"
+                    value={selectUserType}
+                    options={userTypeList}                             
+                    onchange={onUserType}
+                    placeholder={selectUserType}
+                    variant="label-hidden"
+                    class="slds-combobox"
+                   
+                  ></lightning-combobox>
+                </div>
+              </div>
+            </div>
+            <div class="slds-combobox_container slds-combobox-addon_end">
+              <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open" onblur={handleBlur} id="primary-combobox-id-2">
+                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                  <input type="text" class="slds-input slds-combobox__input slds-combobox__input-value" id="combobox-id-27" aria-activedescendant="option0" aria-autocomplete="list" aria-controls="listbox-id-4" aria-expanded="true" aria-haspopup="listbox"
+                    autocomplete="off" role="combobox" placeholder={onPlaceholder} value={userInputName} onkeyup={onUserNamePress} onclick ={onUserNameClick}  />
+                  <span class="slds-icon_container slds-icon-utility-search slds-input__icon slds-input__icon_right">
+                    <lightning-icon size="x-small" class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" icon-name="utility:search"></lightning-icon>
+                  </span>
+                </div>
+  
+                <template if:true={focusDropDown}>
+                  <div id="listbox-id-4" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox" tabindex="0" aria-busy="false">
+                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                      <template if:true={searchBoxPress}>
+  
+                        <li role="presentation" class="slds-listbox__item">
+                          <div aria-selected="true" id="option0" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_term slds-has-focus" role="option">
+                            <span class="slds-icon_container slds-icon-utility-search" title="Search for term: ">
+                              <lightning-icon size="x-small" class="slds-icon slds-input__icon slds-input__icon_right slds-icon-text-default" icon-name="utility:search"></lightning-icon>
+                            </span>
+                            <span class="slds-media__body">
+                              <span class="slds-listbox__option-text slds-listbox__option-text_entity">" {userInputName} " in Users</span>
+                            </span>
+                          </div>
+                        </li>
+                      </template>
+                    <template for:each={searchResults} for:item="item" for:index="index">
+  
+                      <li role="presentation" class="slds-listbox__item" key={item.Id} data-id={item.Id} onclick ={selectUserClick}>
+                        <div id="option759" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                          <span class="slds-media__figure slds-listbox__option-icon">
+                            <span class="slds-icon_container slds-icon-standard-avatar">
+                              <lightning-icon size="x-medium" class="slds-icput__slds-m-center_medium" icon-name="standard:avatar"></lightning-icon>
+                              </span>
+                          </span>
+                          <span class="slds-media__body">
+                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">
+                              <span>
+                                {item.Name}</span>
+                              </span>
+                              <span class="slds-listbox__option-meta son slds-inlds-listbox__option-meta_entity" data-email="">{item.Email}</span>
+                            </span>
+                          </div>
+                        </li>
+  
+                      </template>
+                      </ul>
+                  </div>
+              </template>
+            </div>
+
+            </div>
+          </div>
+        </template>
+        <lightning-input style=" margin-top: 24px;"
+        label="Send notification email"
+        class="slds-p-left_none_xx-large"
+        type="checkbox"
+        checked={checkboxVal}
+        onchange={changeCheckbox}
+        ></lightning-input>
+        </div>
+        <div class="slds-m-top_large">
+
+            <p>
+                <strong>The new owner</strong> will also become the owner of these records related to <strong>{caseNumber}</strong> that are owned by <strong>{currentOwner}</strong>.
+            </p>
+            </div>
+            <div class="slds-m-top_large">
+                <div class="slds-m-top_large">
+
+                    <span style="font-size: 8px;">○</span><span>    &nbsp;Notes and attachments</span>
+                </div>
+                <div class="slds-m-top_medium">
+                    <span style="font-size: 8px;">○</span><span>     &nbsp;Open activities</span>
+                </div>
+            </div>
+      </div>
+      <div slot="footer">
+        <lightning-button variant="neutral" label="Cancel" onclick={onCancel}></lightning-button>
+        <lightning-button variant="brand" label="Submit" onclick={onSave} class="slds-m-left_x-small" disabled={isButtonDisabled}></lightning-button>
+      </div>
+    </lightning-quick-action-panel>
+  </template>

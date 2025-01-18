@@ -1,0 +1,59 @@
+<aura:component implements="lightning:availableForFlowScreens,lightning:isUrlAddressable" controller="FilePreviewController">
+    <aura:attribute name="fileId" type="String"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="allowDelete" type="boolean"/>
+    <aura:attribute name="temporaryDelete" type="boolean" default="true"/>
+
+    <aura:registerEvent name="fileDeletedEvent" type="c:FileDeletedEvent"/>
+
+    <aura:attribute name="title"  type="string" description="Title of the popup"  />
+	<aura:attribute name="cancelLabel"  type="string" default="" description="Label for cancel button"  />
+	<aura:attribute name="confirmLabel"  type="string" default="Okay" description="Label for OK button"  />
+	<aura:attribute name="isHidden" type="Boolean" default="true" description="Flag used to toggle popup"  />
+	<aura:registerEvent name="onSaveClick" type="c:FilePreviewEvent"/>
+	<aura:registerEvent name="onCancelClick" type="c:FilePreviewEvent"/>
+	<aura:method name="changeVisibility" action="{!c.changeVisibility}" description="show/hide this component">
+		<aura:attribute name="isShow" type="Boolean" default="false" />
+	</aura:method>
+
+	<div>
+		<div aria-hidden="{!v.isHidden}" role="dialog"
+			class="{!v.isHidden ? 'slds-modal slds-modal__close slds-fade-in-close' : 'slds-modal slds-modal__open slds-fade-in-open'}">
+	        <div class="slds-modal__container">
+	            <div class="slds-modal__header">
+	           		<h2 class="slds-text-heading--medium">
+                        View Approved Action Plan
+	           		</h2>
+	                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.defaultCloseAction}">
+	                   <!-- <c:svg svgPath="/resource/SLDS214/assets/icons/utility-sprite/svg/symbols.svg#close" category="standard" size="large" name="close" /> -->
+	                    X
+	                </button>
+	            </div>
+
+                <div class="slds-modal__content slds-p-around--medium">Please click PDF icon to see or download Action Plan.</div>
+				<div class="slds-modal__content slds-p-around--medium">
+					 <aura:if isTrue="{!v.temporaryDelete}">
+                        <aura:if isTrue="{!v.allowDelete}">
+                            <lightning:buttonIcon iconName="utility:delete" 
+                                                variant="brand" 
+                                                alternativeText="Delete File" 
+                                                value="{!!v.fileId}" 
+                                                onclick="{!c.deleteFile}"/>
+                        </aura:if>
+                        <aura:html tag="div" HTMLAttributes="{ 'class': 'largeFileCard' }">
+                            <lightning:fileCard fileId="{!v.fileId}" hideDescription="true"/>
+                        </aura:html>
+                    </aura:if>
+				</div>
+
+	           <div class="slds-modal__footer">
+	           	    <aura:if isTrue="{! !empty(v.cancelLabel)}">
+	               		<button class="slds-button slds-button--neutral" onclick="{!c.fireCancelEvent}">{!v.cancelLabel}</button>
+               		</aura:if>	
+	               
+	           </div>
+	       </div>
+	   </div>
+	   <div class="{!v.isHidden ? 'slds-backdrop slds-backdrop--close' : 'slds-backdrop slds-backdrop--open'}" aura:id="backdrop" ></div>
+    </div>
+</aura:component>

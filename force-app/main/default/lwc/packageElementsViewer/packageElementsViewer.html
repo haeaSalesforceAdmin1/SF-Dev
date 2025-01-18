@@ -1,0 +1,78 @@
+<!--
+ - Created by baltamimi on 2022-02-13.
+ -->
+
+<!-- Package Elements Viewer -->
+<template>
+    <article class="slds-card slds-card_boundary">
+
+        <div class="slds-page-header slds-page-header_related-list">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate"
+                                              title="Package Elements">Package Elements</span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+                <!-- Add Document Button -->    
+                <template if:true={showOnload}>    
+                    <lightning-button variant="brand" label="Add Document"
+                                      onclick={openFlow}>Add Document
+                    </lightning-button>
+                </template>
+            </div>
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-meta">
+                    <p class="slds-page-header__meta-text">
+                        <span style="font-weight: 500">{packageElements.length}</span> Items • Sorted by <span style="font-weight: 500">{sortByLabel}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div if:true={showSpinner}>
+            <lightning-spinner
+                alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+        <template if:true={isStepOwner}>
+            <div style="height: 400px;">
+                <c-custom-types
+                    key-field="Id"
+                    data={packageElements}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    show-row-number-column="true"
+                    onsave={handleSave}
+                    draft-values={draftValues}
+                    sorted-direction={sortDirection}
+                    sorted-by={sortBy}
+                    onsort={handleSort}>
+                </c-custom-types>
+            </div>
+        </template>
+
+        <template if:false={isStepOwner}>
+            <div style="height: 400px;">
+                <c-custom-types
+                    key-field="Id"
+                    data={packageElements}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    show-row-number-column="true"
+                    sorted-direction={sortDirection}
+                    sorted-by={sortBy}
+                    onsort={handleSort}>
+                </c-custom-types>
+            </div>
+        </template>
+
+    </article>
+</template>

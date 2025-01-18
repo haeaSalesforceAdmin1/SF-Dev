@@ -1,0 +1,9 @@
+.THIS {
+}
+
+.THIS .attach-to-bottom{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+}

@@ -1,0 +1,66 @@
+<!--
+  @description       : 
+  @author            : San,Kang
+  @group             : 
+  @last modified on  : 06-28-2023
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
+<aura:component access="global" controller="SurveyQuestionController" implements="flexipage:availableForAllPageTypes,lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="evaluationAccountContacts" type="List" default="[]"/>
+    <aura:attribute name="primaryContact" type="String" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="showSpinner" type="Boolean" default="false"/>
+    <aura:attribute name="clickIcon" type="Boolean" default="true"/>
+    <aura:attribute name="showPrimaryContact" type="Boolean" default="false"/> <!--DPM-5399 changed from 'nullPrimayContact' to ' RegionApproved' to check whether approval status is region approved instead of primary contact by Minhee - 24.03.07-->
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:if isTrue="{!v.showPrimaryContact}">
+        <div class="test-id__section slds-section slds-m-vertical_none has-header slds-is-open slds-p-bottom_medium">
+            <button class="test-id__section-header-button slds-section__title-action slds-button" onclick="{!c.headerClick}">
+                
+                <span class="test-id__section-header-icon slds-icon_container slds-m-right_x-small">
+                    <aura:if isTrue="{!v.clickIcon}">
+                    
+                        <lightning:icon
+                        slot="chevronright"
+                        iconName="utility:chevrondown"
+                        size="x-small"
+                        ></lightning:icon>
+                        <aura:set attribute="else">
+                        <lightning:icon
+                        slot="chevronright"
+                        iconName="utility:chevronright"
+                        size="x-small"
+                        ></lightning:icon>     
+                    </aura:set>   
+                    </aura:if>
+                </span>
+            <span class="test-id__section-header-title">Primary Contact</span>
+            </button>
+        </div>
+        <aura:if isTrue="{!v.clickIcon}">
+
+        
+            <div class="slds-p-bottom_medium">
+                <aura:if isTrue="{!v.showSpinner}">
+                    <div class="centerspinner">
+                        <lightning:spinner alternativeText="LoadingSurvey" size="large" />
+                    </div>
+                </aura:if>
+                <div class="slds-box">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col">
+                            <lightning:combobox options="{!v.evaluationAccountContacts}" value="{!v.primaryContact}" label="Primary Contact"></lightning:combobox>
+                            <div class="slds-grid slds-p-top_small">
+                            </div>
+                            
+                            <div class="slds-grid slds-p-top_medium">
+                                <lightning:button label="Save" onclick="{!c.handleSaveEvaluationDetailsClick}"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aura:if>
+    </aura:if>
+</aura:component>

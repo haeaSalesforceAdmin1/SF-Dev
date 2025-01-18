@@ -1,0 +1,23 @@
+.dummy{
+	color : black;
+}
+.titleHeading{
+	border-bottom: 1px solid rgb(212, 212, 212);
+	padding-bottom: 7px;
+	margin-top: -15px;
+}
+.attachmentTitle{
+	padding-bottom: 8px;
+    text-transform: uppercase;
+    color: #2574A9;
+    border-bottom: 2px solid #2574A9;
+    font-size: 14px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+.wrapper{
+    padding-left:32px;
+    background: #fff;
+    margin-top: -25px;
+    padding-bottom: 25px;
+}

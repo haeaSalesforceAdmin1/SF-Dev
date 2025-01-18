@@ -1,0 +1,8 @@
+.border-container {
+    border: 1px solid #d8dde6;
+    /* Light gray border color */
+    border-radius: 5px;
+    /* Optional: Rounded corners */
+    padding: 1rem;
+    /* Optional: Padding inside the border */
+}

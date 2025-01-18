@@ -1,0 +1,146 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 01-11-2024
+  @last modified by  : inhokim
+-->
+<template>
+	<template if:false={isMobileView}>
+		<div class="custom-table gms-tbl">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout">
+				<thead>
+					<tr class="slds-line-height_reset th_span_fix">
+						<th class="" scope="col">
+							<div class="slds-truncate message-text_bold message-text_size">
+								<lightning-input data-id="All" type="checkbox" onchange={handleCheckboxChange}>
+								</lightning-input>
+							</div>
+						</th>
+
+						<template for:each={fields} for:item="field" for:index="index">
+							<th key={field.label} class="" scope="col">
+								<div data-id={field.apiName} class="slds-truncate message-text_bold message-text_size" title={field.label}
+									onclick={handleSort}>
+									{field.label}
+									<template if:true={field.isSorted}>
+										<template if:true={field.isASC}>
+											<lightning-icon icon-name="utility:arrowup" size="xx-small"
+												class="slds-p-left_xx-small"></lightning-icon>
+										</template>
+										<template if:false={field.isASC}>
+											<lightning-icon icon-name="utility:arrowdown" size="xx-small"
+												class="slds-p-left_xx-small"></lightning-icon>
+										</template>
+									</template>
+								</div>
+							</th>
+						</template>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={data} for:item="inv" for:index="index">
+						<tr key={inv.Id} >
+							<td class="checkbox-bg-color">
+								<div class="slds-truncate">
+									<lightning-input data-id={inv.Id} type="checkbox" checked={inv.selected}
+										onchange={handleCheckboxChange}>
+									</lightning-input>
+								</div>
+							</td>
+							<template for:each={inv.fields} for:item="field" for:index="index1">
+								<template if:true={field.showLink}>
+									<td key={field.value} class={inv.rowClass}>
+										<div class="slds-truncate" title={field.value}>
+											<a data-id={inv.Id} onclick={handleInventoryClick}
+												class="slds-m-right_x-small message-text_bold">{field.value}</a>
+										</div>
+									</td>
+								</template>
+								<template if:false={field.showLink}>
+									<td key={field.value} class={inv.rowClass}>
+										<div class="slds-truncate" title={field.value}>{field.value}</div>
+									</td>
+								</template>
+							</template>
+						</tr>
+					</template>
+
+					<template if:true={isNoInventoryFound}>
+						<tr class="slds-hint-parent">
+							<td data-label="No records to display!" colspan={tableColSpanWhenNoInvFound}>
+								<div class="slds-truncate slds-align_absolute-center ">{noRecordsFoundMessage}</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+
+		<template if:true={showCurrentPage}>
+			<div class="slds-grid slds-wrap">
+				<div class="slds-size_1-of-2 slds-p-top_x-small">
+					<b>{currentPage}</b>
+				</div>
+				<div class="slds-size_1-of-2">
+					<lightning-button label=">" name="next" variant="base"
+						class="slds-float_right slds-m-left_small arrow-btn" onclick={handlePrevNext}
+						disabled={disableNext}>
+					</lightning-button>
+					<div class="slds-float_right slds-p-top_xx-small tbl-pg">
+						<template for:each={pages} for:item="page" for:index="index">
+							<span key={page.no} data-id={page.no} class={page.class} style="cursor: pointer;"
+								onclick={handlePageClick}>{page.no}</span>
+						</template>
+					</div>
+					<lightning-button label="<" name="prev" variant="base" class="slds-float_right arrow-btn"
+						onclick={handlePrevNext} disabled={disablePrev}>
+					</lightning-button>
+				</div>
+			</div>
+		</template>
+	</template>
+
+	<template if:true={isMobileView}>
+		<template for:each={invList} for:item="inv" for:index="index">
+			<h3 key={inv.Id} class="slds-section__title slds-m-top_xx-small">
+				<button name={inv.Id} class="slds-section__title-action slds-button accord-bg-color invt-accordion-btn"
+					type="button" onclick={handleVINClick}>
+					<span class="slds-truncate slds-grid">
+						<lightning-input data-id={inv.Id} type="checkbox" label="VIN" checked={inv.selected}
+							onchange={handleCheckboxChange}>
+						</lightning-input>
+					</span>
+					<span class="slds-truncate inv-slds-truncate slds-align_absolute-center">
+						{inv.Name}
+					</span>
+					<span class="slds-icon_container acc-icon-position">
+						<template if:false={inv.showDetails}>
+							<lightning-icon icon-name="utility:chevronright" size="x-small"></lightning-icon>
+						</template>
+						<template if:true={inv.showDetails}>
+							<lightning-icon icon-name="utility:chevrondown" size="x-small"></lightning-icon>
+						</template>
+					</span>
+				</button>
+			</h3>
+
+			<template if:true={inv.showDetails}>
+				<div key={inv.Id} class="slds-m-around_x-small">
+					<table>
+						<template for:each={inv.fields} for:item="field" for:index="index1">
+							<tr key={field.label}>
+								<td class="td-width tbl-head">{field.label}</td>
+								<td class="td-width tbl-data"><b>{field.value}</b></td>
+							</tr>
+						</template>
+					</table>
+				</div>
+			</template>
+		</template>
+
+		<template if:true={isNoInventoryFound}>
+			<div class="slds-truncate slds-align_absolute-center ">{noRecordsFoundMessage}</div>
+		</template>
+	</template>
+</template>

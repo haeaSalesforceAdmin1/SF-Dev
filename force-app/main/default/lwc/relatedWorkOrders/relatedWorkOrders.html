@@ -1,0 +1,51 @@
+<template>
+    <!-- Table -->
+    <lightning-card title="STIL LR Information">
+        <template if:true={showSpinner}>
+            <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+        </template>
+        <div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped" aria-label=" Example headless table of Opportunities with cell content wrapped ">
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                      <div class="slds-truncate" title="Typical Column Header">STIL LR Number</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Wrapped, line clamped">LR Phase</div>
+                      </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">LR Status</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <template for:each={workOrders} for:item="wo">
+                        <!-- When in View only mode -->
+                        <tr class="slds-hint-parent" key={wo.Id}>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <div class="slds-line-clamp" title="">
+                                    <a onclick={handleNavigate} data-value={wo.Id} href="javascript:void(0)">{wo.Lab_Request_Number__c}</a>
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <div class="slds-line-clamp" title="">
+                                    {wo.Phase__c}
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {wo.Status}
+                                </span>
+                            </td>
+
+                        </tr>
+                    </template>
+                </tbody>
+              </table>
+        </div>
+
+    </lightning-card>
+</template>

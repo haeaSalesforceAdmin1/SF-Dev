@@ -1,0 +1,124 @@
+<template>
+
+	<template if:true={showSpinner}>
+		<lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+			size="medium">
+		</lightning-spinner>
+	</template>
+
+	<div class="slds-p-bottom_small slds-grid slds-wrap custom-slds-wrap">
+		<div class="slds-size_1-of-2">
+			<span class="HMA-heading">{headerTitle}</span><span class="inventory-subtitle"> {headerDescription}</span>
+		</div>
+		<div class="slds-size_1-of-2 custom-top-btn">
+			<template if:false={isMobileView}>
+				<template if:true={showCarfax}>
+					<div class="carfax-custom">
+						<lightning-button label="CARFAX" title="CARFAX" onclick={handlCarfaxClick}
+							disabled={disableCarfax} class="slds-float_left xs-btn xs-btn-ico">
+						</lightning-button>
+
+						<div class="tool-tip-carfax-cc">
+							<template if:true={showCarfaxToolTip}>
+								<div class="tool-tip-carfax">
+									CARFAX report is not available when multiple VINs are selected.
+									<div class="arrow"></div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</template>
+				<template if:true={showWindowSticker}>
+					<div class="carfax-custom window-ticker-tlp">
+						<lightning-button label="Window Sticker" title="Window Sticker" type="submit"
+							onclick={handleWindowStickerClick} disabled={disableWindowSticker}
+							class="slds-float_left xs-btn xs-btn-ico xs-btn-ico-crdr">
+						</lightning-button>
+						<div class="tool-tip-carfax-cc">
+							<template if:true={showWindowStickerToolTip}>
+								<div class="tool-tip-carfax">
+									{windowStickerTooltip}
+									<div class="arrow"></div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</template>
+				<template if:true={showCreateRDR}>
+					<div class="carfax-custom create-rdr-tlp">
+						<lightning-button type="submit" label="Create RDR" title="Create RDR"
+							onclick={handleCreateRDRClick} disabled={disableCreateRDR}
+							class="slds-float_left xs-btn xs-btn-ico xs-btn-ico-crdr">
+						</lightning-button>
+						<div class="tool-tip-carfax-cc">
+							<template if:true={showCreateRDRToolTip}>
+								<div class="tool-tip-carfax">
+									{createRDRTooltip}
+									<div class="arrow"></div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</template>
+				<template if:true={showRemoveInventory}>
+					<div class="carfax-custom remove-invn-tlp">
+						<lightning-button type="submit" label="Remove Inventory" title="Remove Inventory"
+							onclick={handleRemoveInventoryClick} disabled={disableRemoveInventory}
+							class="slds-float_left xs-btn xs-btn-ico xs-btn-ico-crdr">
+						</lightning-button>
+						<div class="tool-tip-carfax-cc">
+							<template if:true={showRemoveInventoryToolTip}>
+								<div class="tool-tip-carfax">
+									{removeInventoryTooltip}
+									<div class="arrow"></div>
+								</div>
+							</template>
+						</div>
+					</div>
+				</template>
+				<template if:true={showInspectionChecklist}>
+				<div class="carfax-custom remove-invn-tlp">
+						<lightning-button type="submit" label="Inspection Checklist" title="Inspection Checklist"
+						onclick={handleInspectionChecklistClick} disabled={disableInspectionChecklist}
+							class="slds-float_left xs-btn xs-btn-ico xs-btn-ico-crdr">
+						</lightning-button>
+						<div class="tool-tip-carfax-cc">
+							<template if:true={showInspectionChecklistToolTip}>
+								<div class="tool-tip-carfax">
+									{inspectionChecklistTooltip}
+									<div class="arrow"></div>
+								</div>
+							</template>
+						</div>
+					
+					</div>
+				</template>
+				<div class="cust-download">
+					<img src={downloadImage} class="cust-ico-dwn">
+					<lightning-combobox name="downloadOption" variant="label-hidden" placeholder="Download"
+						value={selDownloadOption} class="slds-float_left xs-btn xs-btn-ico" options={downloadOptions}
+						onchange={handleChange} onblur={handleBlur}>
+					</lightning-combobox>
+				</div>
+			</template>
+
+			<template if:true={isMobileView}>
+				<lightning-icon icon-name="utility:download" alternative-text="Download!" title="Download" size="small"
+					class="xs-cust-icon xs-btn">
+				</lightning-icon>
+				<lightning-icon icon-name="utility:print" alternative-text="Print!" title="Print" size="small"
+					class="xs-cust-icon xs-btn">
+				</lightning-icon>
+			</template>
+		</div>
+	</div>
+
+	<template if:true={showTable}>
+		<div class="custom-table">
+			<c-hcuv_-inventory-table theme={theme} field-map={fieldMap} inventories={invList} search-term={searchTerm}
+				onselectedrows={handleSelectedRows}>
+			</c-hcuv_-inventory-table>
+		</div>
+	</template>
+
+</template>

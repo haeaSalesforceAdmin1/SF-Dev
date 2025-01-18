@@ -1,0 +1,3 @@
+<apex:page standardController="DRCDocument__c"  extensions="RedirectController" action="{!DRCHomeRedirect}" recordSetVar="Redirects">
+
+</apex:page>

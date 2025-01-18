@@ -1,0 +1,20 @@
+<template>
+    <lightning-card title="Related Contacts" icon-name="standard:work_capacity_usage">
+        <div class="slds-m-around_medium">
+            <template if:true={AccountContactRelation.data}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={AccountContactRelation.data}
+                    show-row-number-column
+                    hide-checkbox-column
+                    columns={columns}>
+                </lightning-datatable>
+            </template>
+            <template if:true={AccountContactRelation.error}>
+                {error}
+                
+                <!-- handle Apex error -->
+            </template>
+        </div>
+    </lightning-card>    
+</template>

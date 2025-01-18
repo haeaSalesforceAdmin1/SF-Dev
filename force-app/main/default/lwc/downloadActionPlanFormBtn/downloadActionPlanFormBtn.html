@@ -1,0 +1,15 @@
+<template>
+    <lightning-record-view-form record-id={recordId} object-api-name="Evaluation__c">
+        <lightning-messages></lightning-messages>
+        
+        <div if:true={isPending} class="button" style="margin-left: 83.2%;width: 220px;margin-bottom: -7%;">
+            <lightning-button class="button" label="Download Action Plan Form" onclick={handleButtonClick}></lightning-button>
+        </div>
+
+        <!-- <div if:true={isCompleted} class="button" style="margin-left: 80.2%;width: 200px;margin-bottom: -7%;">
+            <lightning-button class="button" label="View Approved Action Plan" onclick={handleViewButtonClick}></lightning-button>
+        </div> -->
+    </lightning-record-view-form>
+
+
+</template>

@@ -1,0 +1,270 @@
+/*****************************************************************************
+            |          |           |                                            
+@Author     |  @Date   | @TicketNo | @ChangeDesc                               
+------------------------------------------------------------------------------
+inhoKim     | 24.01.23 |  CCSOM-6  | [Modify HCUV Main Page LWC Components' CSS to Align Height in Every Screen Size]
+            |          |           | changed .container.custom-slider height  .slds-show 's margin top     
+------------------------------------------------------------------------------
+inhoKim     | 24.03.20 |  CCSOM-43 | [[SF] HCUV Landing Page image not fitting correctly inside widget]
+            |          |           | changed  .lbl-border  .hma-msg-wrap to fit bottomline 
+------------------------------------------------------------------------------
+inhoKim     | 24.04.09 |  CCSOM-47 | [[SF] GCPO Landing Page Shows Cropped Image]
+            |          |           | changed  .imageLink-CPO                                                   
+*****************************************************************************/
+.container{
+    max-width: 100%;
+    position: relative;
+    margin: auto;
+}
+
+.center {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    height: 250px;
+   
+}
+
+.container img{
+     width: 100%;  
+     object-fit:fill;
+     max-height: 100%;
+     /* transform: scale(0.8); */
+
+    width: auto !important;
+    height: 100% !important;
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    max-height: 100% !important;
+    display: block !important;
+    background: #f8fbff;
+}
+
+.text-section{
+    position:absolute;
+    color: #f2f2f2;
+    font-size: 15px;
+    bottom: 0px;
+    width:100%;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.7);
+}
+.prev,.next{
+    position: relative;
+    width: auto;
+    color: #0a070769;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 0 3px 3px 0;
+    padding-top: 7px;
+}
+.my-icon {
+    padding: 0.2rem;
+}
+.next{
+    background-color: white;
+    right:0;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    padding-top: 7px;
+    margin-left: 15px;
+}
+.prev
+{
+    background-color: white;
+    left:0;
+    height: 40px;
+    width: 40px;
+    text-align: center;
+    padding-top: 7px;
+    margin-right: 15px;
+}
+.round {
+    border-radius: 50%;
+    color:red;
+  }
+.prev:hover,.next:hover{
+    background: white
+}
+.slideNumbers{
+    font-size: 12px;
+    position: absolute;
+    padding: 8px 12px;
+    top: 0;
+    color: #f2f2f2;
+}
+.dotposition{
+    position: relative;
+    /* top: -43px; */
+    top: -50px;/*CCSOM-43*/
+}
+.dot{
+    height:12px;
+    width: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    background-color: #7b7777;
+    margin: 0 3px;
+    display: inline-block;
+}
+
+.active, .dot:hover{
+    background-color: #333333;
+}
+
+.carouselIcon{
+    opacity:0.5;
+}
+
+.carouselItemContainer{
+    width:100%;
+}
+
+.container.custom-slider{
+    height: 600px;
+    /* height: 35.3vw; */
+    /*CCSOM-6  503px > 508px for STAGE*/
+    /*CCSOM-43  503px > 592px > 650 > 600 for STAGE*/
+    /* margin-top:27px; */
+    /* background: #fff; CCSOM-43 */
+}
+
+/* .container.custom-slider .slds-show{
+    height:100%;
+}   [CCSOM-4] , inhokim  
+*/
+/* 
+.slds-is-relative.container {
+    margin: 34px 0;
+} 
+*/
+
+.slds-show{
+    /* width:100%; */
+    width:fit-content;
+    margin:auto;
+    margin-top: 27px;
+    height: 100%;
+    /* border:1px solid #ccc; CCSOM-43 */
+}
+.slds-show-CPO{
+    /* width:100%; */
+    width:100%;
+    margin:auto;
+    margin-top: 27px;
+    height: 100%;
+    /* border:1px solid #ccc; CCSOM-43 */
+}
+.slds-show-CUV{
+    /* width:100%; */
+    width:fit-content;
+    margin:auto;
+    margin-top: 27px;
+    height: 100%;
+    /* border:1px solid #ccc; CCSOM-43 */
+}
+.slds-show-HSU{
+    /* width:100%; */
+    width:fit-content;
+    margin:auto;
+    margin-top: 27px;
+    height: 100%;
+    /* border:1px solid #ccc; CCSOM-43 */
+}
+
+.imageLink{
+    /* width: 100%; */
+    width: 430px; /*CCSOM-43  464 > 430*/
+    /* height: 100%; */
+    height: 600px;/*CCSOM 43 648 > 600*/
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.imageLink-CUV{
+    /* width: 100%; */
+    width: 430px; /*CCSOM-43  464 > 430*/
+    /* height: 100%; */
+    height: 600px;/*CCSOM 43 648 > 600*/
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.imageLink-HSU{
+    /* width: 100%; */
+    width: 430px; /*CCSOM-43  464 > 430*/
+    /* height: 100%; */
+    height: 600px;/*CCSOM 43 648 > 600*/
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.imageLink-CPO{
+    
+     /*CCSOM-43*/
+    width: 100%;
+    
+    /*CCSOM 43*/
+    height: 100%;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position-y: center;/*CCSOM-47  new attribute */
+}
+
+.arrowSpan{
+    display: flex;
+    align-items: center;
+}
+
+.arrowSpan.left{
+    position: relative;
+    left:12%;
+}
+
+.arrowSpan.right{
+    position: relative;
+    right:-80%;
+}
+
+/* .custom-slider{
+    margin-top:24px;
+} */
+
+@media (max-width:1180px){
+    .container.custom-slider{
+        height:auto;
+    }
+}
+@media only screen and (max-width : 884px) {
+    .slds-show{
+        height: auto;
+        width: 100%;
+    }
+
+    .container img{
+        transform: scale(1);
+    }
+}
+.roundedBorder{
+    border-bottom-left-radius:4px;
+    border-bottom-right-radius:4px;
+    border-top-left-radius:4px;
+    border-top-right-radius:4px;
+    /* background-color: #fff; CCSOM-43 */
+}
+
+/*[CCSOM-4] , inhokim  421px , 240119 for 767 px  */
+@media screen and (max-width: 767px) {
+    .container.custom-slider{
+        display: none;
+    }
+    .dotposition{ /*added during CCSOM-43 QA 24.03.20 */
+        display: none;
+    }
+}

@@ -1,0 +1,45 @@
+<template>
+    
+    <template if:true={surveySections}>
+        <lightning-accordion class="survey-accordion"
+                            onsectiontoggle={handleToggleSection}>            
+            <template for:each={surveySectionQuestionsMapData} for:item="surveySectionMap" for:index="sectionIndex">
+                <lightning-accordion-section key={surveySectionMap.key} name={surveySectionMap.key} label={surveySectionMap.key}>
+                    <div class="slds-box">
+                        <template for:each={surveySectionMap.values} for:item="surveyQuestion" for:index="index">
+
+                                <div key={surveyQuestion.Id} class="slds-p-around_small">
+                                    
+                                <template if:true={surveyQuestion.questionNumber}>
+                                    <div class="slds-text-heading_medium" style="font-weight: bold;">Question {surveyQuestion.questionNumber}</div>
+                                </template>
+                                <div class="slds-p-top_small">
+                                    <lightning-formatted-rich-text value={surveyQuestion.question}></lightning-formatted-rich-text>
+                                </div>
+                                <div class="slds-p-top_small">
+                                    <template if:true={surveyQuestion.singleOptionSelection}>
+                                        <lightning-radio-group name={surveyQuestion.id}
+                                                            options={surveyQuestion.options}
+                                                            value={surveyQuestion.response}
+                                                            type="button"
+                                                            onchange={handleResponseValueChanged}>   
+                                        </lightning-radio-group>
+                                    </template>
+                                    <template if:true={surveyQuestion.multipleOptionSelection}>
+                                        <lightning-radio-group name={surveyQuestion.id}
+                                                            options={surveyQuestion.options}
+                                                            value={surveyQuestion.response}
+                                                            type="button"
+                                                            onchange={handleResponseValueChanged}>   
+                                        </lightning-radio-group>
+                                    </template>
+                                </div>
+
+                            </div>
+                        </template>
+                    </div>
+                </lightning-accordion-section>
+            </template>
+        </lightning-accordion>
+    </template>
+</template>

@@ -1,0 +1,35 @@
+<template>
+    <div class="search-container">
+            <p>
+                <lightning-formatted-rich-text value="Safety Case Number"></lightning-formatted-rich-text>
+            </p>
+
+
+            <lightning-input
+            label="Safety Case Number"
+            variant="label-hidden"
+            value={searchKey}
+            placeholder="Search by Case Number"
+            onchange={catchModalSearchKeyChange}
+        ></lightning-input>
+            <ul class="slds-listbox showStr_display slds-listbox_vertical"  lwc:ref="myDiv">
+                <!--  use ref to tartgeg -->
+                <!-- class - slds-dropdown removed  -->
+                <template for:each={recommendations} for:item="rec">               
+                
+                    <div key={rec.Id} class="li_div">
+                        <li 
+                        class="slds-listbox__item li_stil"
+                        onclick={handleSelect}
+                        data-id={rec.Id}
+                        style="display: flex;flex-direction: column;min-width: 0;overflow: hidden;max-height: none;padding: 0;"
+                        >
+                        {rec.SCSCaseNumber__c} / {rec.Stage__c} / {rec.Owner.Name} / {rec.ModelCode__c}
+                        </li> 
+                    </div>
+                </template>
+            </ul>
+    </div>
+
+
+</template>

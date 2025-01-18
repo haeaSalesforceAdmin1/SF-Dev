@@ -1,0 +1,26 @@
+<aura:component implements="flexipage:availableForRecordHome,lightning:availableForFlowScreens,force:hasRecordId"
+                controller = "UploadImageController">
+    <aura:attribute name="filetype" type="List" default="['.png', '.jpg', '.jpeg']" />
+    <aura:attribute name="multiple" type="Boolean" default="true" />
+    <aura:attribute name="disabled" type="Boolean" default="true" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="pictureSrc" type="String" default="https://s3-us-west-1.amazonaws.com/sfdc-demo/image-placeholder.png" />
+    <aura:attribute name="documentId" type="String" />
+
+    <aura:registerEvent name="documentUploadFinished" type="c:DocumentUploadFinished"/>
+    <aura:html tag="style">.toastMessage.forceActionsText{white-space : pre-line !important;}</aura:html>
+
+    <!--<lightning:fileUpload
+        name="fileUploader"
+        multiple="true"
+        accept="{!v.filetype}"
+        recordId="{!v.recordId}"
+        onuploadfinished="{!c.handleUploadFinished}"/>-->
+    <lightning:fileUpload
+        name="fileUploader"
+        multiple="true"
+        recordId="{!v.recordId}"
+        onuploadfinished="{!c.handleUploadFinished}"/>
+    <!--<img src="{!v.pictureSrc}" />-->
+    <!-- <lightning:fileCard fileId="{!v.documentId}"/> -->
+</aura:component>

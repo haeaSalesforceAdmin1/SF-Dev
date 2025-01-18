@@ -1,0 +1,1314 @@
+<apex:page renderas="PDF" contentType="application/pdf" applyBodyTag="false" standardStylesheets="false" showHeader="false" controller="COPPMergedPDFController" action="{!handleLoad}">
+    <apex:variable value="{!$CurrentPage.parameters.recordId}" var="recordId"/>
+    <apex:variable var="LetterDate" value="{!$CurrentPage.parameters.LetterDate}"/>
+    <apex:variable var="regionName" value="{!$CurrentPage.parameters.regionName}"/>
+    <apex:variable var="regionCode" value="{!$CurrentPage.parameters.regionCode}"/>
+    <apex:variable var="DealerPrincipalName" value="{!$CurrentPage.parameters.DealerPrincipalName}"/>
+    <apex:variable var="DealershipName" value="{!$CurrentPage.parameters.DealershipName}"/>
+    <apex:variable var="DealerShip_Address" value="{!$CurrentPage.parameters.DealerShip_Address}"/>
+    <apex:variable var="City_State_Zip_Code" value="{!$CurrentPage.parameters.City_State_Zip_Code}"/>
+    <apex:variable var="Email_Address" value="{!$CurrentPage.parameters.Email_Address}"/> 
+	<apex:variable var="ChoosedTemplate" value="{!$CurrentPage.parameters.ChoosedTemplate}"/>
+    <apex:variable var="Salutation" value="{!$CurrentPage.parameters.Salutation}"/> <!--DPM-5861 added salutation -->
+    <apex:variable value="{!$CurrentPage.parameters.CommentsValue}" var="CommentsValue" /> <!--DPM-5916 added comment -->
+
+<!--DPM-5701 COPP Project  -->
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                size: A4; 
+                @top-center {
+                    content: element(header);
+                }
+                margin: 10px;
+                background-color: {!IF(BrandCode == 'G', '#e6d5cc', 
+                                      IF(BrandCode == 'H', '#c8d4e4', 'white'))};
+                padding: 5px; 
+                height: 100vh; 
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+            
+
+            {
+                margin: 100px;
+                padding: 100px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            }
+
+            div.content {
+                padding-top: 5px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            	flex: 1;
+            	
+            	
+            }
+
+            div.footer {
+            	position: relative;
+            	padding: 10px;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+            	font-size: 8px;
+            	page-break-inside:avoid;
+                padding-top: 60px;
+            }
+            
+            .tracker-container {
+            	margin-top: 50px;
+            	min-height: 100vh; 
+    			display: flex;
+    			flex-direction: column; 
+                page-break-before: always;
+            }
+
+
+            .stationName {
+                text-align: center;
+                font-weight: bold;
+                font-size: 20pt;
+                margin-bottom: 30px;
+            }
+
+            .centered {
+                display: inline-block;
+                padding: 2%;
+            }
+
+            .centered {
+                text-align: center; 
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 20px;
+            }
+
+            .right {
+                text-align: right;
+            	padding: 10px;
+            }
+            
+            .left {
+                text-align: left;
+            }
+            
+            .header {
+                text-align: left;
+                padding: 10px;
+            	position: relative;
+            }
+            
+            .logo{
+                position: absolute;
+            	top: 10px;
+            	left:  {!IF(acc.BrandCode__c == 'G', '550px', 
+                                      IF(acc.BrandCode__c == 'H', '500px', '500px'))}; 
+            }
+
+            .sub-header {
+                background-color: #afd0ff;
+                text-align: left;
+                padding: 5px;
+                font-weight: bold;
+            }
+
+            .metric-header {
+                background-color: #c6d9f1;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .table {
+                width: 100%;
+            	<!--border-collapse: collapse;-->
+                margin: 20px 0;
+            }
+
+            .table, .table th, .table td {
+                <!--border: 1px solid black;-->
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                text-align: center;
+            }
+            
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+    			box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+             th, td {
+                border-collapse: collapse;
+            	box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+            .basic-info {
+                padding: 5px;
+            }
+
+            
+            .information {
+                
+                border: 1px solid black;
+                width: 100%;
+                cellpadding: 5; 
+                cellspacing: 0; 
+                border-collapse: collapse;
+            	margin-bottom: 20px;
+             	
+            }
+
+            .information-header {
+            	font-size: 12pt;
+                text-align: center;
+            	color: #ffffff;
+            	background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationSubtitle{
+            	font-size:10pt;
+            	width: 20%;
+            	text-align: center;
+            	color: #ffffff;
+            	background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationDetail{
+            	font-size:10pt;
+            }
+
+            .information th, .information td {
+           		border-collapse: collapse;
+            	box-shadow: none;  
+            	border: 0.5px solid #000;
+                padding: 5px 10px; 
+            }
+            
+            .sectionName {
+                font-size:8pt;
+            	text-align: center;
+            	background-color: {!IF(acc.BrandCode__c == 'G', '#e6d5cc', 
+                                      IF(acc.BrandCode__c == 'H', '#c8d4e4', 'white'))};
+                font-weight:bold-right; 
+                border-collapse: collapse;
+            	box-shadow: none;  
+            	border: 0.5px solid #000;
+                text-align:center
+            
+            }
+            
+            .kpiTableHeader{
+                text-align: center;
+                    color: #ffffff;
+                    background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                          IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+            
+            .kpiName{
+            	background-color: {!IF(acc.BrandCode__c == 'G', '#f6eeea', 
+                                      IF(acc.BrandCode__c == 'H', '#f4f6f9', 'white'))};
+            }
+
+
+            .kpiTable {
+                font-size: 8pt;
+            	text-align: center;
+            }
+
+            .footerLine{
+             	text-align: left;
+            	border:none;
+            }
+            
+            .signature{
+             	height:50px; 
+            	text-align: left;
+            	padding-bottom:100%;
+            	vertical-align: top;
+            	border:none;
+            }
+
+            
+            html, body {
+                margin: 15px;
+            	background-color: #FFFFFF; 
+                padding: 0;
+                height: 100%;
+                width: 96%;
+
+            }
+
+            .letter-border-container {
+            	
+            }
+            .letter-content-container {
+                background-color: white; 
+                
+                height: 90vh;
+            	min-height: 90vh;
+            	
+            }
+
+            {
+                margin: 0;
+                padding: 0;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            }
+
+            .letter{
+            	background-color: white;
+            }
+            div.letter-content {
+               
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            	font-size: 10px;
+            }
+
+
+            .letter-line{
+                font-weight: bold;
+                text-decoration: underline;
+            }
+
+            .letter-centered {
+                display: inline-block;
+                padding: 2%;
+            }
+
+            .letter-centered {
+                text-align: center; 
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .letter-right {
+                text-align: right;
+            }
+            
+            .letter-left {
+                text-align: left;
+            }
+            
+            .letter-header {
+            	padding-left: {!IF(acc.BrandCode__c == 'G', '550px', 
+                                      IF(acc.BrandCode__c == 'H', '500px', '500px'))};
+            
+            }
+            
+            .letter-basic-info {
+                padding: 5px;
+            }
+            
+            .diagonal-stripes {
+                background-color: #E4E6E6;
+            }
+            
+             @page:not(:first) .footer {
+                display: none !important;
+            }
+
+            /* GM Scorecard*/ 
+            .table-container {
+                display: inline-block;
+                border-collapse: collapse;
+                margin-right: 10px; 
+            }
+
+            .timePeriod{
+                width: 106px;
+                border: 0.5px solid black; 
+                font-size:9pt;
+                text-align: center;
+                border-collapse: collapse;
+            }
+
+            .timePeriodHeader{
+                height: 60px;
+                text-align: center;
+                color: #ffffff;
+                font-size:10pt;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+
+            .table-container:first-of-type .state-represented {
+                margin-top: 3px;
+                font-size: 8pt;
+                text-align: left;
+            }
+
+            .state-represented {
+                margin-top: 0px;
+                font-size: 8pt;
+                text-align: left;
+            }
+
+            .value{
+                height: 20px;
+            }
+
+            .kpiContent{
+            	width: 33.3%;
+            }
+
+            .kpiScorecardTable{
+                border: 0.5px solid black; 
+                width: 182.7px;
+                font-size:9pt;
+                text-align: center;
+                border-collapse: collapse;
+            }
+
+            .kpiScorecardTableHeader{
+                text-align: center;
+                color: #ffffff;
+                font-size:10pt;
+                height: 20px;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+
+            .kpiSubHeader{
+                text-align: center;
+                height: 40px;
+                color: #ffffff;
+                font-size:9pt;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+
+            .table-comments{
+                width: 96%;
+                font-size: 10pt;
+                border: 0.5px solid black; 
+            	vertical-align: top;!important;
+            	white-space: pre; 
+                 padding-left: 10px; 
+            	 padding-right: 10px;
+            	padding-top: 5px;
+            	 
+            }
+
+            .footer-content {
+                width: 100%;
+                font-size: 10pt;
+                margin-top: 50px;
+            }
+
+            .footer-section {
+                float: left;
+                width: 33%;
+            }
+
+            .footer-clear {
+                clear: both;
+            }
+
+            .footer-full-section {
+                width: 50%;
+                float: left;
+            }
+
+            .footer-margin-top {
+                margin-top: 30px;
+            }
+
+            .GMcontent {
+                padding-top: 5px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+                flex: 1;
+
+            }
+            
+
+
+        </style>
+    </head>
+
+
+    
+    <div class="letter-border-container">
+    	<div class="letter-header" >
+                    <apex:outputPanel rendered="{!BrandCode == 'H'}">
+                        <apex:image url="{!$Resource.Hyundai_Logo}" height="45px"/>
+                    </apex:outputPanel>
+                
+                    <apex:outputPanel rendered="{!BrandCode == 'G'}" style="left: 620px">
+                        <apex:image style="text-align: left;" url="{!$Resource.Genesis_Logo}" height="45px"/>
+                    </apex:outputPanel>
+                </div>
+        <div class="letter-content-container">
+            <div class="letter-headerContainer">
+                
+                <div class="letter-left" >
+                    {!today}
+                </div>
+                <div class="letter-centered" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;"> 
+                    <apex:outputPanel >
+                        <div class="letter-basic-info">
+                            <apex:outputPanel rendered="{!BrandCode == 'H'}">
+                                <apex:outputText value="Hyundai Motor America" />
+                            </apex:outputPanel>
+                        
+                            <apex:outputPanel rendered="{!BrandCode == 'G'}">
+                                <apex:outputText value="Genesis Motor America" />
+                            </apex:outputPanel>
+                            
+                        </div>
+                        <div class="letter-basic-info">
+                            <apex:outputText value="Core Operational Performance Program" />
+                        </div>
+                        
+                    </apex:outputPanel>
+                </div>
+            </div>
+        
+            <div class="letter-content" style="font-family: 'Arial Unicode MS', Arial, sans-serif;font-size:10pt;line-height:1.2">
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai1'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update – {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the July 2024 - December 2024 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.    
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on December 31, 2024. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Dec. 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.  
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+
+                <!--Hyundai template 2-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai2'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update – {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the July 2024 – December 2024 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on December 31, 2024. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Dec. 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>        
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Hyundai template 3-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai3'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the October 2024 - March 2025 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.   
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed. 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on March 31, 2025. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Mar. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>        
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Hyundai template 4-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai4'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the September 2024 - February 2025 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on February 28, 2025. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Feb. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period. 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Genesis template 1-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Genesis1'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide you with a status update of your dealership&rsquo;s current performance under the Genesis Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Genesis Motor America (“GMA”) launched COPP to evaluate the Genesis dealer network based on certain core performance metrics.  As part of the Program, GMA will provide regular updates of your dealership&rsquo;s performance during the August 2024 - January 2025 performance period. As previously indicated GMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter. During this extended COPP performance period, Dealer must update their action plan and continue to work toward meeting its assigned targets. GMA will continue to work with and provide regular updates to Dealer&rsquo;s management regarding Dealer&rsquo;s performance under the Program.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note your current performance period end date is Jan. 31, 2025. GMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Jan. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly. If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'CE', regionCode == 'SC')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'EA', regionCode == 'MA')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'WE', regionCode == 'MS')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO_Gen}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Genesis General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Genesis Motor America 
+                </apex:outputPanel>    
+                <!--Genesis template 2-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Genesis2'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide you with a status update of your {!DealershipName} current performance under the Genesis Motor America Core Operational Performance Program (“COPP” or “Program”).                                 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Genesis Motor America (“GMA”) launched COPP to evaluate its dealer network based on certain core performance metrics. As part of the Program, GMA will provide regular updates of your dealership&rsquo;s performance metrics during the June 2024 - November 2024 performance period. As previously indicated GMA will be including a GM report card with the regular updates during the performance period.
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has a six-month performance period from the month you were first placed in the Program to achieve the assigned targets set forth in your {!LetterDate} performance deficiency letter. Moreover, your dealership should now have drafted and implemented a comprehensive action plan to address those deficiencies and achieve the related targets within your dealership&rsquo;s performance period. The action plan should identify specific actions, who shall be responsible at your dealership for those actions, and specific dates by which the actions shall be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ended on November 30, 2024. GMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the November 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly. If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'CE', regionCode == 'SC')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'EA', regionCode == 'MA')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'WE', regionCode == 'MS')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO_Gen}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Genesis General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Genesis Motor America 
+                </apex:outputPanel>    
+            </div>
+        </div>
+    </div>
+
+<!--Tracker-->
+    <div class="tracker-container">
+        <div class="header">
+        <div class="logo">
+            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                <apex:image url="{!$Resource.Hyundai_Logo}" height="45px"/>
+            </apex:outputPanel>
+        
+            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                <apex:image url="{!$Resource.Genesis_Logo}" height="45px"/>
+            </apex:outputPanel>
+        </div>
+        <div class="left" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;"> 
+            <apex:outputPanel >
+                <div class="basic-info">
+                    <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                        <apex:outputText value="Hyundai Motor America" />
+                    </apex:outputPanel>
+                
+                    <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                        <apex:outputText value="Genesis Motor America" />
+                    </apex:outputPanel>
+                </div>
+                <div class="basic-info">
+                    <apex:outputText value="COPP Report Month: {!reportMonth}" />
+                </div>
+                <div class="basic-info">
+                    <apex:outputText value="Performance Period: {!fromMonth} - {!toMonth}" />
+                </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+    <div class="content" style="font-family: 'Arial Unicode MS', Arial, sans-serif;">
+        <table class="information">
+            <tr class="information-header">
+                <th colspan="2">PERFORMANCE DEFICIENCY METRIC TRACKER</th>
+            </tr>
+            <tr>
+                <td class="informationSubtitle">Dealer</td>
+                <td class="informationDetail">{!dealerName}</td>
+            </tr>
+            <tr>
+                <td class="informationSubtitle">Dealer Code</td>
+                <td class="informationDetail">{!acc.DealerCode__c}</td>
+            </tr>
+        </table>
+
+        <table class="kpiTable" border="1" cellpadding="5" cellspacing="0" style="width: 100%;">
+            <thead>
+                <tr class="kpiTableHeader">
+                    <th style="width:25.25%;font-size:10pt">Metric</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">Initial</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month1Label}</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month2Label}</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month3Label}</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month4Label}</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month5Label}</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">{!month6Label}</th>
+                    <th style="width: 8.125%;border-left: 0.5px solid #797978">Curr vs Initial Δ (+/-)</th>
+                    <th style="width: 7%;border-left: 0.5px solid #797978">Target</th>
+                    <th style="width: 8.125%;border-left: 0.5px solid #797978">Curr vs Target Δ (+/-)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <apex:repeat value="{!coppKPIDetailList}" var="section">
+                    <!-- Section Name Row -->
+                    <tr>
+                        <td class="sectionName" colspan="11" >{!section.sectionName}</td>
+                        <!--<td class="sectionName" colspan="10" style="font-weight:bold; border-left: none"></td>-->
+                    </tr>
+                    
+                    <!-- KPI Rows -->
+                    <apex:repeat value="{!section.kpiList}" var="kpiWrapper">
+                        <tr>
+                            <td class="kpiName" style="text-align: right;cellpadding:5; cellspacing:0">
+                                <apex:outputPanel rendered="{!AND(acc.BrandCode__c == 'H', kpiWrapper.isBranding)}">
+                                    GDSI 2.0
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!AND(acc.BrandCode__c == 'G', kpiWrapper.isBranding)}">
+                                    GRD
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!NOT(kpiWrapper.isBranding)}">{!kpiWrapper.kpiDetail.COPP_KPI__r.Name}</apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.kpiDetail.Initial_Score__c)),NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.kpiDetail.Initial_Score__c}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="N" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month1)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month1}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month1BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month2)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month2}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month2BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month3)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month3}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month3BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month4)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month4}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month4BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month5)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month5}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month5BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month6)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.month6}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="{!month6BrandImage}" />
+                                </apex:outputPanel>
+                            </td>
+
+                            <!--DPM-5887-->
+                            <td  class="{!IF(ISBLANK(kpiWrapper.currentInitialDiff), 'diagonal-stripes', '')}">
+                                <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentInitialDiff))}">
+                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                        <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
+                                    </apex:outputPanel> 
+                                    <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                        <apex:outputPanel rendered="{!kpiWrapper.isPositiveInitialDiff}">
+                                            <apex:outputText value="+" style="color: blue" />
+                                        </apex:outputPanel>
+                                        <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
+                                    </apex:outputPanel>
+                                    
+                                    
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                        <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="%"/>
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                    
+                                </apex:outputPanel>
+
+                            </td>
+                            <td>
+                                <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.kpiDetail.Target_Score__c)), NOT(kpiWrapper.isBranding))}">
+                                    <apex:outputText value="{!kpiWrapper.kpiDetail.Target_Score__c}" />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                </apex:outputPanel>
+                                <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                    <apex:outputText value="Y" />
+                                </apex:outputPanel>
+                                
+                            </td>
+                            <td class="{!IF(ISBLANK(kpiWrapper.currentTargetDiff), 'diagonal-stripes', '')}">
+                                <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentTargetDiff))}">
+                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                        <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
+                                    </apex:outputPanel> 
+                                    <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                        <apex:outputPanel rendered="{!kpiWrapper.isPositiveTargetDiff}">
+                                            <apex:outputText value="+" style="color: blue" />
+                                        </apex:outputPanel>
+                                        <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
+                                    </apex:outputPanel>
+                                    
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                        <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                    </apex:outputPanel>
+                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}"> 
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="%"/>
+                                        </apex:outputPanel>
+                                    </apex:outputPanel>
+                                </apex:outputPanel>
+                                <!-- When current vs targer is null -->
+                            </td>
+                        </tr>
+                    </apex:repeat>
+
+                    
+                </apex:repeat>
+            
+            </tbody>
+        </table>
+        <apex:outputPanel >
+            <apex:outputText style="font-size:9px" value="Any missing data is due to the data for that KPI not being finalized before the monthly cutoff. This is expected and should occur infrequently starting August 2024."/>
+        </apex:outputPanel>
+
+    </div>
+    <!-- Footer Section -->
+        <div class="footer" style="width: 100%; left: 0;font-family: 'Arial Unicode MS', Arial, sans-serif;">
+            <table style="width: 100%; border-collapse: collapse;border:none">
+                <tr>
+                    <td class = "footerLine" style="width: 40%;">________________________________________________________</td>
+                    <td class = "footerLine" style="width: 35%;">__________________________________________</td>
+                    <td class = "footerLine" style="width: 25%;">____________________________</td>
+                </tr>
+                <tr>
+                    <td class="signature" style="width: 40%;">Dealer Principal - Print Name</td>
+                    <td class="signature" style="width: 35%;">Dealer Principal - Signature</td>
+                    <td class="signature" style="width: 25%;">Date</td>
+                </tr>
+                <tr>
+                    <td class = "footerLine" style="width: 40%;">________________________________________________________</td>
+                    <td class = "footerLine" style="width: 35%;">__________________________________________</td>
+                    <td class = "footerLine" style="width: 25%;">____________________________</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; text-align: left;border:none">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            HMA Representative - Print Name
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            GMA Representative - Print Name
+                        </apex:outputPanel>
+                    </td>
+                    <td style="width: 35%; text-align: left;border:none">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            HMA Representative - Signature
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            GMA Representative - Signature
+                        </apex:outputPanel>
+                    </td>
+                    <td class="footerLine" style="width: 25%;">Date</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+<!--GM Scorecard-->
+<div class="tracker-container">
+    <div class="header">
+        <div class="logo">
+            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                <apex:image url="{!$Resource.Hyundai_Logo}" height="45px" />
+            </apex:outputPanel>
+
+            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}" style="left: 640px">
+                <apex:image url="{!$Resource.Genesis_Logo}" height="45px" />
+            </apex:outputPanel>
+        </div>
+        <div class="left" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;">
+            <apex:outputPanel >
+                <div class="basic-info">
+                    <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                        <apex:outputText value="Hyundai Motor America" />
+                    </apex:outputPanel>
+
+                    <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                        <apex:outputText value="Genesis Motor America" />
+                    </apex:outputPanel>
+                </div>
+                <div class="basic-info">
+                    <apex:outputText value="COPP Report Month: {!reportMonth}" />
+                </div>
+                <div class="basic-info">
+                    <apex:outputText value="Performance Period: {!fromMonth} - {!toMonth}" />
+                </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+
+    <div class="GMcontent" style="font-family: 'Arial Unicode MS', Arial, sans-serif;">
+        <table class="information">
+            <tr class="information-header">
+                <th colspan="2">GM SCORECARD</th>
+            </tr>
+            <tr>
+                <td class="informationSubtitle">Dealer</td>
+                <td class="informationDetail">{!dealerName}</td>
+            </tr>
+            <tr>
+                <td class="informationSubtitle">Dealer Code</td>
+                <td class="informationDetail">{!acc.DealerCode__c}</td>
+            </tr>
+        </table>
+
+        <div style='margin-top: 0px'>
+            <div class="table-container">
+                <table class='timePeriod' border="1">
+                    <tr>
+                        <th class='timePeriodHeader'>Time Period</th>
+                    </tr>
+                    <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                        <tr>
+                            <td class="value" style="text-align: right;padding-right: 5px;">
+                                <apex:outputText value="{!monthWrapper.month}" />
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr>
+                        <td class="value" style="background-color:#E4E6E6">Program Average</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <table class='kpiScorecardTable' border="1">
+                    <tr>
+                        <th class='kpiScorecardTableHeader' colspan="3">Sales (MTD)</th>
+                    </tr>
+                    <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Actual Sales" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Expected Sales" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Sales Efficiency*" /></td>
+                    </tr>
+                    <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                        <tr>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.actualSales}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.expectedSales}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.salesEfficiency}" />
+                                <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.salesEfficiency))}">%</apex:outputPanel>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr class="average">
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageActualSales}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageExpectedSales}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageSalesEfficiency}" />%
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <table class='kpiScorecardTable' border="1">
+                    <tr>
+                        <th class='kpiScorecardTableHeader' colspan="3">
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                                <apex:outputText value="HRX (R1M)" />
+                            </apex:outputPanel>
+
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                                <apex:outputText value="GBX (R1M)" />
+                            </apex:outputPanel>
+                        </th>
+                    </tr>
+                    <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Dealer" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Region" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="DLR % Region" /></td>
+                    </tr>
+                    <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                        <tr>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HRXDealer}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HRXRegion}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HRXDLR}" />
+                                <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.HRXDLR))}">%</apex:outputPanel>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr class="average">
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHRXDealer}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHRXRegion}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHRXDLR}" />%
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="table-container" style="margin-right: 0px; ">
+                <table class='kpiScorecardTable' border="1">
+                    <tr>
+                        <th class='kpiScorecardTableHeader' colspan="3">
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                                <apex:outputText value="HVX (R1M)" />
+                            </apex:outputPanel>
+
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                                <apex:outputText value="GSX (R1M)" />
+                            </apex:outputPanel>
+                        </th>
+                    </tr>
+                    <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Dealer" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Region" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="DLR% Region" /></td>
+                    </tr>
+                    <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                        <tr>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HVXDealer}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HVXRegion}" />
+                            </td>
+                            <td class="value">
+                                <apex:outputText value="{!monthWrapper.HVXDLR}" />
+                                <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.HVXDLR))}">%</apex:outputPanel>
+                            </td>
+                        </tr>
+                    </apex:repeat>
+                    <tr class="average">
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHVXDealer}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHVXRegion}" />
+                        </td>
+                        <td class="value" style="background-color:#E4E6E6">
+                            <apex:outputText value="{!averageHVXDLR}" />%
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <p class="state-represented" >
+            <apex:outputText value="*State Represented" />
+        </p>
+
+        <apex:outputPanel rendered="{!NOT(ISBLANK(TRIM(CommentsValue)))}" style="display:block ">
+            <div style="margin-top: 35px; font-size: 10pt;">
+                <apex:outputText value="Comments: " />
+            </div>
+            <div class="table-comments">
+                <apex:outputText value="{!CommentsValue}"  escape="false" style="white-space: pre;" />
+            </div>
+        </apex:outputPanel>
+
+    </div>
+
+</div>
+</apex:page>

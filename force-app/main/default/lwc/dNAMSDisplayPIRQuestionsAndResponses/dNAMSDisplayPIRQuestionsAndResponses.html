@@ -1,0 +1,29 @@
+<template>
+    <table>
+        <tbody>
+            <tr>
+                <td style="text-align: left; font-size: 2rem; padding: 20px">PIR Questions Responses</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="border: 1px solid #ccc; border-radius: 5px; margin-top: 10px;" class="slds-box slds-theme_default slds-m-around_medium">
+        <template if:true={sections}>
+            <lightning-accordion allow-multiple-sections-open= true active-section-name={sectionNames}>
+                <template for:each={sections} for:item="sect">
+                    <lightning-accordion-section name={sect.SectionName} label={sect.SectionName} key={sect.SectionName} style="--slds-c-accordion-summary-color-background: #E9F0FA; padding: 2px; border: 1px solid #E9F0FA;">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <template for:each={sect.QuesData} for:item="qns">
+                                <!-- Each question-response pair spans one column, with two columns per row -->
+                                <div class="slds-col slds-size_6-of-12 slds-p-horizontal_medium slds-p-top_xxx-small" key={qns.QuestionId}>
+                                    <strong>{qns.Question__c}</strong>
+                                    <div style="margin-top: 2px; max-width: 100%; word-wrap: break-word; white-space: normal;">{qns.Response__c}</div>
+                                </div>
+                            </template>
+                        </div>
+                    </lightning-accordion-section>
+                </template>
+            </lightning-accordion>
+        </template>
+    </div>
+</template>

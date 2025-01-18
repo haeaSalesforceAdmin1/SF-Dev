@@ -1,0 +1,65 @@
+<template>
+    <div if:true={showError}>
+            <div style="height: 300px;">
+                <div class="slds-text-heading_large slds-text-color_error"><br/>You don't have access to this Account.</div>
+            </div>
+    </div>
+    <!-- Article to show list of records -->
+    <div if:false={showError}>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-page-header slds-page-header_related-list">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 class="slds-card__header-title">
+                                            <lightning-icon icon-name="standard:file" title="file"></lightning-icon>
+                                            <span>
+                                                <div class="slds-page-header__title slds-truncate" title="Files">
+                                                    &nbsp; Files ({allRecords.length})
+                                                </div>
+                                            </span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-meta">
+                        <p class="slds-page-header__meta-text">
+                            <span style="font-weight: 500">{allRecords.length}</span> Items • Sorted by <span style="font-weight: 500">{sortByLabel}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div if:true={showRecords}>
+                <lightning-datatable
+                    key-field="id"
+                    data={records}
+                    columns={columns}
+                    sorted-direction={sortDirection}
+                    sorted-by={sortBy}
+                    onsort={handleSort}
+                    onrowaction={handleRowAction}
+                    hide-checkbox-column="true"
+                    show-row-number-column="true">
+                </lightning-datatable>
+            </div>
+            <footer class="slds-card__footer">
+                    <a class="slds-card__footer-action">
+                        <div if:true={showViewAll}>
+                            <button class="slds-button" onclick={viewAll}>View All</button>
+                        </div>
+                        <div if:true={showViewLess}>
+                            <button class="slds-button" onclick={viewLess}>View Less</button>
+                        </div>
+                    </a>
+                </footer>
+        </article>
+    </div>
+    
+</template>

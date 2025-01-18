@@ -1,0 +1,20 @@
+<template>
+    <div class="wrap">
+        <div class="slds-form-element">
+            <label class="slds-form-element__label" for="text-input-id-49">
+                <abbr class="slds-required" title="required">*</abbr>Search Source VIN</label>
+            <!-- <label class="slds-form-element__label" for="text-input-id-47">Search Source VIN</label> -->
+            <div class="slds-form-element__control slds-input-has-fixed-addon" style="width:2000px">
+                <!-- <a class="slds-button slds-button_outline-brand" href="#">조회</a> -->
+                <input type="text" placeholder=" " style="width:250px; height:30px" aria-labelledby="fixed-text-label fixed-text-addon-pre fixed-text-addon-post" class="slds-input"></input>  
+                <button type="submit" class="slds-button slds-button_outline-brand" style="width:75px; height:32px" onclick={handleSubmit} disabled={buttonTrue}>조회</button>
+                <template if:false={dataStatus}>
+                    <span class="slds-form-element__addon" style="width:1000px; color:red">{outputText}</span> 
+                </template>
+                <template if:true={dataStatus}>
+                    <span class="slds-form-element__addon" style="width:350px; color:blue">{outputText}</span>     
+                </template>     
+            </div>  
+        </div>
+    </div>
+</template>

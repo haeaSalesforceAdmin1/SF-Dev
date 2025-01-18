@@ -1,0 +1,94 @@
+<!--
+/**
+ * [Method Description] 
+ * Account Created DPMR RecordType Evaluation 
+ * Created by [Jonghoon Kim] on [24-08-03] for [Ticket DPM-5663]
+ * Edited by [Jonghoon Kim] on [25-01-07] for [Ticket DPM-5986]
+*/
+-->
+<template>
+    <lightning-card title="New DPMR">
+        <!-- Spinner Component -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- <template if:false={isNext}> -->
+        <div class="slds-m-around_medium">
+            <!-- Section 1 -->
+            <div class="slds-grid slds-wrap">
+                <!-- Select Topics taking 1/3 of the width -->
+                <div class="slds-col slds-size_1-of-3 slds-p-around_small">
+                    <lightning-checkbox-group label="Select Topics" options={topicOptions} value={selectedTopics}
+                        onchange={handleTopicChange} required>
+                    </lightning-checkbox-group>
+                </div>
+                <!-- Other Fields taking 2/3 of the width -->
+                <div class="slds-col slds-size_2-of-3 slds-p-around_small">
+                    <lightning-input label="Account Name" type="text" value={accountName} readonly></lightning-input>
+                    <lightning-input label="Contact Date" type="date" value={contactDate}
+                        onchange={handleContactDateChange} required></lightning-input>
+                    <lightning-input  label="Evaluation Name" type="text" value={evaluationName}
+                        onchange={handleEvalNameChange} disabled></lightning-input>
+                        <lightning-combobox label="Primary Dealer Contact" options={contactOptions} value={primaryContactId}
+                        onchange={handlePrimaryContactChange} placeholder="Select Primary Dealer Contact"
+                        required></lightning-combobox> <!-- Changed the label from 'Dealer Contact' to 'Primary Dealer Contact' by MinheeKim -DPM-5904 12.03.2024-->
+                    <template if:true={isOtherContactSelected}>
+                        <lightning-input label="Primary Dealer Contact Name" type="text" value={primaryContactName}
+                            onchange={handleContactNameChange} required></lightning-input>
+                        <lightning-input label="Primary Dealer Contact Role" type="text" value={primaryContactRole}
+                            onchange={handleContactRoleChange} required></lightning-input>
+                    </template>
+                    <!-- DPM-5904 start: Added Secondary Dealer Contact  by MinheeKim - 12.03.2024-->
+                    <lightning-combobox label="Secondary Dealer Contact" options={secondaryContactOptions} value={secondaryContactId}
+                        onchange={handleSecondContactChange} placeholder="Select Secondary Dealer Contact" disabled={isSecondaryContactDisabled}></lightning-combobox> 
+                    <template if:true={isOtherSecondContactSelected}>
+                        <lightning-input label="Secondary Dealer Contact Name" type="text" value={secondaryContactName}
+                            onchange={handleSecondContactNameChange} required></lightning-input>
+                        <lightning-input label="Secondary Dealer Contact Role" type="text" value={secondaryContactRole}
+                            onchange={handleSecondContactRoleChange} required></lightning-input>
+                    </template>
+                    <!-- DPM-5904 end-->
+                    <lightning-combobox label="Contact Type" options={contactTypeOptions} value={selectedContactType}
+                        onchange={handleContactTypeChange} required></lightning-combobox>
+
+                </div>
+            </div>
+
+            <!-- Section 2 -->
+            <div class="slds-m-top_medium custom-textarea">
+                <lightning-textarea label="Contact Summary" value={comment} onchange={handleCommentChange}
+                    class="textAreaBody"></lightning-textarea>
+                <div class="file-link-container">
+                    <lightning-input type="file" name="fileUploader" onchange={handleFileUpload}
+                        class="inline-input"></lightning-input>
+                    <!-- label="Attach Executive Report (Please make sure to filter the report for a specific dealer)​"  -->
+                    <p>
+                        <a href="#" onclick={handleCRMA} class="download-link">Link to Executive Report for
+                            downloading​</a>
+                    </p>
+                </div>
+                <div>
+                    <template if:true={errorMessage}>
+                        <p class="error-text">{errorMessage}</p>
+                    </template>
+                </div>
+                <template if:true={fileList}>
+                    <template for:each={fileList} for:item="file">
+                        <div key={file.name} class="file-item">
+                            <p class="file-text">
+                                File: {file.name}
+                                <lightning-icon icon-name="utility:delete" alternative-text="Delete" size="x-small" class="delete-icon"
+                                    onclick={handleFileDelete} data-id={file.name}></lightning-icon>
+                            </p>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <div class="slds-m-top_medium slds-text-align_right">
+                <button class="custom-button slds-m-right_small" onclick={handleSave}>Save</button>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,767 @@
+<template>
+    <div class="button-container">
+        <template if:true={isCOPPManager}>
+            <template if:true={isEditMode}>
+                <lightning-button  label="Save" variant="brand" onclick={handleSave} class="slds-m-top_small buttons"></lightning-button> 
+                <lightning-button label="Cancel" variant="brand" onclick={handleCancel} class="slds-m-top_small slds-m-right_x-small buttons"></lightning-button>
+            </template>
+            <template if:true={isViewMode}>
+                <lightning-button label="Edit"  variant="brand" onclick={handleEdit} class="slds-m-top_small slds-m-right_x-small buttons"></lightning-button>
+                <span if:true={formattedLastModifiedDate} style="align-items: center;padding-left:5px">Last updated: {formattedLastModifiedDate} (COPP update by 12:00 will be reflected as daily batch in COPP Tracker and COPP Dashboards.)</span>
+            </template>
+        </template>
+    </div>
+    <lightning-accordion allow-multiple-sections-open
+                         onsectiontoggle={handleSectionToggle}
+                         active-section-name={activeSections}>
+        
+                    <lightning-accordion-section name="COPP" label="COPP" class="--slds-c-accordion-summary-color-background accordion">
+                            <lightning-card class="COPPSection">
+                                <div class="slds-m-around_medium accordianDetail">
+                                    <!--Edit view-->
+                                    <template if:true={isEditMode}>
+                
+                                        <lightning-card >
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">COPP</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="COPP__c"
+                                                        checked={coppInfoData.COPP__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                    </lightning-input>
+                                                    <template if:true={errorEndDate}>
+                                                        <div class="slds-text-color_error">{errorEndDate}</div>
+                                                    </template> 
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Buy/Sell COPP</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="Buy_Sell_COPP__c"
+                                                        checked={coppInfoData.Buy_Sell_COPP__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                </lightning-input>
+                                                <template if:true={errorBuySell}>
+                                                    <div class="slds-text-color_error">{errorBuySell}</div>
+                                                </template>
+                                                <template if:true={errorBuySellDate}>
+                                                    <div class="slds-text-color_error">{errorBuySellDate}</div>
+                                                </template>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">COPP Graduation</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="COPP_Graduation__c"
+                                                        checked={coppInfoData.COPP_Graduation__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        label="COPP Start Date" 
+                                                        name="COPP_Start_Date__c"
+                                                        value={coppInfoData.COPP_Start_Date__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled={isNotCOPP}
+                                                        requierd={isCOPP}
+                                                        type="date"
+                                                        date-style="short" 
+                                                     ></lightning-input>
+                                                     <p if:true={errorStartDate} class="error-message slds-text-color_error">{errorStartDate}</p>
+                                                     <!-- <template if:true={errorStartDate}>
+                                                        <div class="slds-text-color_error">{errorStartDate}</div>
+                                                    </template> -->
+                                                    <template if:true={errorBuySellStartDate}>
+                                                        <div class="error-message slds-text-color_error">{errorBuySellStartDate}</div>
+                                                    </template>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="inputBox">
+                                                        <lightning-input 
+                                                        label="COPP End Date" 
+                                                        name="COPP_End_Date__c"
+                                                        value={coppInfoData.COPP_End_Date__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        type="date"
+                                                        date-style="short" 
+                                                     ></lightning-input>
+                                                    </div>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        label="COPP Graduation Date" 
+                                                        name="COPP_Graduation_Date__c"
+                                                        value={coppInfoData.COPP_Graduation_Date__c}
+                                                        disabled={isCOPPGraduationDisabled}
+                                                        onchange={handleAccountFieldChange}
+                                                        type="date"
+                                                        date-style="short" 
+                                                     ></lightning-input>
+                                                     <template if:true={errorGraduationDate}>
+                                                        <div class="slds-text-color_error">{errorGraduationDate}</div>
+                                                    </template>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-combobox
+                                                        name="WAVE__c"
+                                                        label="WAVE"
+                                                        value={coppInfoData.WAVE__c}
+                                                        placeholder="Select WAVE"
+                                                        requierd={isCOPP}
+                                                        options={picklistOptions}
+                                                        onchange={handleAccountFieldChange}
+                                                    ></lightning-combobox>
+                                                    <template if:true={errorWave}>
+                                                        <div class="error-message slds-text-color_error">{errorWave}</div>
+                                                    </template>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        label="Initial Performance Period Start Month" 
+                                                        name="Initial_Start_Month__c"
+                                                        value={coppInfoData.Initial_Start_Month__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        label="Current Performance Period Start Month" 
+                                                        name="Current_Start_Month__c"
+                                                        value={coppInfoData.Current_Start_Month__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled={isWAVENull}
+                                                        maxlength="7"
+                                                     ></lightning-input>
+                                                     <template if:true={errorCurrentMonth}>
+                                                        <div class="slds-text-color_error">{errorCurrentMonth}</div>
+                                                    </template> 
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Notice of Default</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="NoticeDefault__c"
+                                                        checked={coppInfoData.NoticeDefault__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <template if:true={isGenesis}>
+                                                        <div class="slds-truncate checkbox">GRD Commitment</div>
+                                                        <lightning-input 
+                                                            type="checkbox"  
+                                                            name="GRDCommitment__c"
+                                                            checked={coppInfoData.GRDCommitment__c}
+                                                            onchange={handleAccountFieldChange}
+                                                        >
+                                                        </lightning-input>
+                                                    </template>
+                                                    <template if:false={isGenesis}>
+                                                        <div class="slds-truncate checkbox">GDSI 2.0 Commitment</div>
+                                                        <lightning-input 
+                                                            type="checkbox"  
+                                                            name="GDSI2Commitment__c"
+                                                            checked={coppInfoData.GDSI2Commitment__c}
+                                                            onchange={handleAccountFieldChange}
+                                                        >
+                                                        </lightning-input>
+                                                    </template>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Net Working Capital Cure</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="NetWorkingCapitalCure__c"
+                                                        checked={coppInfoData.NetWorkingCapitalCure__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Flooring Cure</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="FlooringCure__c"
+                                                        checked={coppInfoData.FlooringCure__c}
+                                                        onchange={handleAccountFieldChange}
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+
+                                        </lightning-card>
+
+                                    </template>
+                
+                                    <!--Read Only view-->
+                                    <template if:true={isViewMode}>
+                                        <lightning-card >
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">COPP</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="COPP__c"
+                                                        checked={coppInfoData.COPP__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Buy/Sell COPP</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="Buy_Sell_COPP__c"
+                                                        checked={coppInfoData.Buy_Sell_COPP__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                    >
+                                                </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">COPP Graduation</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="COPP_Graduation__c"
+                                                        checked={coppInfoData.COPP_Graduation__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        class="custom-input"
+                                                        label="COPP Start Date" 
+                                                        name="COPP_Start_Date__c"
+                                                        value={coppInfoData.COPP_Start_Date__c}
+                                                        type="date"
+                                                        date-style="short" 
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        class="custom-input"
+                                                        label="COPP End Date" 
+                                                        name="COPP_End_Date__c"
+                                                        value={coppInfoData.COPP_End_Date__c}
+                                                        date-style="short" 
+                                                        type="date"
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        class="custom-input"
+                                                        label="COPP Graduation Date" 
+                                                        name="COPP_Graduation_Date__c"
+                                                        type="date"
+                                                        date-style="short" 
+                                                        value={coppInfoData.COPP_Graduation_Date__c}
+                                                        onchange={handleAccountFieldChange}
+                                                        disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-combobox
+                                                        class="custom-input"
+                                                        name="WAVE__c"
+                                                        label="WAVE"
+                                                        value={coppInfoData.WAVE__c}
+                                                        placeholder="Select WAVE"
+                                                        options={picklistOptions}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                    ></lightning-combobox>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        class="custom-input"
+                                                        label="Initial Performance Period Start Month" 
+                                                        name="Initial_Start_Month__c"
+                                                        value={coppInfoData.Initial_Start_Month__c}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="4" class="slds-p-around_small">
+                                                    <lightning-input 
+                                                        class="custom-input"
+                                                        label="Current Performance Period Start Month" 
+                                                        name="Current_Start_Month__c"
+                                                        value={coppInfoData.Current_Start_Month__c}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                     ></lightning-input>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                            <lightning-layout horizontal-align="left" multiple-rows>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Notice of Default</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="NoticeDefault__c"
+                                                        checked={coppInfoData.NoticeDefault__c}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <template if:true={isGenesis}>
+                                                        <div class="slds-truncate checkbox">GRD Commitment</div>
+                                                        <lightning-input 
+                                                            type="checkbox"  
+                                                            name="GRDCommitment__c"
+                                                            checked={coppInfoData.GRDCommitment__c}
+                                                            onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                        >
+                                                        </lightning-input>
+                                                    </template>
+                                                    <template if:false={isGenesis}>
+                                                        <div class="slds-truncate checkbox">GDSI 2.0 Commitment</div>
+                                                        <lightning-input 
+                                                            type="checkbox"  
+                                                            name="GDSI2Commitment__c"
+                                                            checked={coppInfoData.GDSI2Commitment__c}
+                                                            onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                        >
+                                                        </lightning-input>
+                                                    </template>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Net Working Capital Cure</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="NetWorkingCapitalCure__c"
+                                                        checked={coppInfoData.NetWorkingCapitalCure__c}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                                <lightning-layout-item size="3" class="slds-p-around_small">
+                                                    <div class="slds-truncate checkbox">Flooring Cure</div>
+                                                    <lightning-input 
+                                                        type="checkbox"  
+                                                        name="FlooringCure__c"
+                                                        checked={coppInfoData.FlooringCure__c}
+                                                        onchange={handleAccountFieldChange}
+                                                            disabled="true"
+                                                    >
+                                                    </lightning-input>
+                                                </lightning-layout-item>
+                                            </lightning-layout>
+                                        </lightning-card>
+                
+                                    </template>
+                                </div>
+                            </lightning-card>
+                        </lightning-accordion-section>
+                         
+        <lightning-accordion-section name="COPPKPI" label="COPP KPIs" class="--slds-c-accordion-summary-color-background">
+            <lightning-card>
+                <div class="slds-m-around_medium accordianDetail">
+                    <!--Edit view-->
+                    <template if:true={isEditMode}>
+
+                        <lightning-card >
+                            <template if:true={sections}>
+                                <template for:each={sections} for:item="section">
+                                    <div key={section.name} class="slds-m-around_medium">
+                                        <div class={sectionContainer}>
+                                            <h2 class="section-name" style="font-weight: bold;">{section.name}</h2>
+                                        </div>
+                                        
+                                        <lightning-layout horizontal-align="left" multiple-rows>
+                                            <template for:each={section.details} for:item="wrapper">
+                                                <template if:false={wrapper.kpiDetail.hideTarget}>
+                                                    <lightning-layout-item key={wrapper.kpi.Id} size="4">
+                                                        <div class="slds-box_x-small slds-m-around_x-small">
+                                                            <div class="slds-truncate" title={wrapper.kpi.Name}>{wrapper.kpi.Name}</div>
+                                                            <lightning-input 
+                                                                type="checkbox"  
+                                                                name="Visiblity__c"
+                                                                checked={wrapper.kpiDetail.Visiblity__c}
+                                                                data-index={wrapper.kpiDetail.index} 
+                                                                onchange={handleFieldChange}
+                                                            ></lightning-input>
+                                                            <template if:true={wrapper.kpiDetail.errorRequired}>
+                                                                <div class="slds-text-color_error">{wrapper.kpiDetail.errorRequired}</div>
+                                                            </template>
+                                                            <template if:true={wrapper.kpiDetail.Visiblity__c}>
+                                                                <lightning-layout size="12" horizontal-align="left" multiple-rows>
+                                                                    <lightning-layout-item size="6" class="slds-p-around_small">
+                                                                        <template if:true={wrapper.kpi.isBranding}>
+                                                                            <template if:false={isGenesis}>
+                                                                                <lightning-combobox
+                                                                                    class="custom-input"
+                                                                                    name="Initial_Score_Text__c"
+                                                                                    label="Initial Score"
+                                                                                    value={wrapper.kpiDetail.Initial_Score_Text__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    placeholder="GDSI 2.0 Not Compliant"
+                                                                                    options={InitialOptionsH}
+                                                                                    onchange={handleFieldChange}
+                                                                                    required
+                                                                                ></lightning-combobox>
+                                                                            </template>
+                                                                            <template if:true={isGenesis}>
+                                                                                <lightning-combobox
+                                                                                    class="custom-input"
+                                                                                    name="Initial_Score_Text__c"
+                                                                                    label="Initial Score"
+                                                                                    value={wrapper.kpiDetail.Initial_Score_Text__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    placeholder="GRD Not Compliant"
+                                                                                    options={InitialOptionsG}
+                                                                                    onchange={handleFieldChange}
+                                                                                    required
+                                                                                ></lightning-combobox>
+                                                                            </template>
+                                                                        </template>
+                                                                        <template if:false={wrapper.kpi.isBranding}>
+                                                                            <lightning-input 
+                                                                                label="Initial Score" 
+                                                                                name="Initial_Score__c"
+                                                                                value={wrapper.kpiDetail.Initial_Score__c} 
+                                                                                data-index={wrapper.kpiDetail.index} 
+                                                                                onchange={handleFieldChange}
+                                                                                required
+                                                                            ></lightning-input>
+                                                                            <template if:true={wrapper.kpiDetail.errorInitialScore}>
+                                                                                <div class="slds-text-color_error">{wrapper.kpiDetail.errorInitialScore}</div>
+                                                                            </template>
+                                                                        </template>
+                                                                        <!--Dealer Sales - Initial Score-->
+                                                                        <template if:true={wrapper.kpiDetail.salesEfficiency}>
+                                                                            <lightning-input 
+                                                                                label="Dealer Sales - Initial Score" 
+                                                                                name="DealerSalesScore"
+                                                                                value={DealerSalesScore} 
+                                                                                onchange={handleFieldChange}
+                                                                                required
+                                                                            ></lightning-input>
+                                                                            <template if:true={errorDealerScore}>
+                                                                                <div class="slds-text-color_error">{errorDealerScore}</div>
+                                                                            </template>
+                                                                        </template>
+                                                                            <template if:true={wrapper.kpi.isBranding}>
+                                                                                <template if:false={isGenesis}>
+                                                                                    <lightning-combobox
+                                                                                        class="custom-input"
+                                                                                        name="Target_Score_Text__c"
+                                                                                        label="Target Score"
+                                                                                        value={wrapper.kpiDetail.Target_Score_Text__c} 
+                                                                                        data-index={wrapper.kpiDetail.index} 
+                                                                                        placeholder="GDSI 2.0 Compliant"
+                                                                                        options={TargetOptionsH}
+                                                                                        onchange={handleFieldChange}
+                                                                                        required
+                                                                                    ></lightning-combobox>
+                                                                                </template>
+                                                                                <template if:true={isGenesis}>
+                                                                                    <lightning-combobox
+                                                                                        class="custom-input"
+                                                                                        name="Target_Score_Text__c"
+                                                                                        label="Target Score"
+                                                                                        value={wrapper.kpiDetail.Target_Score_Text__c} 
+                                                                                        data-index={wrapper.kpiDetail.index} 
+                                                                                        placeholder="GRD Compliant"
+                                                                                        options={TargetOptionsG}
+                                                                                        onchange={handleFieldChange}
+                                                                                        required
+                                                                                    ></lightning-combobox>
+                                                                                </template>
+                                                                            </template>
+                                                                            <template if:false={wrapper.kpi.isBranding}>
+                                                                                <lightning-input 
+                                                                                    label="Target Score" 
+                                                                                    name="Target_Score__c"
+                                                                                    value={wrapper.kpiDetail.Target_Score__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    onchange={handleFieldChange}
+                                                                                    required
+                                                                                ></lightning-input>
+                                                                                <template if:true={wrapper.kpiDetail.errorTargetScore}>
+                                                                                    <div class="slds-text-color_error">{wrapper.kpiDetail.errorTargetScore}</div>
+                                                                                </template>
+                                                                            </template>
+                                                                        
+                                                                    </lightning-layout-item>
+                                                                    <lightning-layout-item size="6" class="slds-p-around_small">
+                                                                        <lightning-input 
+                                                                            label="Initial Score Month" 
+                                                                            name="Initial_Score_Date__c"
+                                                                            value={wrapper.kpiDetail.Initial_Score_Date__c}
+                                                                            data-index={wrapper.kpiDetail.index} 
+                                                                            placeholder="MM-YYYY"
+                                                                            onchange={handleFieldChange}
+                                                                            maxlength="7"
+                                                                            required
+                                                                        ></lightning-input>
+                                                                        <template if:true={wrapper.kpiDetail.errorInitial}>
+                                                                            <div class="slds-text-color_error">{wrapper.kpiDetail.errorInitial}</div>
+                                                                        </template>
+                                                                        <template if:true={wrapper.kpiDetail.salesEfficiency}>
+                                                                            <lightning-input 
+                                                                                label="Expected Sales - Initial Score" 
+                                                                                name="ExpectedSalesScore"
+                                                                                value={ExpectedSalesScore} 
+                                                                                onchange={handleFieldChange}
+                                                                                required
+                                                                            ></lightning-input>
+                                                                            <template if:true={errorExpectedScore}>
+                                                                                <div class="slds-text-color_error">{errorExpectedScore}</div>
+                                                                            </template>
+                                                                        </template>
+                                                                        <template if:false={wrapper.kpiDetail.hideTarget}>
+                                                                            <lightning-input 
+                                                                                label="Target Score Month" 
+                                                                                name="Target_Score_Date__c"
+                                                                                value={wrapper.kpiDetail.Target_Score_Date__c} 
+                                                                                data-index={wrapper.kpiDetail.index} 
+                                                                                placeholder="MM-YYYY"
+                                                                                onchange={handleFieldChange}
+                                                                                maxlength="7"
+                                                                                required
+                                                                            ></lightning-input>
+                                                                            <template if:true={wrapper.kpiDetail.errorTarget}>
+                                                                                <div class="slds-text-color_error">{wrapper.kpiDetail.errorTarget}</div>
+                                                                            </template>
+                                                                        </template>
+
+                                                                    </lightning-layout-item>
+                                                                </lightning-layout>
+                                                                                                                            
+                                                            </template>
+                                                        </div>
+                                                    </lightning-layout-item>
+                                                </template>
+                                            </template>
+                                        </lightning-layout>
+                                    </div>
+                                </template>
+                            </template>
+                        </lightning-card>
+                        
+                    </template>
+
+                    <!--Read Only view-->
+                    <template if:true={isViewMode}>
+                        <lightning-card>
+                            <template if:true={sections}>
+                                <template for:each={sections} for:item="section">
+                                    <div key={section.name} class="slds-m-around_medium">
+                                        <div class={sectionContainer}>
+                                            <h2 class="section-name" style="font-weight: bold;">{section.name}</h2>
+                                        </div>
+                                        <lightning-layout horizontal-align="left" multiple-rows>
+                                            <template for:each={section.details} for:item="wrapper">
+                                                <template if:false={wrapper.kpiDetail.hideTarget}>
+                                                    <lightning-layout-item key={wrapper.kpi.Id} size="4">
+                                                        <div class="slds-box_x-small slds-m-around_x-small">
+                                                            <div class="slds-truncate" title={wrapper.kpi.Name}>{wrapper.kpi.Name}</div>
+                                                            <lightning-input 
+                                                                type="checkbox"  
+                                                                name="Visiblity__c"
+                                                                checked={wrapper.kpiDetail.Visiblity__c}
+                                                                data-index={wrapper.kpiDetail.index} 
+                                                                onchange={handleFieldChange}
+                                                                disabled="true"
+                                                            ></lightning-input>
+                                                            <template if:true={wrapper.kpiDetail.Visiblity__c}>
+                                                                <lightning-layout size="12" horizontal-align="left" multiple-rows>
+                                                                    <lightning-layout-item size="6" class="slds-p-around_small">
+                                                                        <template if:true={wrapper.kpi.isBranding}>
+                                                                            <template if:false={isGenesis}>
+                                                                                <lightning-combobox
+                                                                                    class="custom-input"
+                                                                                    name="Initial_Score_Text__c"
+                                                                                    label="Initial Score"
+                                                                                    value={wrapper.kpiDetail.Initial_Score_Text__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    placeholder="GDSI 2.0 Not Compliant"
+                                                                                    options={InitialOptionsH}
+                                                                                    onchange={handleFieldChange}
+                                                                                    disabled="true"
+                                                                                ></lightning-combobox>
+                                                                            </template>
+                                                                            <template if:true={isGenesis}>
+                                                                                <lightning-combobox
+                                                                                    class="custom-input"
+                                                                                    name="Initial_Score_Text__c"
+                                                                                    label="Initial Score"
+                                                                                    value={wrapper.kpiDetail.Initial_Score_Text__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    placeholder="GRD Not Compliant"
+                                                                                    options={InitialOptionsG}
+                                                                                    onchange={handleFieldChange}
+                                                                                    disabled="true"
+                                                                                ></lightning-combobox>
+                                                                            </template>
+                                                                        </template>
+                                                                        <!-- <template if:true={wrapper.kpi.isBranding}>
+                                                                            <lightning-input 
+                                                                                label="Initial Score" 
+                                                                                name="Initial_Score_Text__c"
+                                                                                value={wrapper.kpiDetail.Initial_Score_Text__c} 
+                                                                                data-index={wrapper.kpiDetail.index} 
+                                                                                onchange={handleFieldChange}
+                                                                                disabled="true"
+                                                                            ></lightning-input>
+                                                                        </template> -->
+                                                                        <template if:false={wrapper.kpi.isBranding}>
+                                                                            <lightning-input 
+                                                                                label="Initial Score" 
+                                                                                name="Initial_Score__c"
+                                                                                value={wrapper.kpiDetail.Initial_Score__c} 
+                                                                                data-index={wrapper.kpiDetail.index} 
+                                                                                onchange={handleFieldChange}
+                                                                                disabled="true"
+                                                                            ></lightning-input>
+                                                                        </template>
+                                                                        <template if:true={wrapper.kpiDetail.salesEfficiency}>
+                                                                            <lightning-input 
+                                                                                label="Dealer Sales - Initial Score" 
+                                                                                name="DealerSalesScore"
+                                                                                value={DealerSalesScore} 
+                                                                                onchange={handleFieldChange}
+                                                                                disabled="true"
+                                                                            ></lightning-input>
+                                                                            <!-- <template if:true={wrapper.kpiDetail.errorInitialScore}>
+                                                                                <div class="slds-text-color_error">{wrapper.kpiDetail.errorInitialScore}</div>
+                                                                            </template> -->
+                                                                        </template>
+                                                                        <template if:false={wrapper.kpiDetail.hideTarget}>
+                                                                            <template if:true={wrapper.kpi.isBranding}>
+                                                                                <template if:false={isGenesis}>
+                                                                                    <lightning-combobox
+                                                                                        class="custom-input"
+                                                                                        name="Target_Score_Text__c"
+                                                                                        label="Target Score"
+                                                                                        value={wrapper.kpiDetail.Target_Score_Text__c} 
+                                                                                        data-index={wrapper.kpiDetail.index} 
+                                                                                        placeholder="GDSI 2.0 Not Compliant"
+                                                                                        options={TargetOptionsH}
+                                                                                        onchange={handleFieldChange}
+                                                                                        disabled="true"
+                                                                                    ></lightning-combobox>
+                                                                                </template>
+                                                                                <template if:true={isGenesis}>
+                                                                                    <lightning-combobox
+                                                                                        class="custom-input"
+                                                                                        name="Target_Score_Text__c"
+                                                                                        label="Target Score"
+                                                                                        value={wrapper.kpiDetail.Target_Score_Text__c} 
+                                                                                        data-index={wrapper.kpiDetail.index} 
+                                                                                        placeholder="GRD Not Compliant"
+                                                                                        options={TargetOptionsG}
+                                                                                        onchange={handleFieldChange}
+                                                                                        disabled="true"
+                                                                                    ></lightning-combobox>
+                                                                                </template>
+                                                                            </template>
+                                                                            <!-- <template if:true={wrapper.kpi.isBranding}>
+                                                                                <lightning-input 
+                                                                                    label="Target Score" 
+                                                                                    name="Target_Score_Text__c"
+                                                                                    value={wrapper.kpiDetail.Target_Score_Text__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    onchange={handleFieldChange}
+                                                                                    disabled="true"
+                                                                                ></lightning-input>
+                                                                            </template> -->
+                                                                            <template if:false={wrapper.kpi.isBranding}>
+                                                                                <lightning-input 
+                                                                                    label="Target Score" 
+                                                                                    name="Target_Score__c"
+                                                                                    value={wrapper.kpiDetail.Target_Score__c} 
+                                                                                    data-index={wrapper.kpiDetail.index} 
+                                                                                    onchange={handleFieldChange}
+                                                                                    disabled="true"
+                                                                                ></lightning-input>
+                                                                            </template>
+                                                                        </template>
+                                                                    </lightning-layout-item>
+                                                                    <lightning-layout-item size="6" class="slds-p-around_small">
+                                                                        <lightning-input 
+                                                                            label="Initial Score Month" 
+                                                                            name="Initial_Score_Date__c"
+                                                                            value={wrapper.kpiDetail.Initial_Score_Date__c} 
+                                                                            data-index={wrapper.kpiDetail.index} 
+                                                                            onchange={handleFieldChange}
+                                                                            disabled="true"
+                                                                        ></lightning-input>
+                                                                        <template if:true={wrapper.kpiDetail.salesEfficiency}>
+                                                                            <lightning-input 
+                                                                                label="Expected Sales - Initial Score" 
+                                                                                name="ExpectedSalesScore"
+                                                                                value={ExpectedSalesScore} 
+                                                                                onchange={handleFieldChange}
+                                                                                disabled="true"
+                                                                            ></lightning-input>
+                                                                            <!-- <template if:true={wrapper.kpiDetail.errorInitialScore}>
+                                                                                <div class="slds-text-color_error">{wrapper.kpiDetail.errorInitialScore}</div>
+                                                                            </template> -->
+                                                                        </template>
+                                                                        <template if:false={wrapper.kpiDetail.hideTarget}>
+                                                                            <lightning-input 
+                                                                            label="Target Score Month" 
+                                                                            name="Target_Score_Date__c"
+                                                                            value={wrapper.kpiDetail.Target_Score_Date__c} 
+                                                                            data-index={wrapper.kpiDetail.index} 
+                                                                            onchange={handleFieldChange}
+                                                                            disabled="true"
+                                                                            ></lightning-input>
+                                                                        </template>
+                                                                    </lightning-layout-item>
+                                                                </lightning-layout>
+                                                                
+                                                                    
+                                                                
+                                                            </template>
+                                                        </div>
+                                                    </lightning-layout-item>
+                                                </template>
+                                            </template>
+                                        </lightning-layout>
+                                    </div>
+                                </template>
+                            </template>
+                        </lightning-card>
+
+                    </template>
+                </div>
+            </lightning-card>
+        </lightning-accordion-section>
+
+    </lightning-accordion>
+    
+</template>

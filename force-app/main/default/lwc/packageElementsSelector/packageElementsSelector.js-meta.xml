@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>53.0</apiVersion>
+    <description>Package Elements Selector</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Package Elements Selector</masterLabel>
+    <targets>
+        <target>lightning__FlowScreen</target>
+        <target>lightningCommunity__Page</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="templatePackageId" type="String" label="Template Package Id" role="inputOnly"/>
+            <property name="dealerId" type="String" label="Dealer Account Id" role="inputOnly"/>
+            <property name="sellingDealerId" type="String" label="Selling Dealer Account Id" role="inputOnly"/>
+            <property name="packageName" type="String" label="Name of the Package" role="inputOnly"/>
+            <property name="packageDescription" type="String" label="Description of the Package" role="inputOnly"/>
+            <property name="primaryContactId" type="String" label="Primary Contact (usually Dealer Principal) for the Package" role="inputOnly"/>
+            <property name="createdPackageId" type="String" label="Newly created package Id" role="outputOnly"/>
+            <property name="errorMessage" type="String" label="Error messages" role="outputOnly"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

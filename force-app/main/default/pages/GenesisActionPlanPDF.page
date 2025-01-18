@@ -1,0 +1,414 @@
+<!--GenesisActionPlanPDF
+* ----- Change Log -----
+* Author   / Date 	   / Ticket Number  / Change Description
+* N/A		/ N/A  	   / DPM-5633		/ Project
+* JongHoon	/ 24-09-09 / DPM-5731		/ Show the template according to whether the 'Priority' value is present or not.
+-->
+<apex:page renderas="PDF" applyBodyTag="false" standardStylesheets="false" showHeader="false" standardController="Evaluation__c" extensions="GenesisActionPlanPDFController" action="{!handleLoad}">
+    <head>
+        <style type="text/css" media="print">
+            @page :first {
+                @top-center {
+                    content: element(header);
+                }
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+             {
+                margin: 100px;
+                padding: 100px;
+            }
+            
+            div.header {
+                font-family: sans-serif !important;
+                margin: 0;
+                padding: 10px;
+                width: 685px;
+                height:50%; 
+                background-color: black;
+                display: flex;
+                flex-direction: row;
+                align-items: center; /* Center vertically */
+            }
+
+            div.content {
+                padding-top: 5px;
+                font-family: sans-serif !important;
+            }
+
+            div.footer {
+
+                padding: 5px;
+                position: running(footer);
+                color: #808080;
+                font-size: 8px;
+                page-break-after:auto;
+            }
+
+            div.subfooter {
+                display: block;
+            }
+
+            div.right {
+                text-align: right;
+            }
+
+            .pagenumber:before {
+                content: counter(page);
+            }
+
+            .pagecount:before {
+                content: counter(pages);
+            }
+
+            .stationName {
+                text-align: center;
+                font-weight: bold;
+                font-size: 20pt;
+                margin-bottom: 30px;
+            }
+
+            table {
+                width: 100%;
+            }
+
+            .left, .centered {
+                display: inline-block;
+                padding: 2%;
+            }
+            .centered {
+                text-align: center; 
+                width: 56%;
+                margin-bottom: 6px;
+                font-size: 20px;
+            }
+
+            .right {
+                text-align: right;
+            }
+            
+            .Question{
+                
+            }
+            
+            .categoryHeader{
+                page-break-inside: avoid; /* Prevent page break inside table */   
+            }
+            .category{
+                font-family: sans-serif !important;
+                font-size: 16px; 
+                font-weight: bold;
+                background-color: #e7e6e6;
+                padding: 10px;
+                /*padding-top: 10px;*/
+                page-break-inside: avoid; /* Prevent page break inside table */                 
+            }
+            .container {
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                box-sizing: border-box;
+            	overflow: hidden;
+            }
+            .Notcategory, .Notquestion {
+                font-family: sans-serif !important;
+                font-size: 16px;
+                font-weight: bold;
+                background-color: #e7e6e6;
+                padding: 10px;
+                margin: 0 1px; /* 요소 간의 여백 설정 */    
+            }
+            
+            .failedQuestion{
+                font-family: sans-serif !important;
+                padding-top: 10px;
+                padding-bottom: 10px;
+                page-break-inside: avoid; /* Prevent page break inside table */
+            }
+            
+            .personnelOnly{
+                page-break-inside: avoid; /* Prevent page break inside table */
+            }
+
+            .tableHeader {
+                border-width: 0px 0px 1px 0px;
+                border-color: #000;
+                border-style: solid;
+            }
+            
+            .information{
+               text-align: center;
+                padding-top: 10px;
+            }
+            
+            .subInfo{
+                padding:10px;
+                margin-bottom: 10px;
+                background-color:#e7e6e6;
+                display: inline-block;
+            }
+            
+            .summary{
+                box-sizing: border-box;
+                padding: 10px;
+                padding-bottom: 100px;
+                margin-top: 10px;
+                background-color: #e7e6e6;
+                line-height: 1.5; /* 줄 간격 조절 */
+            }
+
+            .Notsummary{
+                box-sizing: border-box;
+                padding: 10px;
+                padding-bottom: 100px;
+                margin-top: 20px; /* 상단 마진을 늘려서 겹침 방지 */
+                background-color: #e7e6e6;
+                line-height: 1.5;
+            }
+            
+            .blank{
+                width: 100%;
+                background-color:white
+            }
+            
+            .answers{
+               
+            }
+            
+            .subAnswer{
+                width: 30%;
+                display: inline-block;
+                font-size:14px;
+            }
+            
+            .answers_Not {
+                text-align: justify;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .subAnswer_Not{
+                display: inline-block;
+                width: 31.21%;
+                font-size: 12px;
+                background-color: #e7e6e6;
+                padding: 5px;
+                padding-bottom: 60px;
+                box-sizing: border-box;
+                vertical-align: top; 
+                margin-right: 2px; 
+            }
+            
+            .line{
+                display: inline-block;
+                font-size:14px;
+            }
+            
+            .grayBlank{
+                background-color:#e7e6e6;
+                padding-bottom:60px;
+            }
+
+            .sectionHeader {
+                width: 100%;
+                background-color: #eee;
+                font-size: 16pt;
+                padding: 5px;
+                margin: 20px 0px;
+                font-weight: bold;
+            }
+
+            #totalCost {
+                margin-top: 50px;
+            }
+
+            #totalCostLabel {
+                font-weight: bold;
+                margin-right: 10px;
+            }
+        </style>
+    </head>
+    <apex:variable var="hasKey" value="{!NOT(mapKey.size == 0)}" />
+    <div class="header">
+        <div class="left">
+            <apex:image url="{!$Resource.Genesis_Logo_White}" height="25"/>
+            <!--<apex:image url="/sfc/servlet.shepherd/version/download/068RT000001lMpJYAU" height="35"/> {!$Resource.Genesis_Logo_White}-->
+        </div> 
+        <div class="centered"> 
+            <apex:outputPanel rendered="{!evaluation.Type__c== 'Sales'}">
+                <apex:outputText style="color: white" value="Genesis SALES Evaluation" />
+                <br/>
+                <apex:outputText style="color: white" value="Action Plan" />
+            </apex:outputPanel>
+            <apex:outputPanel rendered="{!evaluation.Type__c== 'Service'}">
+                <apex:outputText style="color: white" value="Genesis AFTER SALES Evaluation" />
+                <br/>
+                <apex:outputText style="color: white" value="Action Plan" />
+            </apex:outputPanel>
+        </div>
+     </div>
+
+    <div class="content">
+        <div class="information">
+            <div class="subInfo" style="width:8%;margin-right:1px;float:left;"><apex:outputText value="{!evaluation.Account__r.DealerCode__c}"></apex:outputText></div>
+            <div class="subInfo" style="width:40%"><apex:outputText value="{!evaluation.Account__r.Name}"></apex:outputText></div>
+            <div class="subInfo" style="width:40%;margin-left:1px;float:right"><apex:outputText value="Action Plan Due Date: {!evaluation.DueDate__c}"></apex:outputText></div>
+        </div>
+        <apex:outputPanel >
+            <div style="padding-bottom: 20px">
+                <div style="font-size: 16px; background-color: #e7e6e6;padding: 10px">
+                    Please review the sections below and write an actionable improvement plan for each question listed. Action plans should also be assigned to a specific person at your retailer, have a completion date, and be measurable.​
+                    ​<br/><br/>
+                    These questions have been identified as opportunity areas during your evaluation. You are free to edit this PDF with your comments or prepare a separate document that addresses all the fields below.​
+                    ​​<br/><br/>
+                    Once completed, please send to your Genesis field representative. Your Genesis field team will review your comments. When approved, this document will be saved to your retailer profile within DPM (Dealer Performance Management). </div>
+            </div>
+        </apex:outputPanel>    
+        <!-- Check if mapKey has data -->
+        <apex:outputPanel rendered="{!hasKey}">
+            <table>
+                <apex:variable var="cnt" value="{!0}" />
+                <apex:repeat value="{!mapKey}" var="key">
+                    <div class="Question">
+                        <div class="categoryHeader">
+                            <apex:outputPanel rendered="{!mapKey.size != cnt}">
+                                <div style="color:#808080;padding-top:10px; padding-bottom:10px">
+                                    <hr style="border-top: 2px inset #bbb;" />
+                                </div>
+                            </apex:outputPanel>
+                            <div class="category">
+                                CATEGORY: &nbsp;
+                                <apex:outputText value="{!key}" />
+                            </div>
+                        </div>
+        
+                        <apex:repeat value="{!surveyQuestionWrapperMap[key]}" var="wrapper">
+                            <apex:variable var="cnt" value="{!cnt+1}" />
+                            <div class="failedQuestion">
+                                <div style="padding-top:10px;padding-bottom:10px;background-color: #e7e6e6;">
+                                    <tr>
+                                        <td>
+                                            <div style="font-size:18px; font-weight:bold;padding-left:10px;padding-right:10px">Failed Question #
+                                                <apex:outputText value="{!wrapper.surveyQuestion.Question_Number__c}"
+                                                />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </div>
+                                <tr>
+                                    <td>
+                                        <div style="display: inline-block !important;padding-left:10px;padding-right:10px;">
+                                            <apex:outputText value="{!wrapper.surveyQuestion.Question_Text__c}" escape="false" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </div>
+        
+                            <div class="blank"></div>
+                            <div class="summary">
+                                <apex:outputText value="{!summary}" escape="false" />
+                            </div>
+                            <div class="answers" style="margin-top:10px;margin-bottom:10px;">
+                                <div class="subAnswer">
+                                    <apex:outputText value="{!responsiblePerson}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                                <div class="subAnswer" style="margin-left: 5px;margin-right: 5px;">
+                                    <apex:outputText value="{!completionDate}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                                <div class="subAnswer" style="width:37.2%">
+                                    <apex:outputText value="{!measured}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                            </div>
+                            <div class="blank"></div>
+        
+                        </apex:repeat>
+                    </div>
+                </apex:repeat>
+            </table>
+        </apex:outputPanel>
+        <apex:outputPanel rendered="{!NOT(hasKey)}"> <!-- DPM-5731 // Jonghoon Kim Start-->
+        
+        <table>
+            <div class="container">
+                <div class="Notcategory" style="width:45%;margin-right:1px;float:left;">
+                    CATEGORY: &nbsp;
+                </div>
+                <div class="Notquestion" style="width:45%;margin-right:1px;float:right;">
+                    Question #: &nbsp;
+                </div>
+            </div>
+            <div class="Notsummary">
+                <!-- <div style="font-size: 16px; background-color: #e7e6e6;padding: 10px"> -->
+                    Action Plan: Text Box for retailer to write their improvement plan
+                    <br/>
+                    (What will specifically be done/changed?)
+                <!-- </div> -->
+            </div>
+            <div class="answers" style="margin-top:10px;margin-bottom:10px;">
+                                <div class="subAnswer">
+                                    <apex:outputText value="{!responsiblePerson}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                                <div class="subAnswer" style="margin-left: 5px;margin-right: 5px;">
+                                    <apex:outputText value="{!completionDate}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                                <div class="subAnswer" style="width:37.2%">
+                                    <apex:outputText value="{!measured}" escape="false" />
+                                    <div class="grayBlank"></div>
+                                </div>
+        
+                            </div>
+        </table>
+        </apex:outputPanel> <!-- DPM-5731 // Jonghoon Kim End -->
+        
+        <!-- personnelOnly 섹션 항상 표시 -->
+        <div class="personnelOnly">
+            <div style="color:#808080;padding-top:10px; padding-bottom:10px">
+                <hr class="line" style="border-top: 2px inset #bbb;border-style:dashed;width: 34.1%" />
+                <p class="line">FOR FIELD PERSONNEL ONLY</p>
+                <hr class="line" style="border-top: 2px inset #bbb;border-style:dashed;width: 34.1%" />
+            </div>
+        
+            <apex:outputPanel >
+                <div class="signature" style="padding-bottom: 20px">
+                    <div style="font-size: 16px; background-color: #e7e6e6;padding: 10px">
+                        Please review the Action Plan submitted by the Retailer above. Once approved, please sign in the below sections. Once signed-off
+                        by both parties please submit to the Genesis Owner Experience Team.
+                    </div>
+                </div>
+            </apex:outputPanel>
+        
+            <apex:outputPanel >
+                <div class="signature" style="padding-bottom: 20px">
+                    <div style="font-size: 16px; background-color: #e7e6e6;padding: 10px">
+                        Signature Line #1: ______________________________________​​
+                        <br/> Job Title:
+                    </div>
+                </div>
+            </apex:outputPanel>
+        
+            <apex:outputPanel >
+                <div class="signature" style="padding-bottom: 20px">
+                    <div style="font-size: 16px; background-color: #e7e6e6;padding: 10px">
+                        Signature Line #2: ______________________________________​​
+                        <br/> Job Title:
+                    </div>
+                </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+</apex:page>

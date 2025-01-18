@@ -1,0 +1,6 @@
+.progressBar {
+    margin: 0;
+    height: 3px;
+    width: 0%;
+    background: yellowgreen;
+}

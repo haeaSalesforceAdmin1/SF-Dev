@@ -1,0 +1,40 @@
+<template>
+    <div class="slds-box slds-theme_default">
+        <template if:true={hasData}>
+            <lightning-tabset variant="standard" class="tab-active" active-tab-value={activeTab}>
+                <lightning-tab if:true={showHMA} label="Hyundai DPM Help" value="HMA">
+                    <lightning-tabset variant="standard" active-tab-value={activeTabHMA}>
+                        <template if:true={showAllTabs}>
+                            <lightning-tab label="HMA Corporate" value="HMACorporate">
+                                <c-d-p-m-help dpm-resources={dpmResources} sales-org-label={salesOrgLabel} after-sales-org-label={afterSalesOrgLabel}
+                                question-links-label={questionLinksLabel} cx-org-label={cxOrgLabel} financial-org-label={financialOrgLabel}
+                                type-of-screen="HMACorporate" header-class="header"></c-d-p-m-help>
+                            </lightning-tab>
+                        </template>
+                        <lightning-tab label="HMA Dealer" value="HMADealer">
+                            <c-d-p-m-help dpm-resources={dpmResources} sales-org-label={salesOrgLabel} after-sales-org-label={afterSalesOrgLabel}
+                            question-links-label={questionLinksLabel} cx-org-label={cxOrgLabel} financial-org-label={financialOrgLabel}
+                            type-of-screen="HMADealer" header-class="header"></c-d-p-m-help>
+                        </lightning-tab>
+                    </lightning-tabset>
+                </lightning-tab>
+                <lightning-tab if:true={showGMA} label="Genesis DPM Help" value="GMA">
+                    <lightning-tabset variant="standard" active-tab-value={activeTabGMA}>
+                        <template if:true={showAllTabs}>
+                            <lightning-tab label="GMA Corporate" value="GMACorporate">
+                                <c-d-p-m-help dpm-resources={dpmResources} sales-org-label={salesOrgLabel} after-sales-org-label={afterSalesOrgLabel}
+                                question-links-label={questionLinksLabel} cx-org-label={cxOrgLabel}  keystone-org-label={keystoneOrgLabel} financial-org-label={financialOrgLabel}
+                                type-of-screen="GMACorporate" header-class="header1"></c-d-p-m-help>
+                            </lightning-tab> <!--DPM-4989 added keystone by MH - 2024.01.26-->
+                        </template>                    
+                        <lightning-tab label="GMA Retailer" value="GMARetailer">
+                            <c-d-p-m-help dpm-resources={dpmResources} sales-org-label={salesOrgLabel} after-sales-org-label={afterSalesOrgLabel}
+                            question-links-label={questionLinksLabel} cx-org-label={cxOrgLabel} keystone-org-label={keystoneOrgLabel} financial-org-label={financialOrgLabel}
+                            type-of-screen="GMARetailer" header-class="header1"></c-d-p-m-help>
+                        </lightning-tab>
+                    </lightning-tabset>
+                </lightning-tab>
+            </lightning-tabset>
+        </template>
+    </div>
+</template>

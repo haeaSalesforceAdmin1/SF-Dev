@@ -1,0 +1,7 @@
+<!--
+ - Created by user on 2023-08-02.
+ -->
+
+<design:component>
+    <design:attribute name="recordId" label="Question Record Id"/>
+</design:component>

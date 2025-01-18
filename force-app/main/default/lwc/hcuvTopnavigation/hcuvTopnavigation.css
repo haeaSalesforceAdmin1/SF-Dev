@@ -1,0 +1,197 @@
+.topNav{
+	background-color: #061C3F;
+	color: #FFFFFF;
+	padding: 1%;
+	font-size: 13px;
+}
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  /* overflow: hidden;  */
+  background-color: #061C3F; 
+  padding-left:5px;
+  display:flex;
+  border-bottom: 2px solid #0088FF;
+  position: relative;
+  height:41px;
+}
+
+/* li {
+  float: left;
+} */
+
+li a {
+  display: block;
+  /* color: #fff;
+  text-align: center;
+  padding: 10px;
+  text-decoration: none;
+  background-color: #061C3F;  */
+
+}
+
+.top-nav-btn{
+  display: block;
+  color: #fff;
+  text-align: center;
+  padding: 10px;
+  text-decoration: none;
+  background-color: #061C3F; 
+  border:0;
+  outline:none;
+}
+
+.top-nav-btn a,.top-nav-btn a:hover,.top-nav-btn a:active{
+  display:block;
+  color:#fff;
+  text-decoration:none;
+}
+/* li a:hover {
+  background: rgba(255,255,255,0.15);
+} */
+/* .top-nav-btn:hover,.top-nav-btn:focus,.top-nav-btn:active{
+  //background: rgba(255,255,255,0.15);
+} */
+.active{
+  background: rgba(255,255,255,0.15);
+  /* border-top: 3px solid #0088FF; */
+  position:relative;
+}
+
+.active:after{
+  content:"";
+  position:absolute;
+  top:0px;
+  height:3px;
+  width:100%;
+  background-color:#0088FF;
+}
+
+.top-menu-meta-wrap{
+  display:flex !important;
+  align-items: center;
+}
+
+.menu-top-ico{
+  margin-right: 2px;
+}
+
+.subMenu{
+  color: #fff;
+}
+
+/* .submenu-active{
+  background-color:#fff;
+  color:#333;
+} */
+
+.top-nav-submenu-wrap{
+  position:absolute;
+  top:42px;
+  display:flex;
+  flex-flow:column;
+  padding:0px;
+  z-index:99;
+  background-color:#fff;
+  min-height:131px;
+  border:1px solid #D8DDE6;
+  border-radius:3px;
+}
+
+/* .top-nav-submenu-wrap li{
+  border:1px solid #16325C;
+  border-bottom:0px !important;
+} */
+
+
+.top-nav-submenu-wrap li a,.top-nav-submenu-wrap li a:hover,.top-nav-submenu-wrap li a:focus,.top-nav-submenu-wrap li a:active{
+  background-color:#fff;
+  color:#16325C ;
+  text-decoration:none;
+  padding:5px 7px;
+}
+.top-nav-submenu-wrap li a:hover
+{
+  background-color:#D8DDE6
+}
+/* .top-nav-submenu-wrap li:last-child{
+  border-bottom:0;
+} */
+.menu-top-text-meta-wrap{
+  margin-left:3px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.menu-top-ico c-cuv-portal-icons{
+  /* filter: brightness(0) invert(1); */
+  filter: saturate(0) !important; 
+}
+
+/* .search-box .slds-form-element__label{
+  //display:none;
+} */
+.search-box input{
+  position: absolute;
+  top:0;
+  left:0;
+  width:200px;
+}
+
+.top-menu-meta-wrap lightning-icon{
+    filter: brightness(0) invert(1);
+}
+
+.top-menu-meta-wrap c-cuv-portal-icons{
+  filter: saturate() !important; 
+}
+
+
+.input-text-color {
+  color: black;
+}
+
+@media (max-width:992px) {
+  .top-nav-btn{
+    width:100%;
+  }
+  .top-nav-btn ul  li a, .top-nav-btn ul  li a:hover, .top-nav-btn ul  li a:active, .top-nav-btn ul  li a:focus{
+    color:#54698D
+  }
+  .xs-top-nav-close{
+    display:flex;
+    justify-content:flex-end;
+    padding: 12px 13px;
+  }
+
+  .xs-top-nav-close img{
+    width:20px;
+  }
+  .menu-top-text-meta-wrap{
+    /* color:#fff; */
+    /* [CCSOM-26] [SF] 'Reference Meterials' Menu Text in Partner Community turns to white color in small browser
+    , inhokim, 240229 */
+    color:#000; 
+  }
+
+  .menu-top-ico svg{
+    /* filter: brightness(0) invert(1); */
+    filter: saturate(-10);
+  }
+
+  .top-nav-btn{
+    padding:1px;
+  }
+
+  .menu-top-text-meta-wrap{
+   text-align:left;
+    white-space:initial;
+  }
+}
+
+@media(max-width:767px) {
+  .menu-top-text-meta-wrap{
+    white-space:nowrap;
+  }
+}

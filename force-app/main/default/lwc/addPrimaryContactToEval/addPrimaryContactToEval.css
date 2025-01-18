@@ -1,0 +1,11 @@
+.main-div{
+    height: 180px;
+}
+.assign-button{
+    padding-top: 10%;
+}
+
+.slds-modal__container{
+    width: 70% !important;
+    max-width: 70% !important;
+}

@@ -1,0 +1,147 @@
+.custom-table .slds-table thead th{
+    color:#54698D;
+    font-size:13px;
+    font-weight:600;
+    background-color:#EDEDED;
+}
+
+
+.custom-table .link-name-desc{
+	color:#16325C;
+	font-size:13px;
+	font-weight:600;
+}
+
+.tbl-pg .slds-m-left_small{
+	color:#1F1F1F;
+	font-weight:600;
+}
+.custom-table .link-name{
+	color:#0070D2;
+	font-size:13px;
+	font-weight:600;
+}
+
+.custom-table .slds-truncate a{
+    font-weight:600;
+    color:#1589EE;
+}
+
+.custom-table tbody tr th .slds-truncate{
+	color:#16325C;
+}
+
+.custom-table tbody tr td div
+{
+    font-weight:600;
+    color:#16325C;
+}
+.td-width {
+	width:50%;
+	overflow-wrap: anywhere;
+	padding-top: 4px;
+}
+
+.acc-icon-position{
+	right: 10px;
+    position: absolute;
+}
+
+.accord-bg-color {
+	background-color: rgb(243, 243, 243);
+	padding:0.5rem;
+}
+
+@media (max-width:992px){
+	.invt-accordion-btn{
+		padding-right:30px;
+	}
+
+	.invt-accordion-btn .inv-slds-truncate{
+		color:#0070D2;
+		margin-right:0px;
+	}
+
+	.invt-accordion-btn .slds-checkbox .slds-checkbox__label .slds-form-element__label{
+		color:#16325C;
+	}
+
+	.tbl-head{
+		font-size:13px;
+		color:#16325C;
+	}
+
+	.tbl-data{
+		font-size:14px;
+		color:#16325C;
+		font-weight:600;
+	}
+}
+
+.active-page{
+    cursor: pointer;
+    background: #ccc;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff !important;
+}
+
+.arrow-btn .slds-button,.arrow-btn{
+    font-size: 21px;
+    margin-top: -2px;
+    font-weight: 600;
+    color: #ccc !important;
+}
+
+.row-bg-color {
+	background-color: #FFF1E0;
+}
+
+.checkbox-bg-color {
+	background-color: white;
+}
+
+/* ADDED FOR CCSOM-3 , inhokim */
+.th_span_fix > th:nth-child(1) {
+	width: 4%;/*lightning checkbox width*/
+}
+th:has(div[data-id="Name"]) {
+	width: 11%;
+}
+th:has(div[data-id="Stock_Number__c"]) {
+	width: 6%;
+}
+th:has(div[data-id="Inspection_RO_No__c"]) {
+	width: 7%;
+}
+th:has(div[data-id="Mileage__c"]) {
+	width: 5%;
+}
+th:has(div[data-id="Inspection_Number__c"]) {
+	width: 8%;
+}
+th:has(div[data-id="Model_Year__c"]) {
+	width: 5%;
+}
+th:has(div[data-id="Model_Description__c"]) {
+	width: 12%;
+}
+th:has(div[data-id="Days_in_Inventory__c"]) {
+	width: 9%;
+}
+th:has(div[data-id="Inventory_Date__c"]) {
+	width: 8%;
+}
+th:has(div[data-id="Open_Campaign__c"]) {
+	width: 8%;
+}
+th:has(div[data-id="Branded_Title__c"]) {
+	width: 8%;
+}
+th:has(div[data-id="SRC_Program__c"]) {
+	width: 8%;
+}
+/*  /  ADDED FOR CCSOM-3 , inhokim */

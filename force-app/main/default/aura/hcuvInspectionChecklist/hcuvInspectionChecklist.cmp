@@ -1,0 +1,14 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="HCUV_InspectionChecklistCtrl">
+    <aura:html tag="style">
+        .slds-modal {
+        visibility: hidden!important;
+        display: none!important;
+        }
+        .slds-backdrop{
+        display: none!important;
+        }  
+        
+    </aura:html>
+    <aura:attribute name="recordId" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+</aura:component>

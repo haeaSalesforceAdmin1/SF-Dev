@@ -1,0 +1,24 @@
+<template>
+    <lightning-card>
+        <div class="slds-p-around_small">
+            <lightning-input type="file" class="" onchange={handleInputFileChange} 
+                            name="fileUpload"></lightning-input>
+            <template if:true={fileName}>
+                <div>
+                    <p>{fileName}</p> <!--onremove={removeReceiptImage}-->
+                    <template if:true={showProgress}>
+                        <hr class="progressBar" style={progressBar}></hr>
+                    </template>
+                </div>
+            </template>
+        </div>
+        <div style="position:relative;">
+            <template if:true={showSpinner} >
+                <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+            </template>
+            <!-- <template if:false={showSpinner} >
+                <lightning-button variant="brand" label="Upload" title="upload" onclick={uploadFiles} class="slds-p-around_small"></lightning-button>
+            </template> -->
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,164 @@
+<!--
+ - Created by user on 2023-08-01.
+ -->
+
+<aura:component access="global" controller="ActionPlanSurveyQuestionController" implements="flexipage:availableForAllPageTypes,lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String" access="global" />
+    <aura:attribute name="surveyQuestions" type="Object[]" />
+    <aura:attribute name="isLoading" type="Boolean" default="true" />
+    <aura:attribute name="isInExperience" type="Boolean" />
+
+    <!-- in salesforce community -->
+    <aura:if isTrue="{!v.isInExperience}">
+        <article class="slds-card">
+            <div class="slds-scrollable" style="max-height: 500px; overflow-y: auto;}">
+                <aura:if isTrue="{!v.isLoading}">
+                    <lightning:spinner alternativeText="Loading" size="medium"/>
+                </aura:if>
+                <aura:if isTrue="{!v.surveyQuestions}">
+                    <aura:iteration items="{!v.surveyQuestions}" var="ques">
+                        <div class="slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none"
+                             key="{!ques.surveyQuestion.Id}">
+                            <div class="slds-grid slds-wrap" style="padding: 0.8rem">
+                                <div class="slds-col slds-size_12-of-12">
+                                    <span style="font-size: 16px; font-weight: bold;">Question {!ques.surveyQuestion.Question_Number_Text__c}</span>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <lightning:formattedRichText value="{!ques.surveyQuestion.Question_Text__c}" class="strong-text"></lightning:formattedRichText>
+                                    <!--span style="font-size: 14px;">{!ques.surveyQuestion.Question_Text__c}</span>-->
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <span style="font-size: 16px; font-weight: bold; color: blue;">Response : {!ques.surveyQuestion.Response__c}</span>
+                                </div>
+                                <div aura:if="{!ques.surveyQuestions}" style="padding-left: 3rem">
+                                    <aura:iteration items="{!ques.surveyQuestions}" var="child">
+                                        <div key="{!child.Id}">
+                                            <div class="slds-col slds-size_12-of-12">
+                                                <lightning:formattedRichText value="{!child.Question_Text__c}" class="strong-text"></lightning:formattedRichText>
+                                                <!--<span style="font-size: 14px;">{!child.Question_Text__c}</span>-->
+                                            </div>
+                                            <div class="slds-col slds-size_12-of-12">
+                                                <span style="font-size: 16px; font-weight: bold; color: blue;">Response : {!child.Response__c}</span>
+                                            </div>
+                                        </div>
+                                    </aura:iteration>
+                                </div>
+                                <div class="slds-col slds-size_12-of-12">
+                                    <div>
+                                        <span style="font-size: 16px; font-weight: bold">Remarks : </span>
+                                        <!--<lightning:formattedRichText value="{!ques.surveyQuestion.Remarks__c}" class="strong-text"></lightning:formattedRichText>-->
+                                        <span style="font-size: 14px;">{!ques.surveyQuestion.Remarks__c}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <aura:if isTrue="{!ques.contentVersions}">
+                                <div class="slds-grid slds-wrap" style="padding: 0.8rem">
+                                    <div class="custom-box slds-text-align_center" key="{!ques.surveyQuestion.Id}">
+                                        <p class="slds-text-align_left" style="font-size: 16px; font-weight: bold;">Evaluator Photos :</p>
+                                        <div class="slds-page-header__row slds-var-m-top_x-small slds-var-m-left_medium slds-grid slds-wrap">
+                                            <ul class="slds-grid slds-wrap slds-gutters">
+                                                <aura:iteration items="{!ques.contentVersions}" var="file">
+                                                    <div class="slds-p-around_small">
+                                                        <c:actionPlanFilePreview fileId="{!file.ContentDocumentId}"/>
+                                                    </div>
+                                                </aura:iteration>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aura:if>
+                        </div>
+                    </aura:iteration>
+                </aura:if>
+            </div>
+        </article>
+    </aura:if>
+
+    <!-- in salesforce org -->
+    <aura:if isTrue="{!not(v.isInExperience)}">
+        <article class="slds-card">
+            <div class="slds-card__header slds-grid slds-page-header">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-custom-custom18" title="SearchDetails">
+                            <lightning:icon iconName="custom:custom18"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <a href="#" class="slds-card__header-link slds-truncate" title="Search Details">
+                                <span style="font-size: 16px;">Failed Questions</span>
+                            </a>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+            <div class="slds-card__body slds-card__body_inner">
+                <div class="slds-scrollable">
+                    <aura:if isTrue="{!v.isLoading}">
+                        <div>
+                            <lightning:spinner alternativeText="Loading" size="medium"/>
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.surveyQuestions}">
+                        <aura:iteration items="{!v.surveyQuestions}" var="ques">
+                            <div class="slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none"
+                                 key="{!ques.surveyQuestion.Id}">
+                                <div class="slds-grid slds-wrap" style="padding-left: 0.8rem; padding-right: 0.8rem; padding-bottom: 0.8rem;">
+                                    <div class="slds-col slds-size_12-of-12">
+                                        <span style="font-size: 16px; font-weight: bold;">Question {!ques.surveyQuestion.Question_Number_Text__c}</span>
+                                    </div>
+                                    <div class="slds-col slds-size_12-of-12" style="margin-bottom: 0.3rem">
+                                        <lightning:formattedRichText value="{!ques.surveyQuestion.Question_Text__c}" class="strong-text"></lightning:formattedRichText>
+                                        <!--<span style="font-size: 14px;">{!ques.surveyQuestion.Question_Text__c}</span>-->
+                                    </div>
+                                    <div class="slds-col slds-size_12-of-12" style="margin-bottom: 0.3rem">
+                                        <span style="font-size: 16px; font-weight: bold; color: blue;">Response : {!ques.surveyQuestion.Response__c}</span>
+                                    </div>
+
+                                    <div aura:if="{!ques.surveyQuestions}" style="padding-left: 3rem">
+                                        <aura:iteration items="{!ques.surveyQuestions}" var="child">
+                                            <div key="{!child.Id}">
+                                                <div class="slds-col slds-size_12-of-12" style="margin-bottom: 0.3rem">
+                                                    <lightning:formattedRichText value="{!child.Question_Text__c}" class="strong-text"></lightning:formattedRichText>
+                                                    <!--<span style="font-size: 14px;">{!child.Question_Text__c}</span>-->
+                                                </div>
+                                                <div class="slds-col slds-size_12-of-12" style="margin-bottom: 0.3rem">
+                                                    <span style="font-size: 16px; font-weight: bold; color: blue;">Response : {!child.Response__c}</span>
+                                                </div>
+                                            </div>
+                                        </aura:iteration>
+                                    </div>
+                                    <div class="slds-col slds-size_12-of-12">
+                                        <div>
+                                            <span style="font-size: 16px; font-weight: bold">Remarks : </span>
+                                            <!--<lightning:formattedRichText value="{!ques.surveyQuestion.Remarks__c}" class="strong-text"></lightning:formattedRichText>-->
+                                            <span style="font-size: 14px;">{!ques.surveyQuestion.Remarks__c}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <aura:if isTrue="{!ques.contentVersions}">
+                                    <div class="slds-grid slds-wrap" style="padding: 0.8rem">
+                                        <div class="custom-box slds-text-align_center" key="{!ques.surveyQuestion.Id}">
+                                            <p class="slds-text-align_left" style="font-size: 16px; font-weight: bold;">Evaluator Photos</p>
+                                           <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                <aura:iteration items="{!ques.contentVersions}" var="file">
+                                                    <div class="slds-p-around_small">
+                                                        <c:actionPlanFilePreview fileId="{!file.ContentDocumentId}"/>
+                                                   </div>
+                                                </aura:iteration>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aura:if>
+                            </div>
+                        </aura:iteration>
+                    </aura:if>
+                </div>
+            </div>
+        </article>
+    </aura:if>
+</aura:component>

@@ -1,0 +1,226 @@
+<!--
+ - Created by User on 2024-02-29.
+-->
+
+<template>
+    <div class="card">
+        <div class="col-group">
+            <div class="title"><b>PEP</b></div>
+            <div class="row-group">
+                <label class="col-form-label">MTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={dpb_mtd_red}></span>
+                        <span class={dpb_mtd_yellow}></span>
+                        <span class={dpb_mtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">QTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={dpb_qtd_red}></span>
+                        <span class={dpb_qtd_yellow}></span>
+                        <span class={dpb_qtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">YTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={dpb_ytd_red}></span>
+                        <span class={dpb_ytd_yellow}></span>
+                        <span class={dpb_ytd_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-group">
+            <div class="title"><b>HCUV (YTD)</b></div>
+            <div class="row-group">
+                <label class="col-form-label">% of Obj.</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={hcuv_obj_red}></span>
+                        <span class={hcuv_obj_yellow}></span>
+                        <span class={hcuv_obj_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">Pen Rate</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={hcuv_pen_red}></span>
+                        <span class={hcuv_pen_yellow}></span>
+                        <span class={hcuv_pen_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-group">
+            <div class="title"><b>SALES EFFICIENCY</b></div>
+            <div class="row-group">
+                <label class="col-form-label">R3</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={sales_efficiency_r3_red}></span>
+                        <span class={sales_efficiency_r3_yellow}></span>
+                        <span class={sales_efficiency_r3_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">R12</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={sales_efficiency_r12_red}></span>
+                        <span class={sales_efficiency_r12_yellow}></span>
+                        <span class={sales_efficiency_r12_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">YTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={sales_efficiency_ytd_red}></span>
+                        <span class={sales_efficiency_ytd_yellow}></span>
+                        <span class={sales_efficiency_ytd_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-group">
+            <div class="title"><b>RETAIL EXPERIENCE (R3M)</b></div>
+            <div class="row-group">
+                <label class="col-form-label">Sales</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={retail_experience_sales_red}></span>
+                        <span class={retail_experience_sales_yellow}></span>
+                        <span class={retail_experience_sales_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">Service</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={retail_experience_service_red}></span>
+                        <span class={retail_experience_service_yellow}></span>
+                        <span class={retail_experience_service_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-group">
+            <div class="title" style="min-width: 196.1px;"><b>RECALL ON DRIVE COMPLETION</b></div>
+            <div class="row-group">
+                <label class="col-form-label">MTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={recall_on_drive_completion_mtd_red}></span>
+                        <span class={recall_on_drive_completion_mtd_yellow}></span>
+                        <span class={recall_on_drive_completion_mtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">QTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={recall_on_drive_completion_qtd_red}></span>
+                        <span class={recall_on_drive_completion_qtd_yellow}></span>
+                        <span class={recall_on_drive_completion_qtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">YTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={recall_on_drive_completion_ytd_red}></span>
+                        <span class={recall_on_drive_completion_ytd_yellow}></span>
+                        <span class={recall_on_drive_completion_ytd_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-group">
+            <div class="title"><b>TOTAL PARTS</b></div>
+            <div class="row-group">
+                <label class="col-form-label">MTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={total_parts_mtd_red}></span>
+                        <span class={total_parts_mtd_yellow}></span>
+                        <span class={total_parts_mtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">QTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={total_parts_qtd_red}></span>
+                        <span class={total_parts_qtd_yellow}></span>
+                        <span class={total_parts_qtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">YTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={total_parts_ytd_red}></span>
+                        <span class={total_parts_ytd_yellow}></span>
+                        <span class={total_parts_ytd_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-group">
+            <div class="title"><b>CPS</b></div>
+            <div class="row-group">
+                <label class="col-form-label">MTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={comp_parts_sales_mtd_red}></span>
+                        <span class={comp_parts_sales_mtd_yellow}></span>
+                        <span class={comp_parts_sales_mtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">QTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={comp_parts_sales_qtd_red}></span>
+                        <span class={comp_parts_sales_qtd_yellow}></span>
+                        <span class={comp_parts_sales_qtd_green}></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row-group">
+                <label class="col-form-label">YTD</label>
+                <div class="traffic-box">
+                    <div class="traffic-light">
+                        <span class={comp_parts_sales_ytd_red}></span>
+                        <span class={comp_parts_sales_ytd_yellow}></span>
+                        <span class={comp_parts_sales_ytd_green}></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--{stringResults}-->
+</template>

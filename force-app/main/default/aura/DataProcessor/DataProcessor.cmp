@@ -1,0 +1,8 @@
+<aura:component >
+
+   <!-- attribute to accept Visualforce page's javascript method -->
+   <aura:attribute name="sendData" type="object"/>
+
+   <!-- Button component to invoke PDF download -->
+   <lightning:button label="Download Document" onclick="{!c.downloadDocument}" />
+</aura:component>

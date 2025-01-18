@@ -1,0 +1,10 @@
+.THIS {
+}
+/* .THIS.slds-template__container {
+      max-width: 80rem !important;
+      width:80% !important;
+      margin : 0 auto;
+} */
+.THIS.slds-card{
+      height : 100vh;
+}

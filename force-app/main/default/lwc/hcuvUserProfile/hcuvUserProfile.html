@@ -1,0 +1,24 @@
+<template>
+	<div class="slds-grid slds-wrap profile-wrap">
+		<div class="slds-border_right user-right-brdr" title={dealerName}>
+			<lightning-formatted-rich-text value={dealerName} if:false={isMobile}></lightning-formatted-rich-text>
+		</div>
+		<div tabindex="0" class="slds-size_6-of-8 profile-icon-wrap" onclick={onClickUserProfile}
+			onblur={onBlurUserProfile}>
+			<img class="slds-float_left userProfile" src={userProfileLogo} if:false={isMobile} />
+			<img class="slds-float_left userProfile" src={userProfileLogo} if:true={isMobile} />
+
+			<div class="dropdown">
+				<div class={downArrowCss} if:false={isMobile}></div>
+				<div class="dropdown-content" if:true={enableSubMenu}>
+					<a data-id="myProfile" href={baseUserUrl}>{myProfile}</a>
+					<a href={accURL}>{myAccount}</a>
+					<a if:true={dealerVis} href='javascript:void(0)' onclick={handleChangeDealer}>{changeDealer}</a>
+					<a href='javascript:void(0)' onclick={handleSwitchToDPM}>{switchToDPM}</a>
+					<a href={logoutURL}>{logout}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<c-hcuv-dual-account is-modal-open={showChangeDealer} onchangedealer={handleChangeDealerVis} selected-dealer={selectedDealerVal}></c-hcuv-dual-account>
+</template>

@@ -1,0 +1,36 @@
+.dummy{
+	color : blue;
+}
+
+
+
+.custom-table thead tr th div{
+	color:#54698D;
+	font-size:13px;
+	font-weight:600;
+}
+
+
+.custom-table .link-name-desc{
+	color:#16325C;
+	font-size:13px;
+	font-weight:600;
+}
+
+
+.custom-table .link-name{
+	color:#0070D2;
+	font-size:13px;
+	font-weight:600;
+}
+
+a {
+	color:#1589EE !important;
+	font-size:13px;
+	font-weight:600;
+}
+
+.left-nav-sub-item-img{
+	width:18px;
+	height:18px;
+}

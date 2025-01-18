@@ -1,0 +1,5 @@
+<apex:page renderAs="PDF" controller="SurveyQuestionController">
+
+
+    Test PDF
+</apex:page>

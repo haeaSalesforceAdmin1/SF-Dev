@@ -1,0 +1,33 @@
+<template>
+	<template if:true={showSpinner}>
+		<lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+			size="medium">
+		</lightning-spinner>
+	</template>
+	<div class="slds-p-bottom_small slds-grid slds-wrap">
+		<div class="slds-size_1-of-2 HMA-heading">
+			{quickLinks}
+		</div>
+	</div>
+	<div class="custom-table quick-links">
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+			<tbody>
+				<template for:each={quickLinksList} for:item="quickLink" for:index="index">
+					<tr key={quickLink.Id} class="slds-hint-parent">
+						<td>
+							<div class="slds-truncate link-name-desc" title={quickLink.Name}>
+								{quickLink.Name}
+							</div>
+						</td>
+						<td>
+							<div class="slds-truncate link-name" title={quickLink.Link__c}>
+								<a data-id={quickLink.Link__c} onclick={handleLinkClick}
+									class="slds-m-right_x-small message-text_bold">{quickLink.Link__c}</a>
+							</div>
+						</td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+	</div>
+</template>

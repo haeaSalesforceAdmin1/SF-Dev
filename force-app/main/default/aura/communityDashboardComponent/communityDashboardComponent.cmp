@@ -1,0 +1,63 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" controller="CommunityDashboardController">
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="account" type="Account" />
+    <aura:attribute name="isDealerTerminated" type="Boolean" default="FALSE" />
+    <aura:attribute name="filter" type="String"/>
+    <aura:attribute name="hyundaiDealerDashboardId" type="String"/>
+    <aura:attribute name="genesisDealerDashboardId" type="String"/>
+    <aura:attribute name="showComponent" type="Boolean" default="TRUE" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:html tag="style">
+        .action-bar {
+            display: none !important;
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showComponent}">
+    <div>
+        <lightning:card variant="Narrow" title="{!v.account.Name}" iconName="standard:account" footer="">
+            </lightning:card>
+        
+        <!-- Hyundai Dashboard-->
+        <aura:if isTrue="{!and(v.account.RecordType.Name == 'Hyundai Dealer', v.hyundaiDealerDashboardId != null)}">
+            <aura:if isTrue="{!!v.isDealerTerminated}">
+            <wave:waveDashboard 
+                dashboardId="{!v.hyundaiDealerDashboardId}"
+                openLinksInNewWindow="false"
+                filter="{!v.filter}"
+                showSharing="true"
+                height="1800"
+                showTitle="false"
+                showHeader="false"
+                openLocation="HIDE"/>
+            </aura:if>
+            <aura:if isTrue="{!v.isDealerTerminated}">
+            <p style="color: red;padding-top: 1%;"><b>This Account has been Terminated please use Dealer tab to select a different dealer.</b></p>
+        </aura:if>
+        </aura:if>
+        
+
+        <!--{"datasets":{"SalesKPI_Genesis":[{"fields":["inventory_dealer_cd"],"filter":{"operator":"in","values":["$DealerCode__c"]},"locked":true,"hidden":true}]}}-->
+        
+        <!-- Gen Dashboard-->
+        <aura:if isTrue="{!and(v.account.RecordType.Name == 'Genesis Retailer', v.genesisDealerDashboardId != null)}">
+            <aura:if isTrue="{!!v.isDealerTerminated}">
+            <wave:waveDashboard 
+                dashboardId="{!v.genesisDealerDashboardId}"
+                openLinksInNewWindow="false"
+                filter="{!v.filter}"
+                showSharing="true"
+                height="1800"
+                showTitle="false"
+                showHeader="false"
+                openLocation="HIDE"/>
+            </aura:if>
+            <aura:if isTrue="{!v.isDealerTerminated}">
+            <p style="color: red;padding-top: 1%;"><b>This Account has been Terminated please use Dealer tab to select a different dealer.</b></p>
+        </aura:if>
+        </aura:if>
+        
+    </div>
+</aura:if>
+</aura:component>

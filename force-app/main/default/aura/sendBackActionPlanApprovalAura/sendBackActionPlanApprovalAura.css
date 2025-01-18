@@ -1,0 +1,12 @@
+.THIS {
+}
+
+.THIS .commentsTextArea textarea {
+    height: 23vh;
+}
+
+.THIS .attach-to-bottom {
+    position: absolute;
+    right: 0px;
+    width: 100%;
+}

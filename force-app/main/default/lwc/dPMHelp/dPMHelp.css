@@ -1,0 +1,66 @@
+.showInLeft{
+	text-align: left;
+}
+ul {
+	margin-left: 20px;;
+}
+.borderAround {
+	border-radius: 0.25em;
+    border: 1px solid #c9c9c9;
+	width: 24%;
+	margin-right: 20px;
+}
+.borderAroundBox {
+	border-radius: 0.25em;
+    border: 1px solid #c9c9c9;
+}
+.borderAroundQuickRef {
+	border-radius: 0.25em;
+    border: 1px solid #c9c9c9;
+	padding-top: 10px;
+    padding-bottom: 10px;
+	background-color: #A36B4F;
+	color: white;
+}
+.borderAroundQuickRefHMA {
+	border-radius: 0.25em;
+    border: 1px solid #c9c9c9;
+	padding-top: 10px;
+    padding-bottom: 10px;
+	background-color: #002c5f;
+	color: white;
+}
+.header {
+	background-color: #002c5f;
+	color: white;
+	text-align: center;
+	padding-top: 7px;
+    padding-bottom: 7px;
+}
+.slds-card__header {
+	padding: 0 !important;
+}
+.header1 {
+	background-color: #A36B4F;
+	color: white;
+	text-align: center;
+	padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+a {
+    color: blue;
+}
+.slds-popover__header {
+    border-bottom: 1px solid black;
+	background: #e6e1e1;
+}
+.slds-page-header{
+    background-color: white;
+}
+.slds-popover {
+	/*margin-left: 42%;
+	margin-top: -23px;*/
+    position: absolute;
+	z-index: 1100 !important;
+}

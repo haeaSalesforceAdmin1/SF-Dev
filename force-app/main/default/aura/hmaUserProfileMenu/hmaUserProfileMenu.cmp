@@ -1,0 +1,56 @@
+<!-- 
+* [Component Description] Hyundai, Genesis Community custom profile menu
+* Created by [MinheeKim] on [2024-06-17] for [DPM-4035]
+-->
+
+<aura:component controller="HMA_UserProfile" implements="forceCommunity:profileMenuInterface" access="global">
+    <aura:attribute name="isDropdownOpen" type="Boolean" default="false" />
+    <aura:attribute name="accounts" type="List" default="[]"/>
+    <aura:attribute name="isMobile" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="oUser" type="user" default="{'sobjectType' : 'User'}" />
+
+    <aura:attribute name="homeUrl" type="String" default=""/>
+    <aura:attribute name="myProfileUrl" type="String" default=""/>
+    <aura:attribute name="myAccountUrl" type="String" default=""/>
+    <aura:attribute name="logoutUrl" type="String" default=""/>
+
+        <div onclick="{!c.onClickUserProfile}" class="profile-name-wrap" >
+
+                <div role="button" aria-expanded="false" aria-haspopup="true" class="profileMenuRegion trigger-link" data-aura-rended-by="5:41;a"  tabindex="0">          
+                        <span class="profileImage"><img variant="circle" src="{!v.oUser.SmallPhotoUrl}"  alternativeText="{!v.oUser.Name}" initials="" class="slds-m-right_small circle-image"></img></span>
+                        <span class="profileName">{!v.oUser.Name}</span>
+                        <span class="triggerDownArrow down-arrow" data-aura-rended-by="10:41;a"><lightning:icon  
+                            iconName="utility:down" 
+                            alternativeText="Down Arrow" 
+                            class="slds-button__icon custom-icon" 
+                            variant="text" 
+                            size="xx-small"/></span>
+                        <div aura:id="dropdown" class="{!v.isDropdownOpen ? 'profileMenu slds-dropdown slds-show' : 'profileMenu slds-dropdown slds-hide'}" > <!--slds-dropdown_left-->
+                            <div class="profileMenuItem" onmouseover="{!c.hoverButton}">
+                                <div class="profileMenuLabel"><a href="{!v.homeUrl}">Home</a></div>
+                            </div>
+                            <aura:iteration items="{!v.accounts}" var="account">
+                                <div class="profileMenuItem">
+                                    <div class="profileMenuLabel"><a href="{!account.value}">{!account.label}</a></div>
+                                </div>
+                            </aura:iteration>     
+                            <div class="profileMenuItem">
+                                <div class="profileMenuLabel"><a href="{!v.myProfileUrl}">My Profile</a></div>
+                            </div>
+                            <div class="profileMenuItem">
+                                <div class="profileMenuLabel"><a href="{!v.myAccountUrl}">My Account</a></div>
+                            </div>
+                            <div class="profileMenuItem">
+                                <div class="profileMenuLabel"><a href="{!v.logoutUrl}">Logout</a></div>
+                            </div>
+                        </div>   
+                    
+                </div>
+
+            
+        </div>
+        
+
+        
+</aura:component>

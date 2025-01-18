@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <description>Keystone Estimator</description>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>analytics__Dashboard</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="analytics__Dashboard">
+            <hasStep>true</hasStep>
+            <property name="guBun" type="String" required="true" />
+            <property name="currentDate" type="String" />
+            <property name="bonus" type="String" />
+            <property name="payoutDataSet" type="String" />
+        </targetConfig>
+    </targetConfigs>
+    <masterLabel>Keystone Estimator</masterLabel>
+</LightningComponentBundle>

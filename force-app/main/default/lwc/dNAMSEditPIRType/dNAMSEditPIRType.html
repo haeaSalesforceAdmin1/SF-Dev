@@ -1,0 +1,116 @@
+<template>
+
+    
+    <template if:true={firstScreen}>
+        <div data-id="pirTypeSelectDiv" class="slds-modal__content slds-p-around_medium">
+        <div class="slds-modal__content slds-p-around_medium" style="border: 1px solid #C9C9C9 !important">
+            <lightning-dual-listbox data-name="PIRTypes" label="PIR Types" source-label="Available" selected-label="Selected" options={options} value={selectedValues} onchange={selectedTypesEdit} required ></lightning-dual-listbox>
+        </div>
+        <footer class="slds-modal__footer" style="border: 1px solid #C9C9C9 !important; margin-top: 16px; background-color: transparent;">
+            <lightning-button variant="brand" label="Next" title="Next" onclick={pirSelectNext}></lightning-button>
+        </footer>
+        </div>
+    </template>
+
+
+<template if:true={isQuestionsFormOpen}>
+<div data-id="pirQuestionFormDiv" class="slds-hide" style="border: 1px solid #C9C9C9 !important; background-color: white; padding: 16px;">
+    <table>
+        <tbody>
+            <tr>
+                <td style="text-align: left; font-size: 2rem; padding: 2px">PIR Questions Form</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style= "font-size: 20px; padding: 16px;">
+        <strong>Selected PIR Types : </strong>
+        <span data-id="selectedPIRTypesDisplay"></span>
+    </div>
+    
+    <template if:true={sections}>
+        <lightning-accordion allow-multiple-sections-open={multiple} active-section-name={sectionNames}>
+            <template for:each={sections} for:item="sect" for:index="moduleIndex">
+                <lightning-accordion-section name={sect.SectionName} label={sect.SectionName} key={sect.SectionName} style="--slds-c-accordion-summary-color-background: #E9F0FA; padding: 2px; border: 1px solid #E9F0FA;">
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-start slds-gutters_x-small">
+                        <template for:each={sect.QuesData} for:item="qns" for:index="qnindex">
+                            <div class="slds-col slds-size_6-of-12 slds-p-horizontal_medium slds-p-top_xxx-small" key={qns.QuestionId}>
+
+                                <!-- Text input -->
+                                <template if:true={qns.IsTextType}>
+                                    <lightning-input type="text" onchange={handleInputChange} data-id={qns.QuestionId} 
+                                                     label={qns.QuestionText} 
+                                                     value={qns.Response} 
+                                                     required={qns.IsRequired} 
+                                                     disabled={qns.IsReadOnly}></lightning-input>
+                                </template>
+
+                                <!-- Date input -->
+                                <template if:true={qns.IsDateType}>
+                                    <lightning-input type="date" onchange={handleInputChange} data-id={qns.QuestionId} 
+                                                     label={qns.QuestionText} 
+                                                     value={qns.Response} 
+                                                     required={qns.IsRequired} 
+                                                     disabled={qns.IsReadOnly}></lightning-input>
+                                </template>
+
+                                <!-- Select input -->
+                                <template if:true={qns.IsSelectType}>
+                                    <lightning-combobox onchange={handleInputChange} data-id={qns.QuestionId} 
+                                                       options={qns.QnOptions} 
+                                                       label={qns.QuestionText} 
+                                                       value={qns.Response}
+                                                       required={qns.IsRequired} 
+                                                       disabled={qns.IsReadOnly}></lightning-combobox>
+                                </template>
+
+                                <!-- Textarea input -->
+                                <template if:true={qns.IsTextAreaType}>
+                                    <lightning-textarea onchange={handleInputChange} data-id={qns.QuestionId} 
+                                                        options={qns.QnOptions} 
+                                                        label={qns.QuestionText}
+                                                        value={qns.Response} 
+                                                        required={qns.IsRequired} 
+                                                        disabled={qns.IsReadOnly}></lightning-textarea>
+                                </template>
+
+                                <!-- Checkbox input -->
+                                <template if:true={qns.IsCheckBoxType}>
+                                    <lightning-input type="checkbox" onchange={handleCheckboxChange} data-id={qns.QuestionFieldName} 
+                                                     required={qns.IsRequired} 
+                                                     disabled={qns.IsReadOnly}></lightning-input>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                </lightning-accordion-section>
+            </template>
+        </lightning-accordion>
+        <footer class="slds-modal__footer" style="border: 1px solid #C9C9C9 !important; margin-top: 16px; background-color: transparent;">
+            <lightning-button variant="brand" label="Save" title="Save" onclick={submitResponses}></lightning-button>
+        </footer>
+    
+    </template>     
+  
+</div>
+</template>
+
+<template if:true={isModalOpen}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <div class="slds-modal__header">
+                <h2 class="slds-text-heading_medium">Confirm Submission</h2>
+            </div>
+            <div class="slds-modal__content slds-p-around_medium" style="text-align: center; font-weight: bold;">
+                <p>Your PIR is edited and saved with updated response(s).</p>
+            </div>
+            
+            <div class="slds-modal__footer">
+                <lightning-button variant="brand" label="OK" onclick={handleConfirm}></lightning-button> 
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>
+
+</template>

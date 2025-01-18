@@ -1,0 +1,138 @@
+.text-new {
+	color: white;
+	background-color:#4BCA81;
+	font-size:9px;
+	padding:2px;
+	border-radius:3px;
+}
+
+/* .text-normal {
+	color:#4BCA81;
+}
+
+.text-low {
+	color: #FFB75D;
+}
+
+.text-high {
+	color: #C23934;
+} */
+
+.custom-table .slds-table thead th{
+	color:#16325C;
+	font-size:13px;
+	font-weight:600;
+	background-color:#EDEDED;
+}
+.custom-table tbody tr td div {
+    font-weight: 600;
+    color: #16325C;
+}
+.tbl-pg .slds-m-left_small{
+	color:#1F1F1F;
+	font-weight:600;
+}
+.custom-table .link-name-desc{
+	color:#16325C;
+	font-size:13px;
+	font-weight:600;
+}
+.custom-table .slds-truncate a{
+	font-weight: 600;
+    color:#1589EE;
+}
+
+.custom-table .link-name{
+	color:#0070D2;
+	font-size:13px;
+	font-weight:600;
+}
+
+.custom-table .slds-truncate a{
+	font-weight:600;
+}
+
+.custom-table tbody tr th .slds-truncate{
+	color:#16325C;
+}
+
+.custom-top-btn .xs-cust-icon {
+    --sds-c-icon-color-foreground-default: #0070d2;
+	width:16px;
+	margin:0 10px;
+
+}
+
+.custom-top-btn .xs-cust-icon:last-child{
+	margin-right:0px;
+}
+
+.arrow-btn .slds-button, .arrow-btn{
+	font-size: 21px;
+	margin-top: -2px;
+	font-weight: 600;
+	color: #ccc !important;
+}
+
+.active-page {
+    cursor: pointer;
+    background: #ccc;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff !important;
+}
+.custom-top-btn{
+	display:flex;
+	justify-content:flex-end;
+}
+
+.custom-top-btn .slds-float_left{
+	margin-right:12px;
+	font-size:11px;
+	white-space:nowrap;
+}
+.custom-top-btn .slds-float_left .slds-button{
+	
+	white-space:nowrap;
+}
+.custom-top-btn .slds-float_left:last-child{
+	margin-right:0;
+}
+.head-const{
+	font-size: 18px; font-weight: bold;
+ color: rgb(14, 14, 14);
+ 
+}
+
+.head-const .arrow{
+	cursor:pointer;
+}
+
+@media (max-width:1280px) {
+	.HMA-heading{
+		font-size:14px;
+	}
+}
+@media (max-width:992px){ 
+	.custom-top-btn{
+		padding-right:16px;
+	}
+	.custom-slds-wrap{
+		border-bottom: 3px solid #0070D2;
+		padding-bottom: 11px;
+		margin-bottom: 13px;
+	}
+	.custom-top-btn{
+		justify-content:flex-start;
+		flex-flow:wrap;
+		font-size:11px;
+		margin-right:0px;
+		margin-bottom:6px;
+	}
+	.custom-top-btn button{
+		width:120px;
+	}
+}

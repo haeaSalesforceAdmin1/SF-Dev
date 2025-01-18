@@ -1,0 +1,106 @@
+<template>
+    <!-- Modal dialog to confirm a record delete -->
+    <div class="slds">
+        <section if:true={isModalOpen} class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                    <lightning-icon
+                        icon-name="utility:close"
+                        size="small"
+                        alternative-text="Indicates close"
+                        onclick={closeDialog}
+                    >
+                    </lightning-icon>
+                    <span class="slds-assistive-text">Cancel and close</span>
+                </button>
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Delete Dealer Change Request</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-messages></lightning-messages>
+                        <h1>Are you sure you want to delete this Dealer Change Request?</h1>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeDialog}></lightning-button>
+                    &nbsp;&nbsp;
+                    <lightning-button variant="brand" onclick={handleDelete} label="Delete"></lightning-button>
+                </footer>
+        
+            </div>
+        </section>
+        <div if:true={isModalOpen} class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+    <!-- Modal dialog to show Error -->
+    <div class="slds">
+        <section if:true={isErrorModalOpen} class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                    <lightning-icon
+                        icon-name="utility:close"
+                        size="small"
+                        alternative-text="Indicates close"
+                        onclick={closeDialog}
+                    >
+                    </lightning-icon>
+                    <span class="slds-assistive-text">Cancel and close</span>
+                </button>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <lightning-messages></lightning-messages>
+                        <h1>There's a problem saving this record. You might not have permission to edit it, or it might have been deleted or archived. Contact your administrator for help.</h1>
+                </div>
+            </div>
+        </section>
+        <div if:true={isErrorModalOpen} class="slds-backdrop slds-backdrop_open"></div>
+    </div>
+
+    <!-- Article to show list of records -->
+    <article >
+        <div class="slds-page-header slds-page-header_related-list">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1 class="slds-card__header-title">
+                                        <lightning-icon icon-name="custom:custom8" title="custom8"></lightning-icon>
+                                        <span>
+                                            <div class="slds-page-header__title slds-truncate" title="Dealer Change Requests">
+                                                &nbsp; Dealer Change Requests
+                                            </div>
+                                        </span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>            
+            </div>
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-meta">
+                    <p class="slds-page-header__meta-text">
+                        <span style="font-weight: 500">{dealerRecords.length}</span> Items • Sorted by <span style="font-weight: 500">{sortByLabel}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div if:true={showSpinner}>
+            <lightning-spinner
+                alternative-text="Loading..." variant="brand">
+            </lightning-spinner>
+        </div>
+        <lightning-datatable
+            key-field="id"
+            data={dealerRecords}
+            columns={columns}
+            sorted-direction={sortDirection}
+            sorted-by={sortBy}
+            onsort={handleSort}
+            onrowaction={handleRowAction}
+            hide-checkbox-column="true"
+            show-row-number-column="true"
+        >
+        </lightning-datatable>
+    </article>
+</template>

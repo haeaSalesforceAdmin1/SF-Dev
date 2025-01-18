@@ -1,0 +1,26 @@
+.THIS {
+
+}
+
+.THIS .centerspinner {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+}
+
+.THIS .attach-to-bottom {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+}
+
+/* -------- LOADING WHEEL --------- */
+/*.THIS .loading_wheel{
+    position: fixed;
+}
+
+.THIS .slds-spinner_container{
+    width: 100vw;
+    left: min(-25vw, calc(-50vw + 20rem));
+}*/

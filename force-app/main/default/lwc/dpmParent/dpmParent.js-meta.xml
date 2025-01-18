@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+	<apiVersion>54.0</apiVersion>
+	<isExposed>true</isExposed>
+	<masterLabel>DPM Help Parent</masterLabel>
+	<targets>
+		<target>lightning__AppPage</target>
+		<target>lightning__Tab</target>
+		<target>lightningCommunity__Page</target>
+		<target>lightningCommunity__Default</target>
+	</targets>
+	<targetConfigs>
+        <targetConfig targets="lightning__AppPage, lightningCommunity__Default">
+            <property name="dpmResources" label="DPM Resources Label" type="String" />
+			<property name="salesOrgLabel" label="Sales Org Label" type="String" />
+			<property name="afterSalesOrgLabel" label="After Sales Org Label" type="String" />
+			<property name="questionLinksLabel" label="Question Label" type="String" />
+			<property name="financialOrgLabel" label="Financial Org Label" type="String" />
+			<property name="cxOrgLabel" label="CX Org Label" type="String" />
+			<property name="keystoneOrgLabel" label="Keystone Org Label" type="String" />
+			<property name="userType" label="User Type" default="internal" description="internal/community" type="String" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

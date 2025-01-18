@@ -1,0 +1,7 @@
+<!--
+ - Created by baltamimi on 2022-02-15.
+ -->
+
+<aura:component description="RefreshView" implements="lightning:availableForFlowActions,force:hasRecordId">
+
+</aura:component>

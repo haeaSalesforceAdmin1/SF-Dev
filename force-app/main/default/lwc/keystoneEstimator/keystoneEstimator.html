@@ -1,0 +1,212 @@
+<!--
+ - Created by User on 2023-06-28.
+ -->
+
+<!-- Keystone Estimator -->
+<template>
+    <!-- {data} -->
+    <div class="card-title-box">
+        <div class="card-title-text">
+            <span class="card-title-text-left">Time Period: {estimatorDate}</span>
+            <template if:true={checkGuBun}>
+                <span class="card-title-text-right">Keystone Estimator - {guBun}</span>
+            </template>
+            <template if:false={checkGuBun}>
+                <span class="card-title-text-right">{checkQuarterlyTitle} Estimator - {guBun}</span>
+            </template>
+        </div>
+    </div>
+    <div class="card-estimator">
+        <div class="card-body">
+            <div style="width:350px;float:left;">
+<!-- <lightning-card style="width:100%">-->
+                <h1 style="background-color:black;color:white;font-size:18px;width:350px;height:40px;text-align:center;vertical-align:middle;display:table-cell;">Projected {guBun} Estimates</h1>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="border-collapse:collapse" >
+                    <thead>
+                        <tr class="div-align-center">
+                            <th class="" scope="col" style="padding-left:var(--lwc-spacingLarge,1.5rem);width:70px;background-color:rgb(243, 243, 243);">
+                                <div>MODEL</div>
+                            </th>
+                            <th style="padding:0px;width:140px;background-color:rgb(243, 243, 243);" scope="col">EST. RETAIL SALES</th>
+                            <th style="padding:0px;width:100px;background-color:rgb(243, 243, 243);" scope="col">EST. MSRP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={listModelItems} for:item="listModelItem" for:index="index">
+                            <tr key={listModelItem.id}>
+                                <td>
+                                    <div>{listModelItem.model}</div>
+                                </td>
+                                <td>
+                                    <lightning-input class="slds-align_absolute-center" data-field-name="sales" data-row-index={index} value={listModelItem.sales} onchange={handleChange} type="number"></lightning-input>
+                                </td>
+                                <td style="padding: 0px;">
+                                    <lightning-input class="slds-align_absolute-center" data-field-name="msrp" data-row-index={index} value={listModelItem.msrp} onchange={handleChange} type="number" formatter="currency" step="1"></lightning-input>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr style="background-color: #e3e3e3; height: 40px">
+                            <td style="font-weight: bold;">
+                                <div class="slds-truncate" >TOTAL</div>
+                            </td>
+                            <td style="font-weight: bold;">{totalListModelItem}</td>
+                            <td style="padding: 0px;">
+                                <span class="slds-align_absolute-center" style="margin: 0px;">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+<!-- </lightning-card>-->
+            </div>
+            <div style="width:580px;float:right;">
+                <div style="float:left;width:100%;">
+                <!-- <lightning-card>-->
+                    <!-- Estimated Payout -->
+                    <h1 style="background-color:black;color:white;font-size:18px;width:600px;height:40px;text-align:center;vertical-align:middle;display:table-cell;">Estimated Payout</h1>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="border-collapse:collapse;" >
+                        <thead>
+                            <tr class="div-align-center">
+                                <th class="program-width" scope="col">
+                                    <div>PROGRAM</div>
+                                </th>
+                                <th class="achieved-width" scope="col">ACHIEVED</th>
+                                <template if:true={checkNC}>
+                                    <th class="common-width" scope="col">$ PAYOUT</th>
+                                </template>
+                                <template if:false={checkNC}>
+                                    <th class="common-width" scope="col">% PAYOUT</th>
+                                    <th class="common-width" scope="col">$ PAYOUT</th>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={listPayoutItems} for:item="listPayoutItem">
+                                <tr key={listPayoutItem.Id} class={listPayoutItem.hidden}>
+                                    <td data-label="Prospecting">
+                                        <div class="slds-truncate">{listPayoutItem.program}</div>
+                                    </td>
+                                    <td class={listPayoutItem.color}>{listPayoutItem.achieved}</td>
+                                    <template if:true={checkNC}>
+                                        <td class={listPayoutItem.prefixNCPay}>{listPayoutItem.payoutNCPay}</td>
+                                    </template>
+                                    <template if:false={checkNC}>
+                                        <td class={listPayoutItem.suffix}>{listPayoutItem.payout1}</td>
+                                        <td class={listPayoutItem.prefix}>{listPayoutItem.payout2}</td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <!-- // Estimated Payout -->
+                    <!-- </lightning-card>-->
+                </div>
+                <div style="float:left;width:100%;margin-top:20px;">
+                    <!-- <lightning-card >-->
+                    <!-- Estimated Opportunity  -->
+                    <h1 style="background-color:black;color:white;font-size:18px;width:600px;height:40px;text-align:center;vertical-align:middle;display:table-cell;">Estimated Opportunity</h1>
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="border-collapse:collapse;" >
+                        <thead>
+                            <tr class="div-align-center">
+                                <th class="program-width" scope="col">
+                                    <div>PROGRAM</div>
+                                </th>
+                                <th class="achieved-width" scope="col">{checkOpportunityTitle}</th>
+                                <template if:true={checkNC}>
+                                    <th class="common-width" scope="col">$ PAYOUT</th>
+                                </template>
+                                <template if:false={checkNC}>
+                                    <th class="common-width" scope="col">% PAYOUT</th>
+                                    <th class="common-width" scope="col">$ PAYOUT</th>
+                                </template>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={listOppItems} for:item="listOppItem">
+                                <tr key={listOppItem.Id}>
+                                    <td data-label="Prospecting">
+                                        <div class="slds-truncate">{listOppItem.program}</div>
+                                    </td>
+                                    <td class={listOppItem.color}>{listOppItem.achieved}</td>
+                                    <template if:true={checkNC}>
+                                        <td class={listOppItem.prefixNCOpp}>{listOppItem.payoutNCOpp}</td>
+                                    </template>
+                                    <template if:false={checkNC}>
+                                        <td class={listOppItem.suffix}>{listOppItem.payout1}</td>
+                                        <td class={listOppItem.prefix}>{listOppItem.payout2}</td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <!-- // Estimated Opportunity  -->
+                    <!-- </lightning-card>-->
+                </div>
+                <template if:true={checkNC}></template>
+                <template if:false={checkNC}>
+                    <div style="float:left;width:100%;margin-top:20px;">
+                        <!-- <lightning-card>-->
+                        <!-- Maximum Estimated Earnings -->
+                        <h1 style="background-color:black;color:white;font-size:18px;width:600px;height:40px;text-align:center;vertical-align:middle;display:table-cell;">Maximum Estimated Earnings</h1>
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="border-collapse:collapse;" >
+                            <thead>
+                                <tr class="div-align-center">
+                                    <th class="" style="background-color:rgb(243, 243, 243);height:33px;" scope="col"  colspan="2"></th>
+                                    <th class="common-width" scope="col">% PAYOUT</th>
+                                    <th class="common-width" scope="col">$ PAYOUT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Prospecting" colspan="2">
+                                        <div class="slds-truncate">Estimated Payout</div>
+                                    </td>
+                                    <td class={sumPayout.suffix}>{sumPayout.payPercent}</td>
+                                    <td class={sumPayout.prefix}>{sumPayout.payCurrency}</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Prospecting" colspan="2">
+                                        <div class="slds-truncate">Estimated Opportunity</div>
+                                    </td>
+                                    <td class={sumOpp.suffix}>{sumOpp.payPercent}</td>
+                                    <td class={sumOpp.prefix}>{sumOpp.payCurrency}</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Prospecting" colspan="2">
+                                        <div class="slds-truncate">Maximum Estimated Earnings</div>
+                                    </td>
+                                    <td class={total.suffix}>{total.payPercent}</td>
+                                    <td class={total.prefix}>{total.payCurrency}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- // Maximum Estimated Earnings -->
+                        <!-- </lightning-card>-->
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+    <div class="card-bottom-box">
+        <div class="card-bottom-text">
+            <div>1. Projected {guBun} Estimates: Pre-populated estimated sales based on previous day COB.</div><br/>
+            <div>2. Estimated MSRP: The amounts suggested in this dashboard are only suggestions and not representative of what may be achieved by any retailer.</div><br/>
+            <div style="margin-left: 13px;">The retailer is free to adjust these amounts based on their anticipated trim/option mix.</div><br/>
+            <div>3. Payout from Program: These amounts are only to be thought of as estimates and assume a maximum payout based on input values.</div><br/>
+            <div style="margin-left: 13px;">They are not indicative of what the retailer will achieve.</div><br/>
+            <div>4. Estimated Payout: This is a sum of payouts from individual programs based on current dealer status and is not a promise of what the retailer will achieve based on input values.</div><br/>
+            <div>5. Estimated Opportunity: This is a sum of potential earning opportunity from individual programs assuming retailer compliance and is not a promise of what the retailer will</div><br/>
+            <div style="margin-left: 13px;">achieve based on input values.</div>
+            <div style="margin-top: 60px;">
+                <div style="font-size: 18px; color: rgb(125, 152, 179); float: left; padding: 10px 0;">Detail payout information can be found using</div>
+                <div class="link-box" style="float: left;">
+                    <a href="https://www.genesisdealerusa.com/_layouts/GSSOSharepointSolution/SSORedirect.aspx?id=VINS_allowCU" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                        <span class="gridLayoutWidget text" style="font-size: 18px; text-align: center; color: rgb(51, 87, 121);">Link to VINS System</span>
+                    </a>
+                    <div class="tooltip-text">
+                        <span>Extemal Data Link<br/>(https://www.genesisdealerusa.com)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

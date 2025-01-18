@@ -1,0 +1,31 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" controller="HCUV_CommunityDashboardController">
+    
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="filter" type="String"/>
+    <aura:attribute name="account" type="String"/>    
+    <aura:attribute name="hyundaiDealerDashboardId" type="String"/>
+    <aura:attribute name="dHeight" type="String" default="1800"/>
+    <aura:attribute name="dashboardType" type="String"/>
+    <aura:attribute name="showComponent" type="Boolean" default="FALSE" />
+    <aura:attribute name="showSharing" type="Boolean" default="true" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:html tag="style">
+        .action-bar {
+            display: none !important;
+        }
+    </aura:html>
+    <aura:if isTrue="{!v.showComponent}">
+    <div>
+            <wave:waveDashboard 
+                dashboardId="{!v.hyundaiDealerDashboardId}"
+                openLinksInNewWindow="false"
+                filter="{!v.filter}"
+                showSharing="{!v.showSharing}"
+                height="{!v.dHeight}"
+                showTitle="false"
+                showHeader="false"/>            
+           
+    </div>
+    </aura:if>
+</aura:component>

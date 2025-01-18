@@ -1,0 +1,18 @@
+<!--
+ - Created by baltamimi on 2022-02-11.
+ -->
+
+<aura:component description="PackageCreateAction"  
+                implements="lightning:isUrlAddressable,flexipage:availableForAllPageTypes,lightning:actionOverride,forceCommunity:availableForAllPageTypes"
+                controller="DNAMSUserPermissionsetCheck" access="global">
+    <aura:attribute name="recordId" type="String"/>
+    <lightning:workspaceAPI aura:id="createPackageWorkspace"/>
+	
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <lightning:card>
+        <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}"/>
+    </lightning:card>
+    
+    
+</aura:component>

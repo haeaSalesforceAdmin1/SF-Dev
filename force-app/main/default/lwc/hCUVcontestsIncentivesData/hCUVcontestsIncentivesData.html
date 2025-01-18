@@ -1,0 +1,130 @@
+<template>
+	<template if:true={showSpinner}>
+		<lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+			size="medium">
+		</lightning-spinner>
+	</template>
+
+	<template if:false={selContestsIncentive}>
+		<div class="slds-p-bottom_small slds-grid slds-wrap">
+			<div class="slds-size_1-of-2" style="font-size: 18px; font-weight: bold; color: rgb(14, 14, 14);">
+				{contestsIncentives}
+			</div>
+		</div>
+		<div class="custom-table gms-tbl">
+			<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+				<thead>
+					<tr class="slds-line-height_reset">
+						<th class="" scope="col">
+							<div data-id="PROGRAM NAME" class="slds-truncate message-text_bold message-text_size"
+								title="PROGRAM NAME">
+								{prgNameText}
+							</div>
+						</th>
+						<th class="" scope="col">
+							<div data-id="START DATE" class="slds-truncate message-text_bold message-text_size"
+								title="DATE">
+								{startDate}
+							</div>
+						</th>
+						<th class="" scope="col">
+							<div data-id="END DATE" class="slds-truncate message-text_bold message-text_size"
+								title="DATE">
+								{endDate}
+							</div>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<template for:each={data} for:item="contestsIncentives" for:index="index">
+						<tr key={contestsIncentives.Id} class="slds-hint-parent">
+							<td>
+								<div class="slds-truncate" title={contestsIncentives.Subject__c}>
+									<a data-id={contestsIncentives.Id} onclick={handleNameClick}
+										class="slds-m-right_x-small message-text_bold">{contestsIncentives.Subject__c}</a>
+									<template if:true={contestsIncentives.isNew}>
+										<span class="text-new">
+											{newText}
+										</span>
+									</template>
+								</div>
+							</td>
+							<td>
+								<div class="slds-truncate" title={contestsIncentives.Date__c}>
+									{contestsIncentives.Date__c}
+								</div>
+							</td>
+							<td>
+								<div class="slds-truncate" title={contestsIncentives.End_Date__c}>
+									{contestsIncentives.End_Date__c}
+								</div>
+							</td>
+						</tr>
+					</template>
+					<template if:true={isNoInventoryFound}>
+						<tr class="slds-hint-parent">
+							<td data-label="No records to display!" colspan="9">
+								<div class="slds-truncate slds-align_absolute-center ">{recordDisplayText}</div>
+							</td>
+						</tr>
+					</template>
+				</tbody>
+			</table>
+		</div>
+
+		<template if:true={showCurrentPage}>
+			<div class="slds-grid slds-wrap">
+				<div class="slds-align_absolute-center">
+					<div class="">
+						<lightning-button label=">" name="next" variant="base"
+							class="slds-float_right slds-m-left_small arrow-btn" onclick={handlePrevNext}
+							disabled={disableNext}>
+						</lightning-button>
+						<div class="slds-float_right slds-p-top_xx-small tbl-pg">
+							<template for:each={pages} for:item="page" for:index="index">
+								<span key={page.no} data-id={page.no} class={page.class} style="cursor: pointer;"
+									onclick={handlePageClick}>{page.no}</span>
+							</template>
+						</div>
+						<lightning-button label="<" name="prev" variant="base" class="slds-float_right arrow-btn"
+							onclick={handlePrevNext} disabled={disablePrev}>
+						</lightning-button>
+					</div>
+
+				</div>
+			</div>
+		</template>
+	</template>
+
+	<template if:true={selContestsIncentive}>
+		<div class="slds-p-bottom_small slds-grid slds-wrap">
+			<div class="slds-size_1-of-2 head-const">
+				<lightning-icon icon-name="utility:back" title="Back" size="x-small" class="slds-p-right_xx-small arrow"
+					onclick={handleBackClick}>
+				</lightning-icon>
+				{contestsIncentives}
+			</div>
+		</div>
+		<div class="slds-box">
+			<lightning-formatted-rich-text value={selContestsIncentive.Description__c}>
+			</lightning-formatted-rich-text>
+
+			<br /><br />
+			<template for:each={selContentDocuments} for:item="selContentDocument" for:index="index">
+				<template if:true={selContentDocument.isVideo}>
+					<img key={selContentDocument.ContentDocumentId} src={hmaIcons.video}
+						class="left-nav-sub-item-img slds-m-right_x-small">
+				</template>
+				<template if:false={selContentDocument.isVideo}>
+					<img key={selContentDocument.ContentDocumentId} src={hmaIcons.pdf}
+						class="left-nav-sub-item-img slds-m-right_x-small">
+				</template>
+				<a key={selContentDocument.ContentDocumentId} data-id={selContentDocument.ContentDocumentId}
+					onclick={handleLinkClick}
+					class="slds-m-right_x-small message-text_bold">{selContentDocument.ContentDocument.Title}</a>
+				<br key={selContentDocument.ContentDocumentId} />
+			</template>
+
+		</div>
+	</template>
+</template>

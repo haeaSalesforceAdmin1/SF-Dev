@@ -1,0 +1,59 @@
+<template>
+	<ul class={topNavCss}>
+		<div if:true={isMobile} class="xs-top-nav-close" onclick={handleTopNavBar}>
+			<img src={clearIcon} />
+		</div>
+			<!-- <template> -->
+			<template for:each={finalMenu} for:item="item">
+				<li key={item.id} data-menu-item-id={item.id} data-id={item.label} onclick={handleNavClick} class={item.isSelectedClassName}>
+					<div tabindex="0" class="top-nav-btn" onblur={handleSubMenuBlur}>
+						<a data-menu-item-id={item.id} class="top-menu-meta-wrap">
+							<div class="menu-top-ico">
+								<c-hcuv-portal-icons icon={item.iconUrl} width="15" height="12"></c-hcuv-portal-icons>
+							</div>
+							<div class="menu-top-text">{item.label}</div>
+							<template if:true={item.subMenu}>
+								<template if:true={item.enableSubMenu}>
+									<lightning-icon icon-name="utility:up" size="x-small"></lightning-icon>
+								</template>
+								<template if:false={item.enableSubMenu}>
+									<lightning-icon icon-name="utility:down" size="x-small"></lightning-icon>
+								</template>
+							</template>
+						</a>
+
+						<template if:true={item.enableSubMenu}>
+							<ul class={subMenuCss} if:true={item.showSubMenu}>
+								<template for:each={item.subMenu} for:item="subItem">
+									<li key={subItem.id} data-menu-item-id={subItem.id} data-id={subItem.label} onclick={handleNavClick}
+										class={subItem.isSelectedClassName}>
+										<a data-menu-item-id={subItem.id} class="top-menu-meta-wrap">
+											<div class="menu-top-ico">
+												<c-hcuv-portal-icons icon={subItem.iconUrl} width="16" height="15">
+												</c-hcuv-portal-icons>
+											</div>
+											<div class="menu-top-text menu-top-text-meta-wrap">{subItem.label}</div>
+										</a>
+									</li>
+								</template>
+							</ul>
+						</template>
+
+						<template if:false={isMobile}>
+							<template if:true={item.showVINSearch}>
+								<button style="margin-top: 10px;" >
+						<div class="">
+							<template if:true={item.showVINSearch} >							
+								<lightning-input class="input-text-color" variant="label-hidden" type="text" onkeypress={handleEnter} onblur={onBlurisVINSearch}>
+								</lightning-input>
+							</template>
+						</div>
+					</button>
+							</template>
+						</template>
+					</div>
+				</li>
+
+			</template>
+	</ul>
+</template>

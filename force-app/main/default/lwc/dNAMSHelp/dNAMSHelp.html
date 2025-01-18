@@ -1,0 +1,276 @@
+<template>
+     <div class="slds-box slds-theme_default">
+            <lightning-tabset variant="standard" class="tab-active">
+                <lightning-tab if:true={showHMA} label="Hyundai DNAMS Help" value="HMA">
+                    <template if:true={isInternalUser}>
+                            <!-- DNAMS Training Material Links -->
+                            <div class="slds-grid slds-no-flex">
+                                <div class="borderAroundBox slds-col slds-size_6-of-12">
+                                    <div>
+                                        <header slot="title" class="header">
+                                            <b>DNAMS Internal Guides</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intHMAGuidesPermissionLinks}>
+                                            <template for:each={intHMAGuidesPermissionLinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </div>
+                                        </br>
+                                        </br>
+                                    </div>
+                                    </br></br>
+                                    <div>
+                                        <header slot="title" class="header">
+                                            <b>How to Assign Dealer Permission?</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intHMAPermissionlinks}>
+                                            <template for:each={intHMAPermissionlinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </div>
+                                        </br>
+                                    </div>
+                                    
+                                </div>
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="borderAroundBox slds-col slds-size_2-of-12">
+                                <div>
+                                        <header slot="title" class="header">
+                                            <b>Dealer Guides</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intHMAGuidelinks}>
+                                            <template for:each={intHMAGuidelinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="borderAroundBox slds-col slds-size_2-of-12">
+                                <div>
+                                        <header slot="title" class="header">
+                                            <b>Support</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                                <div class="slds-p-left_medium">
+                                                    <h1>Dealer Portal and Login Issues</h1></br>
+                                                    <h1>Help Desk 888-734-4762</h1></br>
+                                                    Internal Email to: <a>ServiceNow@HAEAus.com</a></br>
+                                                    or visit <a>https://hmgitsm.service-now.com/hgp</a></br>
+                                                    <h1>DNAMS site questions or issues</h1></br>
+                                                    <h1>DNAMS Support: </h1><a>DNAMSsupport@hmausa.com</a></br>
+                                                    </br>
+                                                </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                            </div> 
+                            <!-- DNAMS Training Material Links -->
+                    </template>
+                    <template if:false={isInternalUser}>
+                        <!-- DNAMS Training Material Links -->
+                        <div class="slds-grid slds-no-flex">
+                            <div class="borderAroundBox slds-col slds-size_4-of-12">
+                                <div>
+                                    <header slot="title" class="header">
+                                        <b>Dealer Guides</b>
+                                    </header>
+                                    </br>
+                                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                                    <template if:true={dealerHMAGuidelinks}>
+                                        <template for:each={dealerHMAGuidelinks} for:item="link">
+                                            <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                    <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                    <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                            </div>
+                                        </template>
+                                    </template>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-12"></div>
+                            <div class="borderAroundBox slds-col slds-size_4-of-12">
+                            <div>
+                                    <header slot="title" class="header">
+                                        <b>Support</b>
+                                    </header>
+                                    </br>
+                                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <div class="slds-p-left_medium">
+                                            <h1>Dealer Portal and Login Issues</h1></br>
+                                            <h1>Help Desk 888-734-4762</h1></br>
+                                            Internal Email to: <a>ServiceNow@HAEAus.com</a></br>
+                                            or visit <a>https://hmgitsm.service-now.com/hgp</a></br>
+                                            <h1>DNAMS site questions or issues</h1></br>
+                                            <h1>DNAMS Support: </h1><a>DNAMSsupport@hmausa.com</a></br>
+                                            </br>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> 
+                        <!-- DNAMS Training Material Links -->
+                    </template>
+
+                </lightning-tab>
+                <lightning-tab if:true={showGMA} label="Genesis DNAMS Help" value="GMA">
+                     <template if:true={isInternalUser}>
+                         <!-- DNAMS Training Material Links -->
+                            <div class="slds-grid slds-no-flex">
+                                <div class="borderAroundBox slds-col slds-size_6-of-12">
+                                    <div>
+                                        <header slot="title" class="headerGMA">
+                                            <b>DNAMS Internal Guides</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intGMAGuidesPermissionLinks}>
+                                            <template for:each={intGMAGuidesPermissionLinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </div>
+                                        </br>
+                                        </br>
+                                    </div>
+                                    </br></br>
+                                    <div>
+                                        <header slot="title" class="headerGMA">
+                                            <b>How to Assign Dealer Permission?</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intGMAPermissionlinks}>
+                                            <template for:each={intGMAPermissionlinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </br>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="borderAroundBox slds-col slds-size_2-of-12">
+                                <div>
+                                        <header slot="title" class="headerGMA">
+                                            <b>Dealer Guides</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                        <template if:true={intHMAGuidelinks}>
+                                            <template for:each={intHMAGuidelinks} for:item="link">
+                                                <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                        <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                        <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                                </div>
+                                            </template>
+                                        </template>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="slds-col slds-size_1-of-12"></div>
+                                <div class="borderAroundBox slds-col slds-size_2-of-12">
+                                    <div>
+                                        <header slot="title" class="headerGMA">
+                                            <b>Support</b>
+                                        </header>
+                                        </br>
+                                        <div slot="footer" class="showInLeft slds-p-left_medium">
+                                                <div class="slds-p-left_medium">
+                                                    <h1>Dealer Portal and Login Issues</h1></br>
+                                                    <h1>Help Desk 888-734-4762</h1></br>
+                                                    Internal Email to: <a>ServiceNow@HAEAus.com</a></br>
+                                                    or visit <a>https://hmgitsm.service-now.com/hgp</a></br>
+                                                    <h1>DNAMS site questions or issues</h1></br>
+                                                    <h1>DNAMS Support: </h1><a>DNAMSsupport@hmausa.com</a></br>
+                                                </div>
+                                        </div>
+                                        </br>
+                                    </div>
+                                </div>
+                            </div> 
+                            <!-- DNAMS Training Material Links -->
+                            <!-- DNAMS Training Material Links -->
+                    </template>
+                    <template if:false={isInternalUser}>
+                        <!-- DNAMS Training Material Links -->
+                        <div class="slds-grid slds-no-flex">
+                            <div class="borderAroundBox slds-col slds-size_4-of-12">
+                                <div>
+                                    <header slot="title" class="headerGMA">
+                                        DNAMS Guides
+                                    </header>
+                                    </br>
+                                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                                    <template if:true={dealerGMAGuidelinks}>
+                                        <template for:each={dealerGMAGuidelinks} for:item="link">
+                                            <div class="slds-p-left_medium" key={link.DNAMS_Header__c}>
+                                                    <template if:true={link.URL__c}><a target="_BLANK" href={link.URL__c}>{link.Text_to_Display__c}</a></template>
+                                                    <template if:false={link.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                            </div>
+                                        </template>
+                                    </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-12"></div>
+                            <div class="borderAroundBox slds-col slds-size_4-of-12">
+                                <div>
+                                    <header slot="title" class="headerGMA">
+                                        <b>Support</b>
+                                    </header>
+                                    </br>
+                                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                                            <div class="slds-p-left_medium">
+                                                <h1>Dealer Portal and Login Issues</h1></br>
+                                                <h1>Help Desk 888-734-4762</h1></br>
+                                                Internal Email to: <a>ServiceNow@HAEAus.com</a></br>
+                                                or visit <a>https://hmgitsm.service-now.com/hgp</a></br>
+                                                <h1>DNAMS site questions or issues</h1></br>
+                                                <h1>DNAMS Support: </h1><a>DNAMSsupport@hmausa.com</a></br>
+                                            </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div> 
+                        <!-- DNAMS Training Material Links -->
+                    </template>
+                    
+           </lightning-tab>
+        </lightning-tabset>
+    </div>
+    
+</template>

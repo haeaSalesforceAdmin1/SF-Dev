@@ -1,0 +1,8 @@
+<design:component >
+    <design:attribute name="recordId" label="Question Record Id"/>
+    <design:attribute name="launchedFromEval" label="From Eval" />
+    <design:supportedFormFactors>
+        <design:supportedFormFactor type="Large"/>
+        <design:supportedFormFactor type="Small"/>
+    </design:supportedFormFactors>
+</design:component>

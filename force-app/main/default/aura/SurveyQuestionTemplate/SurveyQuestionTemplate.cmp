@@ -1,0 +1,3 @@
+<aura:component isTemplate="true" extends="aura:template">
+    <div class="container">{!v.body}</div>
+</aura:component>

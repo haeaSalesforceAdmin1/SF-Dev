@@ -1,0 +1,88 @@
+.slds-p-around_medium {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Left align items */
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+:host {
+    --slds-c-accordion-summary-color-background: #f3f3f3;
+}
+
+/* :host .slds-accordion__summary{
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.slds-accordion__summary{
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+
+
+:host .slds-card{
+    margin-top: -20px !important;
+    z-index: 0 !important;
+    position: relative !important;
+}
+
+.slds-accordion__content{
+    margin-top: -20px;
+    z-index: 0;
+    position: relative;
+} */
+
+.buttons{
+    margin: 1px;
+}
+
+/* .accordianDetail{
+    margin-top: -20px;
+    z-index: 0;
+    position: relative;
+
+} */
+
+.checkbox{
+    font-size: 9.1pt;
+}
+
+.COPPSection{
+    margin-top: -20px;
+}
+
+.container {
+    display: flex;
+    align-items: center; 
+    height: 4vh; 
+    background-color: #e6ecf2; 
+}
+
+.container.genesis {
+    background-color: #e6d5cc; 
+}
+
+.section-name {                   
+    padding: 10px; 
+    border-radius: 5px; 
+}
+
+.slds-form-element__label {
+    font-size: 13pt !important;
+}
+
+/* .custom-input .slds-input {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+} */
+
+:host .custom-input.slds-input[readonly] {
+    /* --slds-c-input-spacing-horizontal-start: 10px !important;;  */
+    --lwc-spacingSmall: 2rem !important;
+}

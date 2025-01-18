@@ -1,0 +1,123 @@
+<!-- Dashboard Header -->
+<template>
+    <!-- {data} -->
+    <div class="card-title-box">
+        <div class="card-title-text">
+           
+        </div>
+    </div>
+    <div class="card-estimator">
+        <template if:true={showMessage}>
+            <div class="hideDashboard">COPP Dashboard is for COPP Dealers and Buy/Sell COPP Dealers only.</div>
+        </template>
+        <div class="card-body">
+            <template for:each={kpiDetails} for:item="kpi">
+                <template if:true={kpi.show}>
+                    <div  key={kpi.kpi_seq} class="container">
+                        <table class="slds-table_cell-buffer" style="border-collapse:collapse" >
+                            <thead>
+                                <tr class="div-align-center">
+                                    <th class="title" colspan="2" >
+                                        {kpi.kpi_name}
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="height:10px;background-color:white"></tr>
+                                <tr class={brandClass}>
+                                    <td class="currentScoreText" scope="col">
+                                        <div style="font-size:18px;font-weight:bold">Current Score</div>
+                                        <template if:false={kpi.branding}><div class="asOf">as of {kpi.cur_month}</div></template>
+                                        <template if:true={kpi.branding}><div class="asOf">as of {kpi.reportMonth}</div></template>
+                                    </td>
+                                    <td class="currentScoreNum" scope="col">
+                                        <template if:false={kpi.branding}>
+                                            <template if:true={kpi.isPercent}>
+                                                {kpi.cur_score}%
+                                            </template>
+                                            <template if:false={kpi.isPercent}>
+                                                {kpi.cur_score}
+                                            </template>
+                                        </template>
+                                        <template if:true={kpi.branding}>
+                                            <div class={kpi.brandingChecked}>
+                                                <template if:true={kpi.brandScore}>{kpi.brandScore}</template>
+                                            </div>
+                                        </template>
+                                    </td>
+                                </tr>
+                                <template if:false={kpi.branding}>
+                                    <tr class="score">
+                                        <td class="scoreCell">
+                                            Vs. Target
+                                        </td>
+                                        <td class={kpi.vsTgtClass} style="text-align:right">
+                                            <template if:true={kpi.isPercent}>
+                                                {kpi.vs_tgt}
+                                            </template>
+                                            <template if:false={kpi.isPercent}>
+                                                {kpi.vs_tgt}
+                                            </template>
+                                        </td>
+                                    </tr>
+                                    <tr class="score">
+                                        <td class="scoreCell">
+                                            <div>Initial Score</div>
+                                            <div class="asOf">as of {kpi.init_month}</div>
+                                        </td>
+                                        <td class="scoreNum">
+                                            <template if:true={kpi.isPercent}>
+                                                {kpi.init_score}%
+                                            </template>
+                                            <template if:false={kpi.isPercent}>
+                                                {kpi.init_score}
+                                            </template>
+                                        </td>
+                                    </tr>
+                                    <tr  class="score">
+                                        <td class="scoreCell" style="padding-top: 2px">
+                                            <div>Target Score</div>
+                                            <div  class="asOf">as of {kpi.tgt_month}</div>
+                                        </td>
+                                        <td class="scoreNum" style="padding-top: 2px;padding-bottom: 10px">
+                                            <template if:true={kpi.isPercent}>
+                                                {kpi.tgt_score}%
+                                            </template>
+                                            <template if:false={kpi.isPercent}>
+                                                {kpi.tgt_score}
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                                <template if:true={kpi.branding}>
+                                    <template if:true={kpi.init_month}>
+                                        <tr class="score">
+                                            <td class="scoreCell" style="padding-top: 10px;padding-bottom: 10px">
+                                                <div>Achieved</div>
+                                            </td>
+                                            <td class="scoreNum">
+                                                {kpi.init_month}
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr  class="score">
+                                        <td class="scoreCell">
+                                            <div>Target</div>
+                                        </td>
+                                        <td  class="scoreNum">
+                                            {kpi.tgt_month}
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                   
+                    </div>   
+
+                </template>
+                
+            </template>
+        </div>
+    </div>
+   
+</template>

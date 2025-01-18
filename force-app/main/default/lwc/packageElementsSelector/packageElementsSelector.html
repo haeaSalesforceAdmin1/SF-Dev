@@ -1,0 +1,75 @@
+<!--
+ - Created by baltamimi on 2022-02-10.
+ -->
+
+<!-- Package Elements Selector -->
+<template>
+    <template if:true={errorMessage}>
+       {errorMessage}
+    </template>
+
+    <div style="height: 300px;">
+        <lightning-datatable
+                key-field="Id"
+                data={templateElements}
+                columns={mainColumns}
+                show-row-number-column
+                hide-checkbox-column
+                suppress-bottom-bar
+                onrowaction={handleRowAction}
+                sorted-by="Sequence__c"
+                class="mainDataTable">
+        </lightning-datatable>
+    </div>
+    <div class="slds-m-top_medium slds-m-bottom_medium slds-float_right">
+        <lightning-button variant="brand-outline" label="Add Document" title="Add Another Document"
+                          class="slds-m-left_x-small" onclick={openModal}></lightning-button>
+
+        <lightning-button disabled={saveDisabled} variant="success" label="Create Package" title="Generate New Package Elements"
+                          onclick={handleUpdate} class="slds-m-left_x-small"></lightning-button>
+    </div>
+
+    <template if:true={isOpenModal}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                 aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                                        alternative-text="close"
+                                        variant="inverse"
+                                        size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Add Documents</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <p><b>Select the templates from the list below to add to your package:
+                    </b></p>
+                    <lightning-datatable
+                            key-field="Id"
+                            data={otherTemplateElements}
+                            columns={addMoreColumns}
+                            suppress-bottom-bar
+                            sorted-by="Sequence__c"
+                    class="addMoreDataTable">
+                    </lightning-datatable>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="brand-outline" label="Cancel" class="slds-m-left_x-small" onclick={closeModal} title="Cancel">
+                        Cancel
+                    </lightning-button>
+                    <lightning-button variant="brand" label="Add Documents" title="Add documents"
+                                      class="slds-m-left_x-small" onclick={saveModal}>Add Documents
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

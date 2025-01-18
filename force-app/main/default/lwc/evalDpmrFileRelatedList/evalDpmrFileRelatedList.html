@@ -1,0 +1,34 @@
+<!--
+/**
+ * [Method Description] 
+ * Account Created DPMR RecordType Evaluation 
+ * Created by [Jonghoon Kim] on [24-09-03] for [Ticket DPM-5663]
+ * Edited by [Author] on [Date] for [Ticket #]
+*/
+-->
+<template>
+    <div class="border-container">
+        <lightning-card title="Files" icon-name="standard:file">
+            <div class="slds-m-around_medium">
+                <template if:true={fileList.data}>
+                    <template if:true={fileList.data.length}>
+                        <lightning-datatable key-field="Id" data={fileList.data} show-row-number-column hide-checkbox-column
+                            columns={columns}>
+                        </lightning-datatable>
+                    </template>
+                    <template if:false={fileList.data.length}>
+                        <lightning-datatable key-field="Id" data={fileList.data} show-row-number-column hide-checkbox-column columns={columns}>
+                        </lightning-datatable>
+                        <div class="slds-text-align_center slds-p-around_medium">
+                            No files
+                        </div>
+                    </template>
+                </template>
+                <template if:true={fileList.error}>
+                    <p>{fileList.error}</p>
+                    <!-- handle Apex error -->
+                </template>
+            </div>
+        </lightning-card>
+    </div>
+</template>

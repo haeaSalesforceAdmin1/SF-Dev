@@ -1,0 +1,22 @@
+<aura:component implements="lightning:availableForFlowScreens,lightning:isUrlAddressable" controller="FilePreviewController" >
+    <aura:attribute name="fileId" type="String"/>
+    <aura:attribute name="parentId" type="String"/>
+    <aura:attribute name="allowDelete" type="boolean"/>
+    <aura:attribute name="temporaryDelete" type="boolean" default="true"/>
+
+    <aura:registerEvent name="fileDeletedEvent" type="c:FileDeletedEvent"/>
+    <aura:if isTrue="{!v.temporaryDelete}">
+        <aura:if isTrue="{!v.allowDelete}">
+            <lightning:buttonIcon iconName="utility:delete" 
+                                        variant="brand" 
+                                        alternativeText="Delete File" 
+                                        value="{!!v.fileId}" 
+                                        onclick="{!c.deleteFile}"/>
+        </aura:if>
+        <aura:html tag="div" HTMLAttributes="{ 'class': 'largeFileCard' }">
+            <lightning:fileCard fileId="{!v.fileId}" hideDescription="true"/>
+            
+        </aura:html>
+    </aura:if>
+</aura:component>
+<!--lightning:isUrlAddressable added DPM-5633-->

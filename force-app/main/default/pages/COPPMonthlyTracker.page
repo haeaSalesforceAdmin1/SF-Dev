@@ -1,0 +1,531 @@
+<apex:page renderas="PDF" applyBodyTag="false" standardStylesheets="false" showHeader="false" standardController="Account" extensions="COPPMonthlyTrackerController" action="{!handleLoad}">
+    <apex:variable value="{!$CurrentPage.parameters.recordId}" var="recordId"/> <!--Added to get record Id from LWC-->
+
+<!--DPM-5701 COPP Project  -->
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                size: A4; 
+                @top-right {
+                    content: element(header);
+                }
+            	margin: 0;
+                background-color: {!IF(BrandCode == 'G', '#e6d5cc', 
+                                      IF(BrandCode == 'H', '#c8d4e4', 'white'))};
+                padding: 15px; 
+                height: 100vh; 
+            	
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+            html, body {
+                margin: 15px;
+            	background-color: #FFFFFF; 
+                padding: 0;
+                height: 96%;
+                width: 96%;
+            }
+
+            {
+                margin: 100px;
+                padding: 100px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            }
+
+            div.content {
+                padding-top: 5px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+                flex: 1;
+                
+                
+            }
+
+            div.footer {
+                position: relative;
+                padding: 10px;
+                padding-top: 60px;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                font-size: 8px;
+                page-break-inside:avoid;
+            }
+            
+            .tracker-container {
+                min-height: 100vh; 
+                display: flex;
+                flex-direction: column; 
+            }
+
+            .footer-content {
+                width: 100%;
+                font-size: 10pt;
+                margin-top: 50px;
+            }
+
+            .footer-section {
+                float: left;
+                width: 33%;
+            }
+
+            .footer-clear {
+                clear: both;
+            }
+
+            .footer-full-section {
+                width: 50%;
+                float: left;
+            }
+
+            .footer-margin-top {
+                margin-top: 30px;
+            }
+
+            .stationName {
+                text-align: center;
+                font-weight: bold;
+                font-size: 20pt;
+                margin-bottom: 30px;
+            }
+
+            .centered {
+                display: inline-block;
+                padding: 2%;
+            }
+
+            .centered {
+                text-align: center; 
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 20px;
+            }
+
+            .right {
+                text-align: right;
+            }
+            
+            .left {
+                text-align: left;
+            }
+            
+            .header {
+                text-align: left;
+                padding: 10px;
+            	position: relative;
+            }
+            
+            .logo{
+                position: absolute;
+            	top: 10px;
+            	left:  {!IF(acc.BrandCode__c == 'G', '550px', 
+                                      IF(acc.BrandCode__c == 'H', '500px', '500px'))};
+            }
+
+            .sub-header {
+                background-color: #afd0ff;
+                text-align: left;
+                padding: 5px;
+                font-weight: bold;
+            }
+
+            .metric-header {
+                background-color: #c6d9f1;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+    			box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+             th, td {
+                border-collapse: collapse;
+            	box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                text-align: center;
+            }
+
+            .basic-info {
+                padding: 5px;
+            }
+
+            .yellow-highlight {
+                background-color: yellow;
+            }
+
+            .red-text {
+                color: red;
+                font-weight: bold;
+            }
+
+            .green-text {
+                color: green;
+                font-weight: bold;
+            }
+            
+            .information {
+                
+                border: 0.5px solid black;
+                width: 100%;
+                cellpadding: 5; 
+                cellspacing: 0; 
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                
+            }
+
+            .information-header {
+                font-size: 12pt;
+                text-align: center;
+                color: #ffffff;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationSubtitle{
+                font-size:10pt;
+                width: 20%;
+                text-align: center;
+                color: #ffffff;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationDetail{
+                font-size:10pt;
+            }
+
+            .information th, .information td {
+                border: 0.5px solid black; 
+                padding: 5px 10px; 
+            }
+            
+            .sectionName {
+                font-size:8pt;
+                text-align: center;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#e6d5cc', 
+                                      IF(acc.BrandCode__c == 'H', '#c8d4e4', 'white'))};
+            	border-collapse: collapse;
+            	box-shadow: none;  
+            	font-weight:bold-right;
+            	text-align:center
+            }
+            
+            .kpiTableHeader{
+                text-align: center;
+                    color: #ffffff;
+                    background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                          IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+            
+            .kpiName{
+                background-color: {!IF(acc.BrandCode__c == 'G', '#f6eeea', 
+                                      IF(acc.BrandCode__c == 'H', '#f4f6f9', 'white'))};
+            	border-collapse: collapse;
+            	box-shadow: none;  
+            }
+            
+
+            .kpiTable {
+                font-size: 8pt;
+                text-align: center;
+                border: 0.5px solid #000;
+            	border-collapse: collapse;
+            	box-shadow: none;  
+                width: 100%;
+            }
+            
+            .diagonal-stripes {
+                background-color: #E4E6E6;
+            }
+            
+            .footerLine{
+             	text-align: left;
+            	border:none;
+            }
+            
+            .signature{
+             	height:50px; 
+            	text-align: left;
+            	padding-bottom:100%;
+            	vertical-align: top;
+            	border:none;
+            }
+        </style>
+    </head>
+    <div class="tracker-container">
+        <div class="header">
+            <div class="logo" >
+                <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                    <apex:image url="{!$Resource.Hyundai_Logo}" height="45px"/>
+                </apex:outputPanel>
+            
+                <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}" style="left: 640px">
+                    <apex:image url="{!$Resource.Genesis_Logo}" height="45px"/>
+                </apex:outputPanel>
+            </div>
+            <div class="left" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;"> 
+                <apex:outputPanel >
+                    <div class="basic-info">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            <apex:outputText value="Hyundai Motor America" />
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            <apex:outputText value="Genesis Motor America" />
+                        </apex:outputPanel>
+                    </div>
+                    <div class="basic-info">
+                        <apex:outputText value="COPP Report Month: {!reportMonth}" />
+                    </div>
+                    <div class="basic-info">
+                        <apex:outputText value="Performance Period: {!fromMonth} - {!toMonth}" />
+                    </div>
+                </apex:outputPanel>
+            </div>
+        </div>
+    
+        <div class="content" style="font-family: 'Arial Unicode MS', Arial, sans-serif;">
+            <table class="information">
+                <tr class="information-header">
+                    <th colspan="2">PERFORMANCE DEFICIENCY METRIC TRACKER</th>
+                </tr>
+                <tr>
+                    <td class="informationSubtitle">Dealer</td>
+                    <td class="informationDetail">{!dealerName}</td>
+                </tr>
+                <tr>
+                    <td class="informationSubtitle">Dealer Code</td>
+                    <td class="informationDetail">{!acc.DealerCode__c}</td>
+                </tr>
+            </table>
+    
+            <table class="kpiTable" border="1" cellpadding="5" cellspacing="0" >
+                <thead>
+                    <tr class="kpiTableHeader">
+                        <th style="width:25.25%;font-size:10pt">Metric</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">Initial</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month1Label}</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month2Label}</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month3Label}</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month4Label}</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month5Label}</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">{!month6Label}</th>
+                        <th style="width: 8.125%;border-left: 0.5px solid #797978">Curr vs Initial Δ (+/-)</th>
+                        <th style="width: 7%;border-left: 0.5px solid #797978">Target</th>
+                        <th style="width: 8.125%;border-left: 0.5px solid #797978">Curr vs Target Δ (+/-)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:repeat value="{!coppKPIDetailList}" var="section">
+                        <!-- Section Name Row -->
+                        <tr>
+                            <td class="sectionName" colspan="11" >{!section.sectionName}</td>
+                            <!--<td class="sectionName" colspan="10" style="font-weight:bold; border-left: none"></td>-->
+                        </tr>
+                        
+                        <!-- KPI Rows -->
+                            <apex:repeat value="{!section.kpiList}" var="kpiWrapper">
+                                <tr>
+                                    <td class="kpiName" style="text-align: right;cellpadding:5; cellspacing:0">
+                                        <apex:outputPanel rendered="{!AND(acc.BrandCode__c == 'H', kpiWrapper.isBranding)}">
+                                            GDSI 2.0
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!AND(acc.BrandCode__c == 'G', kpiWrapper.isBranding)}">
+                                            GRD
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!NOT(kpiWrapper.isBranding)}">{!kpiWrapper.kpiDetail.COPP_KPI__r.Name}</apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.kpiDetail.Initial_Score__c)),NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.kpiDetail.Initial_Score__c}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="N" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month1)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month1}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month1BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month2)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month2}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month2BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month3)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month3}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month3BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month4)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month4}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month4BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month5)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month5}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month5BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.month6)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.month6}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="{!month6BrandImage}" />
+                                        </apex:outputPanel>
+                                    </td>
+                                    <td  class="{!IF(ISBLANK(kpiWrapper.currentInitialDiff), 'diagonal-stripes', '')}">
+                                        <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentInitialDiff))}">
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                                <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
+                                            </apex:outputPanel> 
+                                            <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                                <apex:outputPanel rendered="{!kpiWrapper.isPositiveInitialDiff}">
+                                                    <apex:outputText value="+" style="color: blue" />
+                                                </apex:outputPanel>
+                                                <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
+                                            </apex:outputPanel>
+                                            
+                                            
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                                <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                                <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                                    <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="%"/>
+                                                </apex:outputPanel>
+                                            </apex:outputPanel>
+                                            
+                                        </apex:outputPanel>
+
+                                    </td>
+                                    <td>
+                                        <apex:outputPanel rendered="{!AND(NOT(ISBLANK(kpiWrapper.kpiDetail.Target_Score__c)), NOT(kpiWrapper.isBranding))}">
+                                            <apex:outputText value="{!kpiWrapper.kpiDetail.Target_Score__c}" />
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">%</apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!kpiWrapper.isBranding}">
+                                            <apex:outputText value="Y" />
+                                        </apex:outputPanel>
+                                        
+                                    </td>
+                                    <td class="{!IF(ISBLANK(kpiWrapper.currentTargetDiff), 'diagonal-stripes', '')}">
+                                        <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentTargetDiff))}">
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                                <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
+                                            </apex:outputPanel> 
+                                            <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                                <apex:outputPanel rendered="{!kpiWrapper.isPositiveTargetDiff}">
+                                                    <apex:outputText value="+" style="color: blue" />
+                                                </apex:outputPanel>
+                                                <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
+                                            </apex:outputPanel>
+                                            
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                                <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                            </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}"> 
+                                                <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                                    <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="%"/>
+                                                </apex:outputPanel>
+                                            </apex:outputPanel>
+                                        </apex:outputPanel>
+                                        <!-- When current vs targer is null -->
+                                    </td>
+                                </tr>
+                            </apex:repeat>
+    
+                        
+                    </apex:repeat>
+                   
+                </tbody>
+            </table>
+            <apex:outputPanel >
+                <apex:outputText style="font-size:9px" value="Any missing data is due to the data for that KPI not being finalized before the monthly cutoff. This is expected and should occur infrequently starting August 2024."/>
+            </apex:outputPanel>
+        </div>
+    
+        <!-- Footer Section -->
+        <div class="footer" style="width: 100%; left: 0;font-family: 'Arial Unicode MS', Arial, sans-serif;">
+            <table style="width: 100%; border-collapse: collapse;border:none">
+                <tr>
+                    <td class = "footerLine" style="width: 40%;">________________________________________________________</td>
+                    <td class = "footerLine" style="width: 35%;">__________________________________________</td>
+                    <td class = "footerLine" style="width: 25%;">____________________________</td>
+                </tr>
+                <tr>
+                    <td class="signature" style="width: 40%;">Dealer Principal - Print Name</td>
+                    <td class="signature" style="width: 35%;">Dealer Principal - Signature</td>
+                    <td class="signature" style="width: 25%;">Date</td>
+                </tr>
+                <tr>
+                    <td class = "footerLine" style="width: 40%;">________________________________________________________</td>
+                    <td class = "footerLine" style="width: 35%;">__________________________________________</td>
+                    <td class = "footerLine" style="width: 25%;">____________________________</td>
+                </tr>
+                <tr>
+                    <td style="width: 40%; text-align: left;border:none">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            HMA Representative - Print Name
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            GMA Representative - Print Name
+                        </apex:outputPanel>
+                    </td>
+                    <td style="width: 35%; text-align: left;border:none">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            HMA Representative - Signature
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            GMA Representative - Signature
+                        </apex:outputPanel>
+                    </td>
+                    <td class="footerLine" style="width: 25%;">Date</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</apex:page>

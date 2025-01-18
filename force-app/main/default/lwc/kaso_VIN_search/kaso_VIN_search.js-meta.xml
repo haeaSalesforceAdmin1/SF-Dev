@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>56.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="checkedVinNumber" type="String" label="VinName" role="outputOnly"/>
+            <property name="checkedVinId" type="String" label="VinId" role="outputOnly"/>
+            <property name="vaildationCheck" type="Boolean" label="vaildationCheck" role="outputOnly"/>
+            <property name="inputVinNumber" type="String" label="inputVinNumber" role="inputOnly"/>
+        </targetConfig>
+    </targetConfigs> 
+</LightningComponentBundle>

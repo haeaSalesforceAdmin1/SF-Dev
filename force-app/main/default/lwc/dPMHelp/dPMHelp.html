@@ -1,0 +1,293 @@
+<template>
+    <!-- DPM Resource Links -->
+    <div class="slds-grid slds-no-flex">
+        <div class="borderAroundBox slds-col slds-size_7-of-12">
+            <div>
+                <header slot="title" class={headerClass}>
+                    {dpmResources}
+                </header>
+                <div slot="footer" class="showInLeft slds-p-left_medium">
+                    <template for:each={dpmResourceLinks} for:item="item" >
+                        <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                        <template for:each={item.value} for:item="linkItem">
+                            <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-12"></div>
+        <!-- Question Links -->
+
+        <div class="borderAroundBox slds-col slds-size_4-of-12">
+            <div>
+                <header slot="title" class={headerClass}>
+                    {questionLinksLabel}
+                </header>
+                <div slot="footer" class="showInLeft slds-p-left_medium">
+                    <template if:true={isCorporate}>
+                        <template for:each={questionLinks} for:item="item" >
+                            <template for:each={item.value} for:item="linkItem">
+                                <div key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}>
+                                        {linkItem.Text_to_Display__c}: <lightning-formatted-email value={linkItem.URL__c} hide-icon></lightning-formatted-email>
+                                    </template>
+                                    <template if:false={linkItem.URL__c}>Help Desk: {linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </template>
+                    <template if:false={isCorporate}>
+                        <b>Please contact your regional rep: </b><BR />
+                        <template if:true={dsm}><b>DSM: </b>&nbsp;<a href="#" class="parent" data-type="dsm" onmouseover={openPopover} onmouseleave={closePopOver}>{dsm.Name}</a></template><BR />
+                        <template if:true={dpsm}><b>DPSM: </b>&nbsp;<a href="#" class="parent" data-type="dpsm" onmouseover={openPopover} onmouseleave={closePopOver}>{dpsm.Name}</a></template>
+                        <template if:true={gmm}><b>GMM: </b>&nbsp;<a href="#" class="parent" data-type="gmm" onmouseover={openPopover} onmouseleave={closePopOver}>{gmm.Name}</a></template><BR />
+                        <template if:true={gamm}><b>GAMM: </b>&nbsp;<a href="#" class="parent" data-type="gamm" onmouseover={openPopover} onmouseleave={closePopOver}>{gamm.Name}</a></template>
+                    </template>
+                </div>
+            </div>
+            <template if:true={boolShowPopover}>
+                <section aria-describedby="dialog-body-id-110" aria-labelledby="dialog-heading-id-115" class="slds-popover slds-popover_panel slds-nubbin_top" role="dialog">
+                    <div class="slds-popover__header">
+                        <header class="slds-media slds-media_center slds-m-bottom_small">
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading_medium slds-hyphenate" id="panel-heading-id">
+                                    {hoverContactDetails.Name}
+                                </h2>
+                            </div>
+                        </header>
+                        <footer class="slds-grid slds-wrap slds-grid_pull-padded">
+                            <div class="slds-p-horizontal_small slds-size_1-of-2 slds-p-bottom_x-small">
+                                <dl>
+                                    <dt>
+                                        <p class="slds-popover_panel__label slds-truncate">First Name</p>
+                                    </dt>
+                                    <dd>
+                                        {hoverContactDetails.FirstName}
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="slds-p-horizontal_small slds-size_1-of-2 slds-p-bottom_x-small">
+                                <dl>
+                                    <dt>
+                                        <p class="slds-popover_panel__label slds-truncate">Last Name</p>
+                                    </dt>
+                                    <dd>
+                                        {hoverContactDetails.LastName}
+                                    </dd>
+                                </dl>
+                            </div>
+                            <div class="slds-p-horizontal_small slds-size_1-of-2 slds-p-bottom_x-small">
+                                <dl>
+                                    <dt>
+                                        <p class="slds-popover_panel__label slds-truncate">Email</p>
+                                    </dt>
+                                    <dd>
+                                        <lightning-formatted-email value={hoverContactDetails.Email} ></lightning-formatted-email>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </footer>
+                    </div>
+                </section>
+            </template>
+        </div>
+    </div>
+    <br />
+    <div class="slds-grid slds-no-flex">
+        <div class={quickReferenceClass}>
+            <center>Reference Guides</center>
+        </div>
+    </div>
+    <br />
+    <!-- Sales Org Links -->
+    <div class="slds-grid slds-no-flex">
+        <template if:true={keystoneOrgLabel}>
+            <div class="borderAround slds-col slds-size_3-of-15">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {salesOrgLabel}
+                    </header>
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={salesOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- After Sales Org Links -->
+            <div class="borderAround slds-col slds-size_3-of-15">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {afterSalesOrgLabel}
+                    </header>
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={afterSalesOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- CX Org Links -->
+            <div class="borderAround slds-xxx-horizontal_small slds-col slds-size_3-of-15">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {cxOrgLabel}
+                    </header>
+                    <!-- <center><p><b><u>{cxOrgLabel}</u></b></p></center> -->
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={cxOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- KEYSTONE Org Links -->
+            <div class="borderAround slds-xxx-horizontal_small slds-col slds-size_3-of-15">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {keystoneOrgLabel}
+                    </header>
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={keystoneOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- Financial Org Links -->
+            <div class="borderAround slds-xxx-horizontal_small slds-col slds-size_3-of-15">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {financialOrgLabel}
+                    </header>
+                    <!-- <center><p><b><u>{financialOrgLabel}</u></b></p></center> -->
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={financialOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <template if:false={keystoneOrgLabel}>
+            <div class="borderAround slds-col slds-size_3-of-12">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {salesOrgLabel}
+                    </header>
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={salesOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- After Sales Org Links -->
+            <div class="borderAround slds-col slds-size_3-of-12">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {afterSalesOrgLabel}
+                    </header>
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={afterSalesOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- CX Org Links -->
+            <div class="borderAround slds-xxx-horizontal_small slds-col slds-size_3-of-12">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {cxOrgLabel}
+                    </header>
+                    <!-- <center><p><b><u>{cxOrgLabel}</u></b></p></center> -->
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={cxOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="slds-col slds-size_1-of-12"></div>-->
+            <!-- Financial Org Links -->
+            <div class="borderAround slds-xxx-horizontal_small slds-col slds-size_3-of-12">
+                <div>
+                    <header slot="title" class={headerClass}>
+                        {financialOrgLabel}
+                    </header>
+                    <!-- <center><p><b><u>{financialOrgLabel}</u></b></p></center> -->
+                    <div slot="footer" class="showInLeft slds-p-left_medium">
+                        <template for:each={financialOrgLinks} for:item="item" >
+                            <template if:true={item.key}><b key={item.key}>{item.key}</b></template>
+                            <template for:each={item.value} for:item="linkItem">
+                                <div class="slds-p-left_medium" key={linkItem.DPM_Header__r.Name}>
+                                    <template if:true={linkItem.URL__c}><a target="_BLANK" href={linkItem.URL__c}>{linkItem.Text_to_Display__c}</a></template>
+                                    <template if:false={linkItem.URL__c}>{linkItem.Text_to_Display__c}</template>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

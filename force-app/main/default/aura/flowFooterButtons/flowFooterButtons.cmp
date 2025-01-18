@@ -1,0 +1,5 @@
+<aura:component implements="force:lightningQuickAction,lightning:availableForFlowActions,lightning:isUrlAddressable">
+   <aura:attribute name="recordId" type="String" />
+   <aura:attribute name="buttonType" type="String" />
+   <lightning:workspaceAPI aura:id="workspace"/>
+</aura:component>

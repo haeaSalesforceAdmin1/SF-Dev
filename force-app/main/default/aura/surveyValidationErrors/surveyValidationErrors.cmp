@@ -1,0 +1,21 @@
+<aura:component>
+
+    <aura:attribute name="validationErrorsMapList" type="List" default="[]"/>
+
+    <div style="font-weight: bold; font-size:16px;">The Survey has been saved!</div>
+
+    <div style="font-weight: bold; font-size:16px;" class="slds-p-top_large slds-p-bottom_medium">The following survey questions have not been answered.  In order to submit the survey the following questions will need to be answered.</div>
+
+                
+    <aura:iteration items="{!v.validationErrorsMapList}" var="errorMap" indexVar="errorMapIndex">
+        <!--<div class="slds-grid slds-p-left_medium slds-p-top_medium">
+            <lightning:formattedRichText value="{!errorMap.key}"></lightning:formattedRichText>
+        </div>-->
+        <aura:iteration items="{!errorMap.values}" var="error" indexVar="errorIndex">
+            <div class="slds-grid slds-p-left_x-large slds-p-top_x-small">
+                <lightning:formattedRichText value="{!error}"></lightning:formattedRichText>
+            </div>
+        </aura:iteration>
+    </aura:iteration>
+
+</aura:component>

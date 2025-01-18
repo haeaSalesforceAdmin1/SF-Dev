@@ -1,0 +1,9 @@
+<!--
+ - Created by baltamimi on 2022-02-15.
+ -->
+
+<aura:component description="CloseTab" implements="lightning:availableForFlowScreens,lightning:availableForFlowActions,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+<!--    REF: https://developer.salesforce.com/docs/atlas.en-us.api_console.meta/api_console/sforce_api_console_lightning_closeTab.htm-->
+<aura:handler name="init" value="{!this}" action="{!c.invoke}"/>
+<lightning:workspaceAPI aura:id="workspace" /> 
+</aura:component>

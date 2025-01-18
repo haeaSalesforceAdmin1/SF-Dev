@@ -1,0 +1,1840 @@
+<aura:component access="global" controller="SurveyQuestionController" implements="flexipage:availableForAllPageTypes,lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickActionWithoutHeader,forceCommunity:availableForAllPageTypes">
+
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="surveyQuestions" type="List" />
+    <aura:attribute name="surveySections" type="List" />
+    <aura:attribute name="surveySectionQuestionsMapData" type="List"/>
+    <aura:attribute name="dependentQuestions" type="Map"/>
+    <aura:attribute name="currentOpenSection" type="String"/>
+    <aura:attribute name="isMobile" type="Boolean" default="false"/>
+    <aura:attribute name="dependentSurveyQuestionsMap" type="Map" default="{}" />
+    <aura:attribute name="deletedFileMapData" type="List"/> <!--DPM-5264 Deleted File list-->
+
+    <lightning:flow aura:id="flowData" onstatuschange="{!c.handleStatusChange}" />
+
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="isBenefitsModalOpen" type="boolean" default="false"/>
+
+    <aura:attribute name="instructions" type="String" default=""/>
+    <aura:attribute name="benefits" type="String" default=""/>
+    <aura:attribute name="dueDate" type="String" default=""/>
+    <aura:attribute name="allowEditForCompletedSurvey" type="Boolean" default="false" />
+    <aura:attribute name="showReadonlyPage" type ="Boolean" default="false"/>
+    <aura:attribute name="hasEditAccess" type="Boolean" />
+    <aura:attribute name="hasCompleteAccess" type="Boolean" default="true"/> <!--DPM-5069 added by MH - 2023.10.20-->
+    <aura:attribute name="showSpinner" type="Boolean" default="true"/>
+    <aura:attribute name="isLimitSize" type="Boolean" default="false" /> <!--DPM-5610 added by JH - 2024.07.04-->
+
+    <aura:attribute name="validationErrorsMapList" type="List" default="[]"/>
+    <aura:attribute name="showErrorsModal" type="boolean" default="false"/>
+
+    <aura:attribute name="isSubmitted" type="boolean" default="false"/>
+    <aura:attribute name="isAllQuestionsAnswered" type="boolean" default="false"/>
+    <aura:attribute name="evalTotalScore" type="boolean" default="false"/>
+    <aura:attribute name="launchedFromEval" type="boolean" default="false"/>
+
+    <aura:attribute name="missingEvaluationFields" type="boolean" default="false"/>
+    <aura:attribute name="evaluationAccountContacts" type="List" default="[]"/>
+
+    <aura:attribute name="evaluation" type="Object" />
+    <aura:attribute name="primaryContact" type="String" />
+    <aura:attribute name="primaryContactName" type="String" />
+    <aura:attribute name="primaryContactDate" type="Date" />
+    <aura:attribute name="noReviewNeeded" type="Boolean"/>
+    <aura:attribute name="surveyId" type="String"/>
+    <aura:attribute name="networkId" type="String" default=""/>
+    <aura:attribute name="deletedfileId" type="String"/>
+    
+
+    <aura:handler name="documentUploadFinished" event="c:DocumentUploadFinished" action="{!c.handleDocumentUploadFinished}"/>
+    <aura:handler name="fileDeletedEvent" event="c:FileDeletedEvent" action="{!c.handleFileDeletedEvent}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:attribute name="submitSurveyConfirmModal" type="boolean" default="false"/>
+
+    <aura:registerEvent name="submitSurveyEvent" type="c:submitSurveyEvent" />
+
+    <aura:handler event="c:submitSurveyEvent" action="{!c.submitSurveyEventHandler}"/>
+
+    <aura:attribute name="modalBody" type="Aura.Component[]"/>
+    <aura:attribute name="modalFooter" type="Aura.Component[]"/>
+    <aura:attribute name="showNoSurveyMessage" type="Boolean" default="false"/>
+    <aura:attribute name="showResubmitButton" type="Boolean" default="false"/>
+    <aura:attribute name="CurrentUser" type="Object"/>
+    <aura:attribute name="showTEST" type="Boolean" default="false"/>
+    <aura:attribute name="showQ15" type="Boolean" default="false" /> <!--Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
+
+
+    <!--Warrant Review attributes start-->
+
+
+    <!-- <aura:attribute name="surveyWarrantySectionQuestionsMapData" type="List"/> Changed as the comment by [Minhee Kim] on [01-16-2025] for [DPM-5871] -->
+    <aura:attribute name="surveyWarrantyQuestionList" type="List"/>
+    <aura:attribute name="warrantyReview2022" type="Boolean" default="FALSE" />
+    <aura:attribute name="inStoreReview" type="String" />
+    <aura:attribute name="whatIsTheDealersCurrentRO" type="String" />
+    <aura:attribute name="isTheWarrantyCEEROReviewComplete" type="String" />
+    <aura:attribute name="isTheWarrantyCEEROReviewCompleteFlag" type="Boolean" default="TRUE" />
+    <aura:attribute name="howManyROsWereReviewed" type="String" />
+    <aura:attribute name="howManyROsHadZeroDeficienciesDiscrepancies" type="String" />
+    <aura:attribute name="othersDescribe" type="String" />
+    <aura:attribute name="commentsActionPlan" type="String" />
+
+    <aura:attribute name="warrantyCEEROReviewExcelFileDocuments" type="List" default="[]" />
+    <aura:attribute name="ROReviewActionPlan" type="List" default="[]" />
+    <aura:attribute name="WOPRActionPlanWOPRScoreBelowAvg" type="List" default="[]" />
+    <aura:attribute name="otherWOPRActionPlan" type="List" default="[]" />
+    <aura:attribute name="warrantyReviewQuestionsMap" type="Map" default="{}" />
+    <aura:attribute name="warrantyReviewQuestionsMapTmp" type="Map" default="{}" />
+    <aura:attribute name="hasCommentsActionPlan" type="Boolean" default="True"/>
+    <!--Warrant Review attributes end-->
+
+
+    <!-- Change For JDP Evaluator-->
+    <aura:attribute name="JdpEvaluationCheckbox" type="boolean" default="false"/>
+    <aura:attribute name="surveyCategory" type="List" default=""/>
+    <aura:attribute name="surveySubCategory" type="List" default=""/>
+
+    <aura:attribute name="sysUser" type="boolean" default="false"/>
+    <!-- Change For JDP Evaluator-->
+
+    <!-- Mark Warranty review checkbox as true or false-->
+    <aura:attribute name="warrantyReview22" type="Boolean" default="FALSE" />
+    <aura:attribute name="SurveyRecord" type="Survey__c"/>
+    <aura:attribute name="isSurveyCompletion" type="boolean" default="false"/>
+
+    <!-- New Warranty Review Fields  starts here-->
+
+    <!-- <aura:attribute name="NUMBEROFROSREVIEWED" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHOUTANYDISCREPANCIES" type="Integer" default='0'  />
+    <aura:attribute name="NUMBEROFROSWITHINSUFFICIENTTECHNOTES" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHDATEMILEAGEDISCREPANCY" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHIMPROPERADDON" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHSUBLETDISCREPANCY" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHIMPROPERREPAIR" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWHERERODOESNOTMATCHCLAIM" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHMISSINGDOCUMENTS" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION" type="Integer" default='0' />
+    <aura:attribute name="NUMBEROFROSWHICHARENOTWARRANTY" type="Integer" default='0' /> 
+    <aura:attribute name="NumberOfRosWithInsufficientDigtalDoc" type="Integer" default='0' /> Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863] 
+     Changed as the comment by [Minhee Kim] on [01-16-2025] for [DPM-5871]-->
+
+
+    <!-- OutPut field warrentyReview -->
+    <!-- <aura:attribute name="PercentageNUMBEROFROSREVIEWED" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHOUTANYDISCREPANCIES" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHINSUFFICIENTTECHNOTES" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHDATEMILEAGEDISCREPANCY" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHIMPROPERADDON" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHSUBLETDISCREPANCY" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHIMPROPERREPAIR" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWHERERODOESNOTMATCHCLAIM" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHMISSINGDOCUMENTS" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION" type="Integer" />
+    <aura:attribute name="PercentageNUMBEROFROSWHICHARENOTWARRANTY" type="Integer" />
+    <aura:attribute name="PercentageNumberOfRosWithInsufficientDigtalDoc" type="Integer" /> Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863] 
+     Changed as the comment by [Minhee Kim] on [01-16-2025] for [DPM-5871]-->
+
+    <!-- <aura:attribute name="EvaluationId" type="String" />-->
+    <!-- Warrenty question in Metadata format -->
+    <aura:attribute name="warQuestions" type="List"/>
+    <aura:attribute name="inputWarrentyQuestion" type="List"/>
+
+
+    <!-- this below code will fetch the Record Id-->
+    <force:recordData recordId="{!$SObjectType.CurrentUser.Id}"
+                      fields="Profile.Name"
+                      targetFields="{!v.CurrentUser}"/>
+
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+
+    <!--Dhiraj Warranty :{!v.warrantyReview22}-->
+    <aura:if isTrue="{!not(v.warrantyReview22)}">
+
+
+        <div class="slds" style="bottom: auto;border: 2px solid silver;">
+            <aura:if isTrue="{!v.showSpinner}">
+                <div class="centerspinner">
+                    <lightning:spinner alternativeText="Loading" size="large" />
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.showNoSurveyMessage}">
+                <div class="slds-box">
+                    <div class="slds-grid">
+                        <div style="font-size: 16px; font-weight:bold; color:red">This evaluation is not associated to a survey.  Click the Evaluation Info tab to see any related Action Plans.</div>
+                    </div>
+                </div>
+            </aura:if>
+
+
+            <!--Contact Missing starts here-->
+            <aura:if isTrue="{!v.surveySectionQuestionsMapData != null}">
+                <aura:if isTrue="{!v.missingEvaluationFields}">
+                    <div class="slds-p-bottom_medium">
+                        <div class="slds-box">
+                            <div class="slds-grid">
+                                <div style="font-size: 16px; font-weight:bold; color:red">Contact Date and either a Primary Contact or Primary Contact Name are required before proceeding with Survey. If you don't see the contact you want to assign, please contact support.</div>
+                            </div>
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col">
+                                    <div class="slds-grid slds-p-top_small">
+                                        <lightning:combobox options="{!v.evaluationAccountContacts}" value="{!v.primaryContact}" label="Primary Contact"></lightning:combobox>
+                                    </div>
+                                    <div class="slds-grid slds-p-top_small">
+                                        <lightning:input type="text" value="{!v.primaryContactName}" label="Primary Contact Name (Use if no Primary Contact Exist)"></lightning:input>
+                                    </div>
+                                    <div class="slds-grid slds-p-top_small">
+                                        <lightning:input type="date" value="{!v.primaryContactDate}" label="Contact Date"></lightning:input>
+                                    </div>
+
+                                    <div class="slds-grid slds-p-top_medium">
+                                        <lightning:button label="Save" onclick="{!c.handleSaveEvaluationDetailsClick}"/>
+                                    </div>
+                                </div>
+                                <!-- <div class="slds-list_horizontal" style="padding-top: 15%;">
+                                    <lightning:input type="checkbox" label="No Review Needed unless Region required" name="noreview"  checked="{!v.noReviewNeeded}" required="false" disabled="{!v.CurrentUser.Profile.Name == 'System Administrator' ? false : true}"/>
+                                    <lightning:helptext content="Check mark indicates - No Review Needed unless Required by Region." />
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+                <!-- COMMENT OUT PER DPM-4958 BY LJ -->
+                <!--DPM-4958 Re-Changed by MH-->
+                <aura:if isTrue="{!v.showTEST }">
+                    <div class="slds-p-bottom_small">
+                        <div class="slds-box" style="background-color: #F0F8FF;">
+                            <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+                                Before you complete the survey, please make sure the total size of all images does not exceed the maximum 30MB limit . Otherwise, the Survey PDF cannot be generated.
+                                <!--<span style='color:red;'>per question</span>-->
+                            </div>
+                        </div>
+                    </div>
+                </aura:if>
+
+                <div class="slds-grid">
+
+                    <aura:if isTrue="{!!v.missingEvaluationFields}">
+
+                        <!-- if contactfield false and hasEditAccess false-->
+                        <aura:if isTrue="{!!v.hasEditAccess}">
+                            <div class="slds-align_absolute-center slds-p-bottom_small">
+                                <!--<aura:if isTrue="{!v.newtworkId == ''}">-->
+                                <lightning:button onclick="{!c.handleGeneratePDF}" variant="brand" label="Survey PDF w Images"></lightning:button>
+                                <lightning:button onclick="{!c.handleGenerateWIPDF}" variant="brand" label="Survey PDF w/o Images"></lightning:button>
+
+                                <!--</aura:if> -->
+                            </div>
+                        </aura:if>
+
+                        <!-- Save Button Display -->
+                        <aura:if isTrue="{!and(and(not(v.showReadonlyPage), v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}">
+                            <div class="slds-align_absolute-center slds-p-bottom_small">
+                                <lightning:button onclick="{!c.handleSaveClick}" variant="brand" label="Save" name="UpdateSave"></lightning:button>
+
+                                <!-- Do not display Generate Pdf Button later remove it -->
+                                <aura:if isTrue="{!v.newtworkId == ''}">
+                                    <lightning:button onclick="{!c.handleGeneratePDF}" variant="brand" label="Survey PDF w Images"></lightning:button>
+                                    <lightning:button onclick="{!c.handleGenerateWIPDF}" variant="brand" label="Survey PDF w/o Images"></lightning:button>
+                                </aura:if>
+                            </div>
+                        </aura:if>
+
+                        <!--                        <aura:if isTrue="{!and(and(v.showReadonlyPage, v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}">-->
+                        <!--                            true-->
+                        <!--                            <aura:set attribute="else">-->
+                        <!--                                false-->
+                        <!--                            </aura:set>-->
+                        <!--                        </aura:if>-->
+
+                        <aura:if isTrue="{!and(and(v.showReadonlyPage, v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}">
+                            <aura:if isTrue="{!and(!v.isSubmitted, v.hasEditAccess)}"> 
+
+                                <!-- once click on Save button Edit and Complete Survey button appears-->
+                                <div class="slds-align_absolute-center slds-p-bottom_small">
+                                    <lightning:button onclick="{!c.handlePreviousButonClick}" variant="brand" label="Edit"></lightning:button>
+                                    <aura:if isTrue="{!v.newtworkId == ''}">
+                                        <lightning:button onclick="{!c.handleGeneratePDF}" variant="brand" label="Survey PDF w Images"></lightning:button>
+                                        <lightning:button onclick="{!c.handleGenerateWIPDF}" variant="brand" label="Survey PDF w/o Images"></lightning:button>
+                                    </aura:if>
+                                    <lightning:button onclick="{!c.handleSubmitButonClick}" variant="brand" label="Complete Survey"></lightning:button>
+                                </div>
+
+                                <!-- Edit and Generate Pdf Button shows here-->
+                                <aura:set attribute="else">
+                                    <div class="slds-align_absolute-center slds-p-bottom_small">
+                                        <aura:if isTrue="{!and(v.allowEditForCompletedSurvey,v.hasEditAccess)}">
+
+                                            <aura:if isTrue="{!v.sysUser}">
+                                                <!-- Edit button show only to Admin System user -->
+                                                <lightning:button onclick="{!c.handlePreviousButonClick}" variant="brand" label="Edit"></lightning:button>
+
+                                            </aura:if>
+
+                                            <aura:if isTrue="{!and(and(v.showResubmitButton, v.networkId != ''), v.networkId != null)}">
+                                                <lightning:button onclick="{!c.handleResubmitClick}" variant="brand" label="Resubmit"></lightning:button>
+                                            </aura:if>
+                                        </aura:if>
+
+                                        <aura:if isTrue="{!v.networkId == ''}">
+                                            <lightning:button onclick="{!c.handleGeneratePDF}" variant="brand" label="Survey PDF w Images"></lightning:button>
+                                            <lightning:button onclick="{!c.handleGenerateWIPDF}" variant="brand" label="Survey PDF w/o Images"></lightning:button>
+                                        </aura:if>
+                                    </div>
+                                </aura:set>
+
+                            </aura:if>
+                        </aura:if>
+                    </aura:if>
+                </div>
+                <!-- survey Completion message-->
+                <!-- COMMENT OUT PER DPM-4958 BY LJ -->
+                <aura:if isTrue="{!and(v.isSubmitted,v.networkId=='')}">
+                    <div class="slds-p-bottom_small">
+                        <div class="slds-box" style="background-color: #F0F8FF;">
+                            <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+                                This survey has been completed!
+                            </div>
+                            <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+                                Next Steps: Click the Summary tab to review any action plans generated from Survey Questions.
+                            </div>
+                            <!--DPM-5071 changed to comment by MH - 2023.11.01 : Next Steps: Click the Summary tab to review any action plans generated from Survey Questions.  . If the Survey Score is 100%, click the Submit Evaluation for Approval button.-->
+                        </div>
+                    </div>
+                </aura:if>
+
+            </aura:if>
+            <!--Contact Missing ends here-->
+
+            <!--
+            @description : Add yes/no action to all Survey Questions
+            @lastModifiedby : yc.park@solomontech.net
+            @lastModifiedDate : 23/07/24
+            -->
+             <aura:if isTrue="{!v.sysUser}">
+                <lightning:button variant="brand" name="Yes" label="All Yes" title="ALL YES" onclick="{! c.handleAllRadioOptionChanged }" />
+                <lightning:button variant="brand" name='No' label="All No" title="ALL NO" onclick="{! c.handleAllRadioOptionChanged }" /> 
+            </aura:if>
+            
+            <!--<div class="slds-box">-->
+            <aura:if isTrue="{!v.surveySectionQuestionsMapData != null}">
+                <!-- Display Data in Edit Mode start here-->
+                <aura:if isTrue="{!and(and(not(v.showReadonlyPage), v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}">
+
+                    <aura:iteration items="{!v.surveySectionQuestionsMapData}" var="surveyMap" indexVar="sectionIndex">
+                        <!-- InStore Review Starts here -->
+                        <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+
+                            <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex == 0)}"><!--{!and(surveyQuestion.warrantyReview2022,questionIndex == 0)}-->
+
+                                <div class="slds-box">
+
+                                    <!--Instruction start-->
+                                    <div class="slds-page-header" style="cursor: pointer;" data-id="{!'wrinstructions-' + (surveyQuestion.questionNumber -1)}" name="name" aura:id="wrinstructions" onclick="{!c.handleShowHideInsructions}">
+                                        <section class="slds-clearfix">
+                                            <div class="slds-float--left ">
+                                                <lightning:icon class="slds-show" aura:id="wrinstructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                <lightning:icon class="slds-hide" aura:id="wrinstructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                            </div>
+                                            <div class="slds-m-left_medium"><b>Instructions</b></div>
+                                        </section>
+                                    </div>
+                                    <div class="slds-hide slds-p-around_small" aura:id="wrinstructionstext" data-id="{!'wrinstructionstext-' + (surveyQuestion.questionNumber -1)}">
+                                        <div class="slds-box" style="background-color: #F0F8FF;">
+                                            <lightning:formattedRichText value="{!surveyQuestion.warrantyReviewInstruction2022}"></lightning:formattedRichText>
+                                        </div>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <!--hidden section, using so can help determine toggle in underlying questions that do have an instruction-->
+                                        <lightning:icon class="slds-hide" aura:id="wrinstructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                        <lightning:icon class="slds-hide" aura:id="wrinstructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                        <div class="slds-hide slds-p-around--medium" aura:id="wrinstructionstext" data-id="{!'wrinstructionstext-' + (surveyQuestion.questionNumber -1)}">
+                                            <lightning:formattedRichText value="{!surveyQuestion.warrantyReviewInstruction2022}"></lightning:formattedRichText>
+                                        </div>
+                                    </aura:set>
+                                    <!--Instruction ends-->
+
+                                    <div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-3">
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">In Store Review?</legend>
+                                                <lightning:select variant="label-hidden" name="In_Store_Review" label="In Store Review?" value="{!v.inStoreReview}" onchange="{!c.picklistValChange}">
+                                                    <option value="YES">YES</option>
+                                                    <option value="NO">NO</option>
+                                                    <option value="NO">HYBRID</option>
+                                                </lightning:select>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 2%;">
+                                            <div class="slds-size_1-of-1">
+
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">What is the Dealer’s current RO file organization?</legend>
+                                                <lightning:select variant="label-hidden" name="What_is_the_Dealers_current_RO" label="What is the Dealer’s current RO file organization?" value="{!v.whatIsTheDealersCurrentRO}" onchange="{!c.picklistValChange}">
+                                                    <option value="Electronically scanned. Scanned PDF files stored in DMS data storage/server/cloud/etc.">Electronically scanned. Scanned PDF files stored in DMS data storage/server/cloud/etc.</option>
+                                                    <option value="Manual filing. VIN Service File Folder for each VIN. Completed RO pkgs (w/all related support documents) are placed in the designated VIN Svc file folder.">Manual filing. VIN Service File Folder for each VIN. Completed RO pkgs (w/all related support documents) are placed in the designated VIN Svc file folder.</option>
+                                                    <option value="Manual filing. No separate VIN Service File. Filed by RO# Sequence.">Manual filing. No separate VIN Service File. Filed by RO# Sequence.</option>
+                                                    <option value="Manual filing. No separate VIN Service File. Filed by RO Activity Dates.">Manual filing. No separate VIN Service File. Filed by RO Activity Dates.</option>
+                                                    <option value="Manual filing. No separate VIN Service File. Filed by Accounting Posting Dates.">Manual filing. No separate VIN Service File. Filed by Accounting Posting Dates.</option>
+                                                    <option value="Manual filing. No separate VIN Service File. Others – Describe.">Manual filing. No separate VIN Service File. Others – Describe.</option>
+                                                </lightning:select>
+                                                <!--
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">What is the Dealer’s current RO file organization?</div>
+                                                                    <div class="slds-text-heading_small" style="margin-top: 1%;">1. Electronically scanned</div>
+                                                                    <div class="slds-text-heading_small" style="padding-left: 2%;margin-top: 1%;">a. Scanned PDF files stored in DMS data storage/server/cloud/etc.</div>
+                                                                    <div class="slds-text-heading_small" style="margin-top: 1%;">2. Manual filing</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 2%;margin-top: 1%;">a. VIN Service File Folder for each VIN.</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 4%;margin-top: 1%;">i Completed RO pkgs (w/all related support documents) are placed in the designated VIN Svc file folder</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 2%;margin-top: 1%;">b. No separate VIN Service File.</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 4%;margin-top: 1%;">i Filed by RO# Sequence</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 4%;margin-top: 1%;">ii Filed by RO Activity Dates</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 4%;margin-top: 1%;">iii Filed by Accounting Posting Dates</div>
+                                                                    <div class="slds-text-heading_small"  style="padding-left: 4%;margin-top: 1%;">iv Others – Describe</div>
+                                                                    -->
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 6%;">
+                                            <div class="slds-size_1-of-3">
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">Others - Describe</legend>
+
+                                                <lightning:input variant="label-hidden" type="text" name="others" label="Others" value="{!v.othersDescribe}"/>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-3">
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">How many ROs were reviewed?</legend>
+                                                <lightning:input variant="label-hidden" type="number" name="werereviewed" label="How many ROs were reviewed?" value="{!v.howManyROsWereReviewed}" required="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-3">
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">How many ROs had zero (0) deficiencies/discrepancies?</legend>
+                                                <lightning:input variant="label-hidden" type="number" name="werereviewed" label="How many ROs had zero (0) deficiencies/discrepancies?" value="{!v.howManyROsHadZeroDeficienciesDiscrepancies}" required="true"/>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%; margin-bottom: 2%;">
+                                            <div class="slds-size_1-of-2">
+                                                <legend class="slds-form-element__legend slds-form-element__label strong-text">Is the Warranty RO Review complete?</legend>
+                                                <lightning:select variant="label-hidden" name="Is_the_Warranty_CEE_RO_Review_complete" label="Is the Warranty RO Review complete?" value="{!v.isTheWarrantyCEEROReviewComplete}" onchange="{!c.picklistValChange}">
+                                                    <option value="YES">YES</option>
+                                                    <option value="NO">NO</option>
+                                                </lightning:select>
+                                            </div>
+                                            <aura:if isTrue="{!and(v.isTheWarrantyCEEROReviewCompleteFlag)}">
+                                                <div class="slds-size_1-of-16" style="margin-left:2%;">
+                                                    <h1 style="color:red;text-align:left">*</h1>
+                                                </div>
+                                            </aura:if>
+                                            <div class="slds-size_1-of-3">
+                                                <div class="slds-p-left_x-small">
+                                                    <lightning:fileUpload
+                                                            name="fileUploader"
+                                                            title="Warranty RO Review Excel File"
+                                                            label="Warranty RO Review Excel File"
+                                                            multiple="true"
+                                                            recordId="{!v.surveyId}"
+                                                            onuploadfinished="{!c.handleUploadFinished}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <aura:if isTrue="{!v.warrantyCEEROReviewExcelFileDocuments.length > 0}">
+                                            <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                            <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                <aura:iteration items="{!v.warrantyCEEROReviewExcelFileDocuments}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                    <div class="slds-col slds-p-top_xx-small">
+                                                        <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                    </div>
+                                                </aura:iteration>
+                                            </div>
+                                        </aura:if>
+
+                                    </div>
+
+                                </div><!-- class="slds-box" -->
+                            </aura:if>
+
+                        </aura:iteration>
+                        <!-- InStore Review ends here -->
+
+                        <lightning:accordion aura:id="accordion">
+                            <aura:iteration items="{!v.surveyCategory}" var="surCategory" indexVar="key">
+                                <lightning:accordionSection label="{!surCategory}">
+                                    <div class="slds-box" style="border: 2px solid silver;overflow-y:scroll; height : 1000px; position: relative;">
+
+                                        <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+                                            <aura:if isTrue="{!(surveyQuestion.category==surCategory)}">
+
+                                                <aura:if isTrue="{!surveyQuestion.showquestion}">
+                                                    <!--questionIndex :{!questionIndex} -->
+                                                    <!-- showdueDate -->
+                                                    <!--  <aura:if isTrue="{!surveyQuestion.showdueDate}">
+                                                            <aura:if isTrue="{!!surveyQuestion.warrantyReview2022}">
+                                                                <div class="slds-page-header" style="cursor: pointer;" data-id="{!'dueDate-' + (questionIndex)}" name="name" aura:id="dueDate" onclick="{!c.handleShowHideDueDate}">
+                                                                    <section class="slds-clearfix">
+                                                                        <div class="slds-floatleft">
+                                                                            <lightning:icon class="slds show" aura:id="dueDateadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                            <lightning:icon class="slds hide" aura:id="dueDatedash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                        </div>
+                                                                        <div class="slds-m-left_medium"><b>Due Date</b></div>
+                                                                    </section>
+                                                                </div>
+                                                                <div class="slds-hide slds-p-around_small" aura:id="dueDatetext" data-id="{!'dueDatetext-' + (questionIndex)}">
+                                                                    <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                        <lightning:formattedRichText value="{!surveyQuestion.dueDate}"></lightning:formattedRichText>
+                                                                    </div>
+                                                                </div>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:icon class="slds-hide" aura:id="dueDateadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                    <lightning:icon class="slds-hide" aura:id="dueDatedash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                    <div class="slds-hide slds-p-around medium" aura:id="dueDatetext" data-id="{!'dueDatetext-' + (questionIndex)}">
+                                                                        <lightning:formattedRichText value="{!surveyQuestion.dueDate}"></lightning:formattedRichText>
+                                                                    </div>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                            <aura:set attribute="else">
+                                                                <div class="slds-hide slds-p-around_small" aura:id="dueDatetext" data-id="{!'dueDatetext-' + (questionIndex)}">
+                                                                    <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                        <lightning:formattedRichText value="{!surveyQuestion.dueDate}"></lightning:formattedRichText>
+                                                                    </div>
+                                                                </div>
+                                                            </aura:set>
+                                                        </aura:if> -->
+
+
+                                                    <!-- showinstructions -->
+                                                    <aura:if isTrue="{!surveyQuestion.showinstructions}">
+                                                        <aura:if isTrue="{!!surveyQuestion.warrantyReview2022}"><!-- {!!surveyQuestion.warrantyReview2022} down data-id after instructions (surveyQuestion.questionNumber)-->
+
+                                                            <!-- (surveyQuestion.questionNumber -1) questions // questionIndex--> <!-- {!'instructions-' + (surveyQuestion.questionNumber)} -->
+                                                            <!--<div class="slds-page-header" style="cursor: pointer;" data-id="{!'instructions-' + (questionIndex)}" name="name" aura:id="instructions" onclick="{!c.handleShowHideInsructions}">
+                                                                <section class="slds-clearfix">
+                                                                    <div class="slds-float&#45;&#45;left">
+                                                                        <lightning:icon class="slds-show" aura:id="instructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                        <lightning:icon class="slds-hide" aura:id="instructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                    </div>
+                                                                    <div class="slds-m-left_medium"><b>Instructions</b></div>
+                                                                </section>
+                                                            </div>        							&lt;!&ndash; aura:id="instructionstext" &ndash;&gt;	&lt;!&ndash; {!'instructionstext-' + (surveyQuestion.questionNumber)}&ndash;&gt;
+                                                            <div class="slds-hide slds-p-around_small" aura:id="instructionstext" data-id="{!'instructionstext-' + (questionIndex)}">
+                                                                <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>-->
+                                                            <div class="slds-page-header" style="cursor: pointer;" data-id="{!'instructions-' + (questionIndex)}" name="name" aura:id="instructions" onclick="{!c.handleShowHideInsructions}">
+                                                                <section class="slds-clearfix">
+                                                                    <div class="slds-float--left">
+
+                                                                        <div class="slds-show" data-id="{!'instructionsadd'+(questionIndex)}">
+                                                                            <lightning:icon aura:id="instructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                        </div>
+
+                                                                        <div class="slds-hide" data-id="{!'instructionsdash'+(questionIndex)}">
+                                                                            <lightning:icon aura:id="instructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="slds-m-left_medium"><b>Instructions</b></div>
+                                                                </section>
+                                                            </div>        							<!-- aura:id="instructionstext" -->	<!-- {!'instructionstext-' + (surveyQuestion.questionNumber)}-->
+                                                            <div class="slds-hide slds-p-around_small" aura:id="instructionstext" data-id="{!'instructionstext' + (questionIndex)}">
+                                                                <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>
+                                                            <aura:set attribute="else">
+                                                                <!--hidden section, using so can help determin toggle in udnerlying questions that do have an instruction-->
+                                                                <lightning:icon class="slds-hide" aura:id="instructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                <lightning:icon class="slds-hide" aura:id="instructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                <div class="slds-hide slds-p-around--medium" aura:id="instructionstext" data-id="{!'instructionstext-' + (questionIndex)}">
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </aura:set>
+                                                        </aura:if>
+
+                                                        <aura:set attribute="else">
+                                                            <div class="slds-hide slds-p-around_small" aura:id="instructionstext" data-id="{!'instructionstext-' + (questionIndex)}">
+                                                                <div class="slds-box" style="background-color: #F0F8FF;">
+
+                                                                    <section class="slds-clearfix">
+                                                                        <div class="slds-float--left">
+                                                                            <lightning:icon class="slds-show" aura:id="instructionsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+
+                                                                            <lightning:icon class="slds-hide" aura:id="instructionsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                        </div>
+                                                                        <div class="slds-m-left_medium"><b>Instructions</b></div>
+                                                                    </section>
+
+
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+
+                                                    <!-- showbenefits-->
+                                                    <aura:if isTrue="{!surveyQuestion.showbenefits}"><!-- {!surveyQuestion.showbenefits}--><!-- {!'benefits-' + (surveyQuestion.questionNumber -1)} -->
+                                                        <div class="slds-page-header"  data-id="{!'benefits-' + (questionIndex)}" style="cursor: pointer;" onclick="{!c.handleShowHideBenefits}">
+                                                            <section class="slds-clearfix">
+                                                                <div class="slds-float--left">
+                                                                    <lightning:icon class="slds-show" aura:id="benefitsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                    <lightning:icon class="slds-hide" aura:id="benefitsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                </div>
+                                                                <div class="slds-m-left--large"><b>Benefits</b></div>
+                                                            </section>
+                                                        </div>
+                                                        <div class="slds-hide slds-p-around_small" aura:id="benefitstext">
+                                                            <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                <lightning:formattedRichText value="{!surveyQuestion.benefits}"></lightning:formattedRichText>
+                                                            </div>
+                                                        </div>
+                                                        <aura:set attribute="else">
+                                                            <!--hidden section, using so can help determin toggle in udnerlying questions that do have an instruction-->
+                                                            <lightning:icon class="slds-hide" aura:id="benefitsadd" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                            <lightning:icon class="slds-hide" aura:id="benefitsdash" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                            <div class="slds-hide slds-p-around--medium" aura:id="benefitstext" data-id="{!'benefitstext-' + (questionIndex)}"><!-- {!'benefitstext-' + (surveyQuestion.questionNumber -1)} -->
+
+                                                                <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                <!--<lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>-->
+
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+
+                                                    <div class="slds-grid slds-p-bottom_x-small">
+                                                        <div class="slds-col slds-size_1-of-1">
+                                                            <!-- display question number and question text-->
+                                                            <div class="slds-p-left_x-small ">
+                                                                <aura:if isTrue="{!surveyQuestion.questionNumber != null}">
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">Question {!surveyQuestion.questionNumber}
+                                                                        <aura:if isTrue="{!surveyQuestion.isCarriedOver}">
+                                                                            &nbsp; <lightning:icon iconName="action:priority" alternativeText="Carried Over" title="Carried Over" size="x-small" />
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022)}">
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.question}" class="strong-text"></lightning:formattedRichText>
+                                                                    <div><p><b>If an action plan is required, have we received the action plan already?</b></p>
+                                                                        <p style="color:red;"> Select “NO” to send a request to the dealer to provide an action plan.</p>
+                                                                        <p style="color:red;"> Select “YES” if an action plan was already created or if no action plan is needed.</p></div>
+                                                                    <aura:set attribute="else">
+                                                                        <lightning:formattedRichText value="{!surveyQuestion.question}"></lightning:formattedRichText>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </div>
+
+                                                            <div class="slds-p-left_x-small  slds-p-top_xx-small">
+
+                                                                <aura:if isTrue="{!and(surveyQuestion.singleOptionSelection, not(surveyQuestion.iscalculated)) }"><!--{!and(surveyQuestion.singleOptionSelection, not(surveyQuestion.iscalculated)) }-->
+                                                                    <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex}"
+                                                                                          aura:id="{!surveyQuestion.id}"
+                                                                                          options="{!surveyQuestion.options}"
+                                                                                          value="{!surveyQuestion.response}"
+                                                                                          onchange="{!c.handleRadioOptionChanged}"
+                                                                                          type="button"
+                                                                                          disabled="{!or(surveyQuestion.readonly, and(surveyQuestion.imagerequiredpriortoanswer, surveyQuestion.relatedDocuments.length == 0))}">
+                                                                    </lightning:radioGroup>
+                                                                </aura:if>
+
+                                                                <aura:if isTrue="{!surveyQuestion.multipleOptionSelection}">
+                                                                    <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex}" values="{!surveyQuestion.responseArray}" options="{!surveyQuestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+                                                                </aura:if>
+
+                                                                <!-- Comment Action/Plan box -->
+                                                                <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022)}">
+                                                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%;">
+                                                                        <div class="slds-size_1-of-2">
+                                                                            <aura:iteration items="{!v.warrantyReviewQuestionsMap}" var="someVar" indexVar="someIndex" >
+                                                                                <aura:if isTrue="{!and(someVar.key == surveyQuestion.questionNumber)}">
+                                                                                    <legend class="slds-form-element__legend slds-form-element__label strong-text">{!someVar.values}</legend>
+                                                                                    <lightning:input variant="label-hidden" type="number" name="technotes" label="{!someVar.values}" value="{!surveyQuestion.howManyROsHadInsufficientTechNotes}"/>
+                                                                                </aura:if>
+                                                                            </aura:iteration>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%;">
+                                                                        <div class="slds-size_1-of-1">
+                                                                            <div class="slds-p-top_large">
+                                                                                <div class="slds-text-heading_small" style="font-weight: bold;">Comments/Action Plan</div>
+                                                                                <lightning:inputRichText value="{!surveyQuestion.commentsActionPlan}"></lightning:inputRichText>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </aura:if>
+
+                                                                <!-- input type like yes/no text number-->
+                                                                <aura:if isTrue="{!surveyQuestion.textquestiontype}">
+                                                                    <div class=" slds-p-right_xx-large">
+                                                                        <lightning:input type="text" value="{!surveyQuestion.response}" variant="label-hidden" disabled="{!or(surveyQuestion.readonly, and(surveyQuestion.imagerequiredpriortoanswer, surveyQuestion.relatedDocuments.length == 0))}"/>
+                                                                    </div>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!surveyQuestion.numberquestiontype}">
+                                                                    <div class=" slds-p-right_xx-large">
+                                                                        <lightning:input type="number" value="{!surveyQuestion.response}" variant="label-hidden" disabled="{!or(surveyQuestion.readonly, and(surveyQuestion.imagerequiredpriortoanswer, surveyQuestion.relatedDocuments.length == 0))}"/>
+                                                                    </div>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!surveyQuestion.multiselectwithinlineentry}">
+                                                                    <div class=" slds-p-right_xx-large">
+                                                                        <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex}" values="{!surveyQuestion.responseArray}" options="{!surveyQuestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+                                                                    </div>
+                                                                </aura:if>
+
+                                                            </div>
+
+                                                            <!-- child question starts here-->
+                                                            <aura:if isTrue="{!surveyQuestion.inlinequestions.length > 0}">
+                                                                <div class="slds-p-top_x-small">
+                                                                    <aura:iteration items="{!surveyQuestion.inlinequestions}" var="inlinequestion" indexVar="inlinequestioninedex">
+
+                                                                        <div class="slds-grid slds-p-top_x-small slds-p-left_large">
+                                                                            <!--<div class="slds-col slds-grow-none">
+                                                                                    <lightning:input type="checkbox" variant="label-hidden"/>
+                                                                                </div>-->
+                                                                            <div class="slds-col slds-p-top_small" style="text-align: left;">
+                                                                                <!-- added by Soyeon Kim for DPM-4847 starts-->
+                                                                                <aura:if isTrue="{!inlinequestion.instructions}">
+                                                                                    <div style="cursor: pointer;" data-id="{!'instructions-'+questionIndex+'-'+inlinequestioninedex}" onclick="{!c.handleShowHideChildInsructions}">
+                                                                                        <section class="slds-clearfix">
+                                                                                            <div class="slds-float--left">
+                                                                                                <div class="slds-show" data-id="{!questionIndex+'add'+inlinequestioninedex}">
+                                                                                                    <lightning:icon aura:id="{!questionIndex+'add'+inlinequestioninedex}" iconName="utility:add" size="xx-small" alternativeText="Indicates add"/>
+                                                                                                </div>
+                                                                                                <div class="slds-hide" data-id="{!questionIndex+'dash'+inlinequestioninedex}">
+                                                                                                    <lightning:icon aura:id="{!questionIndex+'dash'+inlinequestioninedex}" iconName="utility:dash" size="xx-small" alternativeText="Indicates dash"/>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="slds-m-left_medium"><b>Instructions</b></div>
+                                                                                        </section>
+                                                                                    </div>
+                                                                                    <div class="slds-hide" data-id="{!questionIndex+'text'+inlinequestioninedex}" style="padding-top: 0.75rem;">
+                                                                                        <div class="slds-box" style="background-color: #F0F8FF;">
+                                                                                            <lightning:formattedRichText value="{!inlinequestion.instructions}"></lightning:formattedRichText>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                                <!-- added by Soyeon Kim for DPM-4847 ends-->
+                                                                                <!--p>{!inlinequestion.showquestion}</p -->
+                                                                                <lightning:formattedRichText value="{!inlinequestion.question}"></lightning:formattedRichText>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="slds-grid slds-p-top_x-small slds-p-left_small">
+                                                                            <div class="slds-col slds-size_1-of-2 slds-p-left_medium" style="text-align: left;">
+                                                                                <aura:if isTrue="{!inlinequestion.singleOptionSelection}">
+                                                                                    <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex + '-' + inlinequestioninedex}"
+                                                                                                          aura:id="{!inlinequestion.id}"
+                                                                                                          options="{!inlinequestion.options}"
+                                                                                                          value="{!inlinequestion.response}"
+                                                                                                          onchange="{!c.handleInlineRadioOptionChanged}"
+                                                                                                          type="button">
+                                                                                    </lightning:radioGroup>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!inlinequestion.singleOptionSelectionWithOther}">
+                                                                                    <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex + '-' + inlinequestioninedex}"
+                                                                                                          aura:id="{!inlinequestion.id}"
+                                                                                                          options="{!inlinequestion.options}"
+                                                                                                          value="{!inlinequestion.response}"
+                                                                                                          onchange="{!c.handleInlineRadioOptionChanged}"
+                                                                                                          type="button">
+                                                                                    </lightning:radioGroup>
+                                                                                    <aura:if isTrue="{!inlinequestion.response == 'Other'}">
+                                                                                        <div>
+                                                                                            <lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinequestioninedex}" type="text" value="{!inlinequestion.otherresponsetext}" label="Other Response" onblur="{!c.handleOtherTextValueChanged}"></lightning:input>
+                                                                                        </div>
+                                                                                    </aura:if>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!inlinequestion.textquestiontype}">
+                                                                                    <lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinequestioninedex}" type="text" value="{!inlinequestion.response}" variant="label-hidden" onblur="{!c.handleInlineTextChange}"></lightning:input>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!inlinequestion.numberquestiontype}">
+                                                                                    <lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinequestioninedex}" type="number" value="{!inlinequestion.response}" variant="label-hidden" onblur="{!c.handleInlineNumericChange}"></lightning:input>
+                                                                                </aura:if>
+                                                                                <aura:if isTrue="{!inlinequestion.multipleOptionSelection}">
+                                                                                    <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex + inlinequestioninedex}" values="{!inlinequestion.responseArray}" options="{!inlinequestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+                                                                                </aura:if>
+                                                                            </div>
+                                                                            <div class="slds-col_bump-left">
+                                                                                <span></span>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </aura:iteration>
+                                                                </div>
+                                                            </aura:if>
+
+                                                            <aura:if isTrue="{!surveyQuestion.inlinequestionstablular.length > 0}">
+                                                                <div class="slds-grid slds-p-top_x-small">
+                                                                    <div class="slds-col slds-size_1-of-1">
+                                                                        <table class="slds-table slds-max-medium-table_stacked-horizontal">
+                                                                            <thead>
+                                                                            <th></th>
+                                                                            <th>{!surveyQuestion.tabularheader1}</th>
+                                                                            <th>{!surveyQuestion.tabularheader2}</th>
+                                                                            <aura:if isTrue="{!and(surveyQuestion.tabularheader3 != null, surveyQuestion.tabularheader3 != '')}">
+                                                                                <th>{!surveyQuestion.tabularheader3}</th>
+                                                                            </aura:if>
+                                                                            </thead>
+                                                                            <aura:iteration items="{!surveyQuestion.inlinequestionstablular}" var="inlinetabular" indexVar="inlinetabularindex">
+                                                                                <tr>
+                                                                                    <td><lightning:formattedRichText value="{!inlinetabular.question}"></lightning:formattedRichText></td>
+                                                                                    <td data-label="{!surveyQuestion.tabularheader1}"><lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinetabularindex}" type="number" value="{!inlinetabular.responsenumber1}" variant="label-hidden" disabled="{!inlinetabular.readonly}" onblur="{!c.numericTabularChange}"/></td>
+                                                                                    <td data-label="{!surveyQuestion.tabularheader2}"><lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinetabularindex}" type="number" value="{!inlinetabular.responsenumber2}" variant="label-hidden" disabled="{!inlinetabular.readonly}" onblur="{!c.numericTabularChange}"/></td>
+                                                                                    <aura:if isTrue="{!surveyQuestion.tabularheader3}">
+                                                                                        <td data-label="{!surveyQuestion.tabularheader3}"><lightning:input name="{!sectionIndex + '-' + questionIndex + '-' + inlinetabularindex}" type="number" value="{!inlinetabular.responsenumber3}" variant="label-hidden" disabled="{!inlinetabular.readonly}" onblur="{!c.numericTabularChange}" step="0.01"/></td>
+                                                                                    </aura:if>
+                                                                                </tr>
+                                                                            </aura:iteration>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </aura:if>
+                                                            <!-- child question ends here-->
+
+                                                            <aura:if isTrue="{!and(surveyQuestion.singleOptionSelection, surveyQuestion.iscalculated) }">
+                                                                <div class="slds-p-top_medium">
+                                                                    <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex}"
+                                                                                          aura:id="{!surveyQuestion.id}"
+                                                                                          options="{!surveyQuestion.options}"
+                                                                                          value="{!surveyQuestion.response}"
+                                                                                          onchange="{!c.handleRadioOptionChanged}"
+                                                                                          type="button"
+                                                                                          disabled="{!or(surveyQuestion.readonly, and(surveyQuestion.imagerequiredpriortoanswer, surveyQuestion.relatedDocuments.length == 0))}">
+                                                                    </lightning:radioGroup>
+                                                                </div>
+                                                            </aura:if>
+
+                                                            <!--<div class="slds-grid slds-p-top_large">
+                                                                    <div class="slds-col slds-grow-none">
+                                                                        <aura:if isTrue="{!surveyQuestion.showinstructions}">
+                                                                            <lightning:button variant="brand"
+                                                                                              name="{!sectionIndex + '-' + questionIndex}"
+                                                                                              label="Instructions"
+                                                                                              title="Instructions"
+                                                                                              onclick="{! c.openModal }" />
+                                                                        </aura:if>
+                                                                    </div>
+                                                                    <div class="slds-col slds-grow-none slds-p-left_x-small">
+                                                                        <aura:if isTrue="{!surveyQuestion.showbenefits}">
+                                                                            <lightning:button variant="brand"
+                                                                                              name="{!sectionIndex + '-' + questionIndex}"
+                                                                                              label="Benefits"
+                                                                                              title="Benefits"
+                                                                                              onclick="{! c.openBenefitsModal }" />
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </div>-->
+
+                                                            <!-- Remarks text Box -->
+                                                            <!--<div>{!surveyQuestion.remarks}</div>--> <!--DPM-5069 changed to comment--> 
+                                                            <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}">
+                                                                <aura:if isTrue="{!surveyQuestion.showremarks}">
+                                                                    <div class="slds-p-top_large">
+                                                                        <!--                                                                        <div class="slds-text-heading_small" style="font-weight: bold;">Remarks</div>-->
+                                                                        <!--                                                                        <lightning:inputRichText aura:Id="{!sectionIndex + '-' + questionIndex + '-remark'}" value="{!surveyQuestion.remarks}"></lightning:inputRichText>-->
+                                                                        <!-- added by Soyeon Kim for DPM-4873 starts-->
+                                                                        <aura:if isTrue="{!surveyQuestion.response == 'No'}">
+                                                                            <div class="slds-text-heading_small" style="font-weight: bold;color: Red;display:inline-block;">*</div>
+                                                                            <div class="slds-text-heading_small" style="font-weight: bold;display:inline-block;">Remarks</div>
+                                                                            <lightning:inputRichText value="{!surveyQuestion.remarks}"></lightning:inputRichText>
+                                                                        </aura:if>
+                                                                        <aura:if isTrue="{!surveyQuestion.response != 'No'}">
+                                                                            <div class="slds-text-heading_small" style="font-weight: bold;">Remarks</div>
+                                                                            <lightning:inputRichText value="{!surveyQuestion.remarks}"></lightning:inputRichText>
+                                                                        </aura:if>
+                                                                        <!-- added by Soyeon Kim for DPM-4873 ends-->
+                                                                    </div>
+                                                                </aura:if>
+                                                            </aura:if>
+
+                                                            <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}">
+                                                                <div class="slds-p-left_x-small  slds-p-top_small">
+                                                                    <aura:if isTrue="{!and(and(lessthan(surveyQuestion.relatedDocuments.length,surveyQuestion.requiredimages), surveyQuestion.requiredimages > 0), surveyQuestion.response != surveyQuestion.failvalue)}">
+                                                                        <h1 style="color:red;text-align:left">{!surveyQuestion.requiredimages - surveyQuestion.relatedDocuments.length} Image(s) required. </h1>
+                                                                    </aura:if>
+                                                                    <c:ImageManager recordId="{!surveyQuestion.id}"/><br/>
+                                                                </div>
+                                                                <aura:if isTrue="{!surveyQuestion.relatedDocuments.length > 0}">
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                                                    <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                                        <aura:iteration items="{!surveyQuestion.relatedDocuments}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                                            <div class="slds-col slds-p-top_xx-small">
+                                                                                <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!surveyQuestion.id}" allowDelete="{!!v.showReadonlyPage}" />
+                                                                            </div>
+                                                                        </aura:iteration>
+                                                                    </div>
+                                                                </aura:if>
+                                                            </aura:if>
+
+                                                        </div>
+
+                                                        <!--<div class="slds-col slds-size_1-of-2">
+                                                                <div class="slds-text-heading_small" style="font-weight: bold;">Instructions</div>
+                                                                <lightning:formattedRichText value="{!surveyQuestion.instructions}"></lightning:formattedRichText>
+                                                                <div class="slds-p-top_large">
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">Benefits</div>
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.benefits}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>-->
+                                                    </div>
+
+                                                    <!-- line break-->
+                                                    <aura:if isTrue="{!surveyMap.values.length != (questionIndex + 1)}">
+                                                        <div class="slds-p-left_x-large slds-p-right_x-large">
+                                                            <hr class="solid"/>
+                                                        </div>
+                                                    </aura:if>
+
+                                                    <!--<aura:set attribute="else">
+                                                            <div class="slds-grid slds-p-bottom_large">
+                                                                <div class="slds-col slds-size_1-of-1">
+                                                                    <div class="slds-p-left_x-small ">
+                                                                        <aura:if isTrue="{!surveyQuestion.questionNumber != null}">
+                                                                            <div class="slds-text-heading_small" style="font-weight: bold;">Question {!surveyQuestion.questionNumber}</div>
+                                                                        </aura:if>
+                                                                        <lightning:formattedRichText value="{!surveyQuestion.question}"></lightning:formattedRichText>
+                                                                    </div>
+                                                                    <div class="slds-p-left_x-small  slds-p-top_x-small">
+                                                                        <aura:if isTrue="{!surveyQuestion.singleOptionSelection}">
+                                                                            <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex}"
+                                                                                                  aura:id="{!surveyQuestion.id}"
+                                                                                                  options="{!surveyQuestion.options}"
+                                                                                                  value="{!surveyQuestion.response}"
+                                                                                                  onchange="{!c.handleRadioOptionChanged}"
+                                                                                                  type="button">
+                                                                            </lightning:radioGroup>
+                                                                        </aura:if>
+                                                                        <aura:if isTrue="{!surveyQuestion.multipleOptionSelection}">
+                                                                            <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex}" values="{!surveyQuestion.responseArray}" options="{!surveyQuestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+                                                                        </aura:if>
+                                                                        <aura:if isTrue="{!surveyQuestion.textquestiontype}">
+                                                                            <lightning:input type="text" value="{!surveyQuestion.response}" variant="label-hidden"/>
+                                                                        </aura:if>
+                                                                        <aura:if isTrue="{!surveyQuestion.numberquestiontype}">
+                                                                            <lightning:input type="number" value="{!surveyQuestion.response}" variant="label-hidden"/>
+                                                                        </aura:if>
+                                                                    </div>
+
+                                                                    <div class="slds-p-left_x-small  slds-p-top_small">
+                                                                        <aura:if isTrue="{!and(surveyQuestion.relatedDocuments.length == 0, surveyQuestion.requiredimages > 0)}">
+                                                                            <h1 style="color:red;text-align:left">Image(s) required.</h1>
+                                                                        </aura:if>
+                                                                        <c:ImageManager recordId="{!surveyQuestion.id}"/><br/>
+                                                                    </div>
+
+                                                                    <aura:if isTrue="{!surveyQuestion.relatedDocuments.length > 0}">
+                                                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                                            <aura:iteration items="{!surveyQuestion.relatedDocuments}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                                                <div class="slds-col slds-p-top_xx-small">
+                                                                                    <c:FilePreviewComponent fileId="{!relatedDocument}"/>
+                                                                                </div>
+                                                                            </aura:iteration>
+                                                                        </div>
+                                                                    </aura:if>
+                                                                </div>
+                                                            </div>
+
+                                                            <aura:if isTrue="{!surveyMap.values.length != (questionIndex + 1)}">
+                                                                <div class="slds-p-left_large slds-p-right_large">
+                                                                    <hr class="solid"/>
+                                                                </div>
+                                                            </aura:if>
+                                                        </aura:set>-->
+
+                                                </aura:if>
+
+                                            </aura:if>
+                                        </aura:iteration>
+
+                                    </div>
+
+                                </lightning:accordionSection>
+                            </aura:iteration>
+
+                            <!-- File Upload Code starts here -->
+                            <!-- {!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)} -->
+                            <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+                                <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)}"><!-- {!surveyMap.values.length == (questionIndex + 1)} -->
+                                    <div class="slds-p-left_x-large slds-p-right_x-large">
+                                        <hr class="solid"/>
+                                    </div>
+
+                                    <!-- RO Review Action Plan -->
+                                    <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)}">
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%; margin-bottom: 2%;border-top : 1px dotted;">
+                                            <div class="slds-size_4-of-4">
+                                                <div class="slds-p-left_x-small">
+                                                    <lightning:fileUpload
+                                                            name="fileUploader"
+                                                            title="RO Review Action Plan"
+                                                            label="RO Review Action Plan"
+                                                            multiple="true"
+                                                            recordId="{!v.surveyId}"
+                                                            onuploadfinished="{!c.handleUploadFinished2nd}"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.ROReviewActionPlan.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.ROReviewActionPlan}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+
+                                    <!--WOPR Action Plan, WOPR score below average-->
+                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%; margin-bottom: 2%;">
+                                        <div class="slds-size_4-of-4">
+                                            <div class="slds-p-left_x-small">
+                                                <lightning:fileUpload
+                                                        name="fileUploader"
+                                                        title="WOPR Action Plan, WOPR score below  average"
+                                                        label="WOPR Action Plan, WOPR score below  average"
+                                                        multiple="true"
+                                                        recordId="{!v.surveyId}"
+                                                        onuploadfinished="{!c.handleUploadFinished3rd}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:if isTrue="{!v.WOPRActionPlanWOPRScoreBelowAvg.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.WOPRActionPlanWOPRScoreBelowAvg}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+
+                                    <!-- Other WOPR Action Plan-->
+                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%; margin-bottom: 2%;">
+                                        <div class="slds-size_4-of-4">
+                                            <div class="slds-p-left_x-small">
+                                                <lightning:fileUpload
+                                                        name="fileUploader"
+                                                        title="Other WOPR Action Plan"
+                                                        label="Other WOPR Action Plan"
+                                                        multiple="true"
+                                                        recordId="{!v.surveyId}"
+                                                        onuploadfinished="{!c.handleUploadFinished4th}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:if isTrue="{!v.otherWOPRActionPlan.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.otherWOPRActionPlan}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+
+                                </aura:if>
+                            </aura:iteration>
+                            <!-- File Upload Code ends here -->
+
+
+                        </lightning:accordion>
+
+                    </aura:iteration>
+
+                </aura:if>
+
+                <!-- Save Button Generate PDF button starts here-->
+                <aura:if isTrue="{!and(and(not(v.showReadonlyPage), v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}">
+                    <div class="slds-grid" style="padding-top: 2%;">
+                        <div class="slds-align_absolute-center slds-p-bottom_small">
+                            <lightning:button onclick="{!c.handleSaveClick}" variant="brand" label="Save"></lightning:button>
+                            <!--<lightning:button onclick="{!c.handleNextButtonClick}" variant="brand" label="Validate"></lightning:button>-->
+                            <aura:if isTrue="{!v.newtworkId == ''}">
+                                <lightning:button onclick="{!c.handleGeneratePDF}" variant="brand" label="Generate Survey PDF"></lightning:button>
+                                <lightning:button onclick="{!c.handleGenerateWIPDF}" variant="brand" label="Survey PDF w/o Images"></lightning:button>
+                            </aura:if>
+                        </div>
+                    </div>
+                </aura:if>
+                <!-- Svae Button Generate PDF button ends here-->
+
+
+                <!-- Display Data in Read Mode start here-->
+                <aura:if isTrue="{!or(and(v.showReadonlyPage, v.surveySectionQuestionsMapData.length == 1), !v.hasEditAccess)}">
+                    <aura:iteration items="{!v.surveySectionQuestionsMapData}" var="surveyMap" indexVar="sectionIndex">
+
+                        <!-- InStore Review Warrenty start here-->
+                        <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+                            <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex == 0)}">
+                                <aura:if isTrue="{!!v.missingEvaluationFields}">
+                                    <div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-1">
+                                                <div class="slds-text-heading_small" style="font-weight: bold;">In Store Review <p style="color: blue;">{!surveyQuestion.inStoreReview}</p></div>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-1">
+                                                <div class="slds-text-heading_small" style="font-weight: bold;">How many ROs were reviewed? <p style="color: blue;">{!surveyQuestion.howManyROsWereReviewed}</p></div>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-size_1-of-1">
+                                                <div class="slds-text-heading_small" style="font-weight: bold;">How many ROs had zero (0) deficiencies/discrepancies? <p style="color: blue;">{!surveyQuestion.howManyROsHadZeroDeficienciesDiscrepancies}</p></div>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%;">
+                                            <div class="slds-text-heading_small" style="font-weight: bold;">What is the Dealer’s current RO file organization? <p style="color: blue;">{!surveyQuestion.whatIsTheDealersCurrentRO}</p></div>
+                                            <div class="slds-size_1-of-1">
+                                                <div class="slds-text-heading_small" style="font-weight: bold;">Others – Describe <p style="color: blue;">{!surveyQuestion.othersDescribe}</p></div>
+                                            </div>
+                                        </div>
+                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="padding-left: 2%;margin-top: 1%; margin-bottom: 2%;">
+                                            <div class="slds-size_1-of-1">
+                                                <div class="slds-text-heading_small"  style="font-weight: bold;">Is the Warranty RO Review complete? <p style="color: blue;">{!surveyQuestion.isTheWarrantyCEEROReviewComplete}</p></div>
+                                            </div>
+
+                                        </div>
+                                        <aura:if isTrue="{!v.warrantyCEEROReviewExcelFileDocuments.length > 0}">
+                                            <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                            <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                <aura:iteration items="{!v.warrantyCEEROReviewExcelFileDocuments}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                    <div class="slds-col slds-p-top_xx-small">
+                                                        <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                    </div>
+                                                </aura:iteration>
+                                            </div>
+                                        </aura:if>
+                                    </div>
+                                </aura:if>
+
+                            </aura:if>
+
+                        </aura:iteration>
+                        <!-- InStore Review Warrenty ends here-->
+
+                        <lightning:accordion aura:id="accordionView">
+                            <aura:iteration items="{!v.surveyCategory}" var="surCategory" indexVar="key">
+                                <lightning:accordionSection label="{!surCategory}">
+                                    <div style="max-height: 1000px; overflow-y: scroll;">
+                                        <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+                                            <aura:if isTrue="{!(surveyQuestion.category==surCategory)}">
+
+                                                <aura:if isTrue="{!surveyQuestion.showquestion}">
+                                                    <div class="slds-grid slds-p-bottom_medium">
+                                                        <div class="slds-col slds-size_1-of-1">
+                                                            <div class="slds-grid slds-p-right_large">
+                                                                <div class="slds-col slds-size_1-of-1">
+                                                                    <div class="slds-grid ">
+                                                                        <aura:if isTrue="{!surveyQuestion.questionNumber != null}">
+                                                                            <div class="slds-text-heading_small" style="font-weight: bold;">Question {!surveyQuestion.questionNumber}
+                                                                                <aura:if isTrue="{!surveyQuestion.isCarriedOver}">
+                                                                                    &nbsp; <lightning:icon iconName="action:priority" alternativeText="Carried Over" title="Carried Over" size="x-small"/>
+                                                                                </aura:if>
+
+                                                                            </div>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                    <div class="slds-grid ">
+                                                                        <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022)}">
+                                                                            <lightning:formattedRichText value="{!surveyQuestion.question}" class="strong-text"></lightning:formattedRichText>
+                                                                            <aura:set attribute="else">
+                                                                                <lightning:formattedRichText value="{!surveyQuestion.question}"></lightning:formattedRichText>
+                                                                            </aura:set>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                    <div class="slds-grid slds-p-bottom_medium">
+                                                                        <div style="font-weight: bold; color:blue; font-size: 16px">Response:&nbsp;{!surveyQuestion.response}</div>
+                                                                    </div>
+                                                                    <aura:if isTrue="{!surveyQuestion.response == 'Other'}">
+                                                                        <div class="slds-grid slds-p-bottom_medium">
+                                                                            <div style="font-weight: bold; color:blue; font-size: 16px">Other Response:&nbsp;{!surveyQuestion.otherresponsetext}</div>
+                                                                        </div>
+                                                                    </aura:if>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <!--Child Question -->
+                                                            <aura:iteration items="{!surveyQuestion.inlinequestions}" var="inlinequestion">
+                                                                <div class="slds-grid slds-p-left_xx-large slds-p-right_xx-large">
+                                                                    <div class="slds-col slds-size_1-of-1">
+                                                                        <div class="slds-grid ">
+                                                                            <lightning:formattedRichText value="{!inlinequestion.question}"></lightning:formattedRichText>
+                                                                        </div>
+                                                                        <div class="slds-grid slds-p-bottom_medium">
+                                                                            <div style="font-weight: bold; color:blue; font-size: 16px">Response:&nbsp;{!inlinequestion.response}</div>
+                                                                        </div>
+                                                                        <aura:if isTrue="{!inlinequestion.response == 'Other'}">
+                                                                            <div class="slds-grid slds-p-bottom_x-small">
+                                                                                <div style="font-weight: bold; color:blue; font-size: 16px">Other Response:&nbsp;{!inlinequestion.otherresponsetext}</div>
+                                                                            </div>
+                                                                        </aura:if>
+                                                                    </div>
+                                                                </div>
+                                                            </aura:iteration>
+                                                            <aura:if isTrue="{!surveyQuestion.inlinequestionstablular.length > 0}">
+                                                                <div class="slds-grid slds-p-left_xx-large slds-p-top_x-small">
+                                                                    <div class="slds-col">
+                                                                        <table class="slds-table slds-max-medium-table--stacked">
+                                                                            <thead>
+                                                                            <tr class="slds-text-heading--label">
+                                                                                <th></th>
+                                                                                <th>{!surveyQuestion.tabularheader1}</th>
+                                                                                <th>{!surveyQuestion.tabularheader2}</th>
+                                                                                <aura:if isTrue="{!and(surveyQuestion.tabularheader3 != null, surveyQuestion.tabularheader3 != '')}">
+                                                                                    <th>{!surveyQuestion.tabularheader3}</th>
+                                                                                </aura:if>
+                                                                            </tr>
+                                                                            </thead>
+                                                                            <tbody class="slds-text-body_regular">
+                                                                            <aura:iteration items="{!surveyQuestion.inlinequestionstablular}" var="inlinetabular" indexVar="inlinetabularindex">
+                                                                                <tr>
+                                                                                    <td data-label=""><lightning:formattedRichText value="{!inlinetabular.question}"></lightning:formattedRichText></td>
+                                                                                    <td data-label="tabularheader1"><div style="font-weight: bold; color:blue; font-size: 16px">{!inlinetabular.responsenumber1}</div></td>
+                                                                                    <td data-label="tabularheader2"><div style="font-weight: bold; color:blue; font-size: 16px">{!inlinetabular.responsenumber2}</div></td>
+                                                                                    <aura:if isTrue="{!surveyQuestion.tabularheader3}">
+                                                                                        <td data-label="tabularheader3">{!inlinetabular.responsenumber3}</td>
+                                                                                    </aura:if>
+                                                                                </tr>
+                                                                            </aura:iteration>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </aura:if>
+
+                                                        </div>
+                                                    </div>
+                                                    <aura:if isTrue="{!surveyQuestion.relatedDocuments.length > 0}">
+                                                        <div class="slds-p-bottom_x-large">
+                                                            <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                                            <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                                                <aura:iteration items="{!surveyQuestion.relatedDocuments}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                                    <div class="slds-col slds-p-top_xx-small">
+                                                                        <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!surveyQuestion.id}" allowDelete="{!!v.showReadonlyPage}"/>
+                                                                    </div>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </div>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!surveyQuestion.showremarks}">
+                                                        <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}">
+                                                            <div class="slds-grid ">
+                                                                <div class="slds-p-bottom_x-large">
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">Remarks</div>
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.remarks}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>
+                                                        </aura:if>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022)}">
+                                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%;">
+                                                            <div class="slds-size_1-of-1">
+                                                                <aura:iteration items="{!v.warrantyReviewQuestionsMap}" var="someVar" indexVar="someIndex" >
+                                                                    <aura:if isTrue="{!and(someVar.key == surveyQuestion.questionNumber)}">
+                                                                        <div class="slds-text-heading_small strong-text">{!someVar.values} <p style="color: blue;font-weight: bold;">{!surveyQuestion.howManyROsHadInsufficientTechNotes}</p></div>
+                                                                    </aura:if>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </div>
+                                                        <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%;">
+                                                            <div class="slds-size_1-of-1">
+                                                                <div class="slds-p-top_large">
+                                                                    <div class="slds-text-heading_small" style="font-weight: bold;">Comments/Action Plan</div>
+                                                                    <lightning:formattedRichText value="{!surveyQuestion.commentsActionPlan}"></lightning:formattedRichText>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!surveyMap.values.length != (questionIndex + 1)}">
+                                                        <div class="slds-p-left_x-large slds-p-right_x-large">
+                                                            <hr class="solid"/>
+                                                        </div>
+                                                    </aura:if>
+
+                                                </aura:if>
+
+                                            </aura:if>
+                                        </aura:iteration>
+                                    </div>
+                                </lightning:accordionSection>
+                            </aura:iteration>
+
+                            <!-- File Upload Section starts here-->
+                            <aura:iteration items="{!surveyMap.values}" var="surveyQuestion" indexVar="questionIndex">
+
+                                <!-- Line Break-->
+                                <!-- {!surveyMap.values.length != (questionIndex + 1)} -->
+                                <!--{!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)}-->
+                                <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)}">
+                                    <div class="slds-p-left_x-large slds-p-right_x-large">
+                                        <hr class="solid"/>
+                                    </div>
+                                </aura:if>
+                                <aura:if isTrue="{!and(surveyQuestion.warrantyReview2022,questionIndex + 1 == surveyMap.values.length)}">
+
+                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%; margin-bottom: 2%;border-top : 1px dotted;">
+                                        <div class="slds-size_4-of-4">
+                                            <div class="slds-p-left_x-small"  style="font-weight: bold;">
+                                                RO Review Action Plan
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:if isTrue="{!v.ROReviewActionPlan.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.ROReviewActionPlan}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+
+                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%; margin-bottom: 2%;">
+                                        <div class="slds-size_4-of-4">
+                                            <div class="slds-p-left_x-small"  style="font-weight: bold;">
+                                                WOPR Action Plan, WOPR score below  average
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:if isTrue="{!v.WOPRActionPlanWOPRScoreBelowAvg.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.WOPRActionPlanWOPRScoreBelowAvg}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+
+                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%; margin-bottom: 2%;">
+                                        <div class="slds-size_4-of-4">
+                                            <div class="slds-p-left_x-small"  style="font-weight: bold;">
+                                                Other WOPR Action Plan
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <aura:if isTrue="{!v.otherWOPRActionPlan.length > 0}">
+                                        <div class="slds-text-heading_small" style="font-weight: bold;">Attached Files</div>
+                                        <div class="slds-grid slds-p-top_xxx-small slds-wrap">
+                                            <aura:iteration items="{!v.otherWOPRActionPlan}" var="relatedDocument" indexVar="relatedDocumentIndex">
+                                                <div class="slds-col slds-p-top_xx-small">
+                                                    <c:FilePreviewComponent fileId="{!relatedDocument}" parentId="{!v.surveyId}" allowDelete="{!!v.showReadonlyPage}" />
+                                                </div>
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:iteration>
+
+                        </lightning:accordion>
+                    </aura:iteration>
+                </aura:if>
+                <!-- Display Data in Read Mode ends here-->
+
+            </aura:if>
+            <!--</div> class="slds-box"-->
+
+            <!--Footer-->
+            <aura:if isTrue="{!v.isModalOpen}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <aura:if isTrue="{!not(empty(v.instructions))}">
+                                <div class="slds-text-heading_medium  slds-p-bottom_small"><b>Instructions</b></div>
+                                <lightning:formattedRichText value="{!v.instructions}"/>
+                            </aura:if>
+                        </div>
+                        <!--Modal/Popup Box Footer Starts here-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="OK"
+                                              title="OK"
+                                              onclick="{! c.closeModal }"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.isDueDateModalOpen}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <aura:if isTrue="{!not(empty(v.dueDate))}">
+                                <div class="slds-text-heading_medium  slds-p-bottom_small"><b>Due Date:</b></div>
+                                <lightning:formattedRichText value="{!v.dueDate}"/>
+                            </aura:if>
+                        </div>
+                        <!--Modal/Popup Box Footer Starts here-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="OK"
+                                              title="OK"
+                                              onclick="{! c.closeDueDateModal }"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.isBenefitsModalOpen}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container">
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <aura:if isTrue="{!not(empty(v.benefits))}">
+                                <div class="slds-text-heading_medium slds-p-bottom_small"><b>Benefit</b></div>
+                                <lightning:formattedRichText value="{!v.benefits}"/><br/>
+                            </aura:if>
+                        </div>
+                        <!--Modal/Popup Box Footer Starts here-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="OK"
+                                              title="OK"
+                                              onclick="{! c.closeBenefitsModal }"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.showErrorsModal}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_medium">
+                    <div class="slds-modal__container">
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__header">
+                            <h2 id="header43" class="slds-text-heading--medium">Error(s)</h2>
+                        </div>
+                        <div class="slds-modal__content errors slds-p-around_medium" id="modal-content-id-1">
+                            <div style="font-weight: bold; font-size:16px;">The Survey has been saved!</div>
+                            <div style="font-weight: bold; font-size:16px;" class="slds-p-top_large slds-p-bottom_medium">The following survey questions have not been answered.  In order to submit the survey the following questions will need to be answered.</div>
+
+                            <aura:iteration items="{!v.validationErrorsMapList}" var="errorMap" indexVar="errorMapIndex">
+                                <!--<div class="slds-grid slds-p-left_medium slds-p-top_medium">
+                              <lightning:formattedRichText value="{!errorMap.key}"></lightning:formattedRichText>
+                          </div>-->
+
+                                <aura:iteration items="{!errorMap.values}" var="error" indexVar="errorIndex">
+                                    <div class="slds-grid slds-p-left_x-large slds-p-top_x-small">
+                                        <lightning:formattedRichText value="{!error}"></lightning:formattedRichText>
+                                    </div>
+                                </aura:iteration>
+                            </aura:iteration>
+                        </div>
+
+                        <!--Modal/Popup Box Footer Starts here-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="Close"
+                                              title="Close"
+                                              onclick="{! c.handleCloseErrorModalAndReturnToSurvey }"/>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.submitSurveyConfirmModal}">
+                <!-- Modal/Popup Box starts here-->
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open ">
+                    <div class="slds-modal__container">
+                        <!--Modal/Popup Box Body Starts here-->
+                        <div class="slds-modal__header">
+                            <h2 id="header43" class="slds-text-heading--medium">Confirm Complete Survey</h2>
+                        </div>
+                        <div class="slds-modal__content errors slds-p-around_medium" id="modal-content-id-1">
+                            <div style="font-weight: bold; font-size:16px;">This survey will be completed!</div>
+
+                            <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+                                Next Steps after completing survey: Click the Summary tab to review any action plans generated from Survey Questions.
+                            </div>
+                        </div>
+
+                        <!--Modal/Popup Box Footer Starts here -->
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="neutral"
+                                              label="Cancel"
+                                              title="Cancel"
+                                              onclick="{! c.handleConfirmSubmitSurveyCancel}"/>
+
+                            <lightning:button variant="brand"
+                                              label="Confirm"
+                                              title="Confirm"
+                                              onclick="{! c.handleContinueSubmitSurveyClick }"/>
+
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+
+        </div>
+
+
+        <!-- Warranty Review Example Changes by Dhiraj-->
+        <aura:set attribute="else">
+            <!--Show Spinner-->
+            <aura:if isTrue="{!v.showSpinner}">
+                <div class="centerspinner">
+                    <lightning:spinner alternativeText="LoadingSurvey" size="large" />
+                </div>
+            </aura:if>
+
+
+            <!--Survey Completion Message -->
+            <aura:if isTrue="{!or(and(v.isSubmitted, not(v.hasEditAccess)),v.isSurveyCompletion)}"><!-- {!v.isSubmitted}-->
+                <div class="slds-p-bottom_small">
+                    <div class="slds-box" style="background-color: #F0F8FF;">
+                        <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+                            This survey has been completed! <!--DPM-5730  jonghoon kim // 24.08.29 -->
+                        </div>
+
+                    </div>
+                </div>
+            </aura:if>
+
+            <aura:iteration items="{!v.surveyWarrantyQuestionList}" var="surveyMap" indexVar="sectionIndex"> <!-- surveyWarrantySectionQuestionsMapData to surveyWarrantyQuestionList-->
+                <!--Show Edit Button -->
+                <aura:if isTrue="{!or(and(v.showReadonlyPage, v.surveyWarrantyQuestionList.length == 1), !v.hasEditAccess)}"><!--{!and(and(v.showReadonlyPage, v.surveyWarrantySectionQuestionsMapData.length == 1), v.hasEditAccess)}-->
+                    <aura:if isTrue="{!and(v.isSubmitted,v.hasEditAccess)}"><!-- {!and(!v.isSubmitted, v.hasEditAccess)}-->
+                        <div class="slds-align_absolute-center slds-p-bottom_small">
+                            <lightning:button onclick="{!c.handleEditButonClickRecordOpen}" variant="brand" label="Edit"></lightning:button>
+                            <lightning:button onclick="{!c.handleWarrantyCompleteSurvey}" variant="brand" label="Submit"></lightning:button>
+                        </div>
+                    </aura:if>
+                </aura:if>
+
+
+                <aura:if isTrue="{!and(and(not(v.showReadonlyPage), v.surveyWarrantyQuestionList.length == 1), v.hasEditAccess)}">
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col slds-size_1-of-1">
+                            <table class="slds-table slds-max-medium-table_stacked-horizontal">
+                                <thead>
+                                <th>Question</th>
+                                <th>Enter Value</th>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><strong>Q1.</strong> NUMBER OF RO'S REVIEWED</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSREVIEWED}" aura:id="{!surveyMap.values.NUMBEROFROSREVIEWED}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError1" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q2.</strong> NUMBER OF RO'S WITHOUT ANY DISCREPANCIES</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHOUTANYDISCREPANCIES}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError2" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q3.</strong> NUMBER OF RO'S WITH INSUFFICIENT TECH NOTES</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHINSUFFICIENTTECHNOTES}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError3" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q4.</strong> NUMBER OF RO'S WITH DATE MILEAGE DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHDATEMILEAGEDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError4" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q5.</strong> NUMBER OF RO'S WITH IMPROPER ADDON</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERADDON}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError5" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q6.</strong> NUMBER OF RO'S WITH TIME JUSTIFICATION DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError6" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q7.</strong> NUMBER OF RO'S WITH SUBLET DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHSUBLETDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError7" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q8.</strong> NUMBER OF RO'S WITH IMPROPER REPAIR</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERREPAIR}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError8" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q9.</strong> NUMBER OF RO'S WHERE RO DOES NOT MATCH CLAIM</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWHERERODOESNOTMATCHCLAIM}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError9" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q10.</strong> NUMBER OF RO'S WITH MISSING DOCUMENTS</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHMISSINGDOCUMENTS}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError10" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q11.</strong> NUMBER OF RO'S WITH CUSTOMER SIGNATURE DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError11" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q12.</strong> NUMBER OF RO'S WITH PRIOR APPROVAL DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError12" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q13.</strong> NUMBER OF RO'S WITH PARTS RETENTION DISCREPANCY (RO DOCUMENTATION)</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError13" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q14.</strong> NUMBER OF RO'S WHICH ARE NOT WARRANTY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWHICHARENOTWARRANTY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError14" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <aura:if isTrue="{!v.showQ15}">
+                                    <tr>
+                                        <td><strong>Q15.</strong> NUMBER OF RO'S WITH INSUFFICIENT DIGITAL DOCUMENTATION</td>
+                                        <td>
+                                            <lightning:input type="Number" value="{!surveyMap.values.NumberOfRosWithInsufficientDigtalDoc}" />
+                                            <div style="color: red;">
+                                                <ui:outputText value="" aura:id="customeError15" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </aura:if>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- Save Button for Warranty-->
+                    <aura:if isTrue="True"><!--{!and(and(not(v.showReadonlyPage), v.surveySectionQuestionsMapData.length == 1), v.hasEditAccess)}-->
+                        <div class="slds-grid" style="padding-top: 2%;">
+                            <div class="slds-align_absolute-center slds-p-bottom_small">
+                                <lightning:button onclick="{!c.handleWarrantySaveClick}" variant="brand" label="Save"></lightning:button>
+                            </div>
+                        </div>
+                    </aura:if>
+
+                </aura:if>
+                <!-- {!and(v.showReadonlyPage,v.hasEditAccess)} -->
+                <aura:if isTrue="{!or(and(v.showReadonlyPage, v.surveyWarrantySectionQuestionsMapData.length == 1), !v.hasEditAccess)}">
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col slds-size_1-of-1">
+                            <table class="slds-table slds-max-medium-table_stacked-horizontal">
+                                <thead>
+                                <th>Question</th>
+                                <th>Value</th>
+                                <th>Percentage</th>
+                                </thead>
+
+                                <tr>
+                                    <td><strong>Q1.</strong> NUMBER OF RO'S REVIEWED</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSREVIEWED}" aura:id="{!surveyMap.values.NUMBEROFROSREVIEWED}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q2.</strong> NUMBER OF RO'S WITHOUT ANY DISCREPANCIES</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHOUTANYDISCREPANCIES}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHOUTANYDISCREPANCIES}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q3.</strong> NUMBER OF RO'S WITH INSUFFICIENT TECH NOTES</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHINSUFFICIENTTECHNOTES}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHINSUFFICIENTTECHNOTES}" style="percent-fixed" />
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q4.</strong> NUMBER OF RO'S WITH DATE MILEAGE DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHDATEMILEAGEDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHDATEMILEAGEDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q5.</strong> NUMBER OF RO'S WITH IMPROPER ADDON</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERADDON}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHIMPROPERADDON}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q6.</strong> NUMBER OF RO'S WITH TIME JUSTIFICATION DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q7.</strong> NUMBER OF RO'S WITH SUBLET DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHSUBLETDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHSUBLETDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q8.</strong> NUMBER OF RO'S WITH IMPROPER REPAIR</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERREPAIR}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHIMPROPERREPAIR}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q9.</strong> NUMBER OF RO'S WHERE RO DOES NOT MATCH CLAIM</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWHERERODOESNOTMATCHCLAIM}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWHERERODOESNOTMATCHCLAIM}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q10.</strong> NUMBER OF RO'S WITH MISSING DOCUMENTS</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHMISSINGDOCUMENTS}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHMISSINGDOCUMENTS}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q11.</strong> NUMBER OF RO'S WITH CUSTOMER SIGNATURE DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q12.</strong> NUMBER OF RO'S WITH PRIOR APPROVAL DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q13.</strong> NUMBER OF RO'S WITH PARTS RETENTION DISCREPANCY (RO DOCUMENTATION)</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q14.</strong> NUMBER OF RO'S WHICH ARE NOT WARRANTY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWHICHARENOTWARRANTY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWHICHARENOTWARRANTY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <aura:if isTrue="{!v.showQ15}">
+                                    <tr>
+                                        <td><strong>Q15.</strong> NUMBER OF RO'S WITH INSUFFICIENT DIGITAL DOCUMENTATION</td> <!--Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
+                                        <td>
+                                            <ui:outputText value="{!surveyMap.values.NumberOfRosWithInsufficientDigtalDoc}" />
+                                        </td>
+                                        <td>
+                                            <lightning:formattedNumber value="{!surveyMap.values.PercentageNumberOfRosWithInsufficientDigtalDoc}"
+                                                style="percent-fixed" />
+                                        </td>
+                                    </tr>
+                                </aura:if>
+                            </table>
+                        </div>
+                    </div>
+                </aura:if>
+
+            </aura:iteration>
+        </aura:set>
+    </aura:if>
+
+</aura:component>

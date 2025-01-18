@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT">
+    <!-- Add aura:attribute tags to define event shape.
+         One sample attribute here. -->
+    <aura:attribute name="documentIds" type="String[]"/>
+    <aura:attribute name="parentId" type="String"/>
+</aura:event>

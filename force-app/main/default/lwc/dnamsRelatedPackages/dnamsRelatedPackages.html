@@ -1,0 +1,87 @@
+<!--
+ - Created by Bhavana on 2023-08-30.
+ -->
+<!-- Packages -->
+<template>
+    <div if:true={showError}>
+        <div style="height: 300px;">
+            <div class="slds-text-heading_large slds-text-color_error"><br/>You don't have access to this Account.</div>
+        </div>
+    </div>
+    <!-- Article to show the Dealer Change Requests records -->
+    <div if:false={showError}>
+        <article class="slds-card slds-card_boundary">
+            <div class="slds-page-header slds-page-header_related-list">
+                <div class="slds-page-header__row">
+                    <div class="slds-page-header__col-title">
+                        <div class="slds-media">
+                            <div class="slds-media__body">
+                                <div class="slds-page-header__name">
+                                    <div class="slds-page-header__name-title">
+                                        <h1 class="slds-card__header-title">
+                                            <lightning-icon icon-name="standard:case" variant="inverse" size="small" title="case"></lightning-icon>
+                                            <span>
+                                                <div class="slds-text-heading_small">
+                                                    <b>&nbsp; Related Packages ({allRecords.length})</b>
+                                                </div>
+                                            </span>
+                                        </h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+                </div>
+            </div>
+            <div if:true={showSpinner}>
+                <lightning-spinner
+                    alternative-text="Loading..." variant="brand">
+                </lightning-spinner>
+            </div>
+            <div if:true={showRecords}>
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-label="Example default base table of Opportunities">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Package Number">Package Number</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Type">Type</div>
+                            </th>
+                            <th class="" scope="col">
+                                <div class="slds-truncate" title="Status">Status</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={packageRecords} for:item="record">
+                            <tr class="slds-hint-parent" key={record.Id}>
+                                <th data-label="Package Number" scope="row">
+                                <div class="slds-truncate" title={record.Name}>
+                                    <a href={record.packageRequestUrl} tabindex="-1">{record.Name}</a>
+                                </div>
+                                </th>
+                                <td data-label="Request Type">
+                                <div class="slds-truncate" title={record.Type__c}>{record.Type__c}</div>
+                                </td>
+                                <td data-label="Status">
+                                <div class="slds-truncate" title={record.Status_2__c}>{record.Status_2__c}</div>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                <footer class="slds-card__footer">
+                    <a class="slds-card__footer-action">
+                        <div if:true={showViewAll}>
+                            <button class="slds-button" onclick={viewAll}>View All</button>
+                        </div>
+                        <div if:true={showViewLess}>
+                            <button class="slds-button" onclick={viewLess}>View Less</button>
+                        </div>
+                    </a>
+                </footer>
+            </div>
+        </article>
+    </div>
+</template>

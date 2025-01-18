@@ -1,0 +1,212 @@
+<template>
+    <!-- 
+        * @description : Add new field called "NHTSA TREAD Category" to CMT only for North America
+        * @author San, Kang : SanKang@autoeveramerica.com | 2024-01-17 ~ 2024-01-19
+        * @tecket no: SO-311
+     -->
+    <template if:true={filterVisblity}>
+        <template if:true={isMismatch}>
+            <template if:false={nextPage}>
+                <lightning-card title="Navex Validation Checker">
+                    <template if:true={showSpinner}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <template if:true={nasoCheck}>
+                        <lightning-button data-name="Accept" label="Accept" variant="brand" slot="actions" class="slds-m-left_x-small" onclick={handleToggleClick}></lightning-button>&nbsp;
+                        <lightning-button data-name="Reject" label="Reject" variant="destructive" slot="actions" class="slds-m-left_x-small" onclick={handleToggleClick}></lightning-button>
+                    </template>
+                    <!-- Basic Logic -->
+                    <template if:false={nasoCheck}>
+                        <lightning-button label="Accept" variant="brand" slot="actions" class="slds-m-left_x-small" onclick={handleAcceptBtn}></lightning-button>&nbsp;
+                        <lightning-button label="Reject" variant="destructive" slot="actions" class="slds-m-left_x-small" onclick={handleRejectBtn}></lightning-button>
+                    </template>
+                    <lightning-layout horizontal-align="space">
+                        <lightning-layout-item padding="horizontal-large">
+                            <div style="color: red;">
+                                <p>Action Required! VIN and Navex field mismatch detected for {mismatchFields}. To accept the changes from the VIN Lookup choose Accept. Choose Reject to ignore this message.</p>
+                            </div>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                    <br/>
+                    <lightning-layout>
+                        <table class="slds-table slds-table_cell-buffer slds-table_fixed-layout">
+                            <thead>
+                                <tr>
+                                    <th class="slds-size_1-of-2">
+                                        Vin Fields
+                                    </th>
+                                    <th class="slds-size_1-of-2">
+                                        Navex Fields
+                                    </th>
+                                </tr>
+                            </thead>
+                        <tbody>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Make' value={vehicleInfo.vinMake}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Make' value={vehicleInfo.caseMake}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Model' value={vehicleInfo.vinModel}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Model' value={vehicleInfo.caseModel}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Year' value={vehicleInfo.vinModelYear_formatted}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Year' value={vehicleInfo.caseModelYear_formatted}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Transmission' value={vehicleInfo.vinTransmission}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Transmission' value={vehicleInfo.caseTransmission}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Fuel Type' value={vehicleInfo.vinFuelType}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Fuel Type' value={vehicleInfo.caseFuelType}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Drivetrain' value={vehicleInfo.vinDrivetrain}></c-case-vin-mismatch-message-element>
+                                </td>
+                                <td class="slds-size_1-of-2">
+                                    <c-case-vin-mismatch-message-element label='Drivetrain' value={vehicleInfo.caseDrivetrain}></c-case-vin-mismatch-message-element>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        </table>
+                    </lightning-layout>
+                </lightning-card>
+            </template>
+        </template>
+
+        <!-- 
+            * @description : Add new field called "NHTSA TREAD Category" to CMT only for North America
+            * @author San, Kang : SanKang@autoeveramerica.com | 2024-01-17 ~ 2024-01-19
+            * @tecket no: SO-311
+        -->
+        <template if:true={nextPage}>
+            <lightning-card title="TREAD Category INPUT">
+                <template if:true={showSpinner}>
+                    <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                </template>
+                <template if:true={navexStatusAccept}>
+                    <lightning-button label="Finish" variant="brand" slot="actions" class="slds-m-left_x-small" onclick={updateAcceptMisMatch}></lightning-button>&nbsp;
+                </template>
+                <template if:false={navexStatusAccept}>
+                    
+                    <lightning-button label="Finish" variant="brand" slot="actions" class="slds-m-left_x-small" onclick={updateRejectMisMatch}></lightning-button>&nbsp;
+                </template>
+                <lightning-layout horizontal-align="space">
+                    <lightning-layout-item padding="horizontal-large">
+                        <div style="color: red;">
+                            <p>Select appropriate NHTSA TREAD Category.</p>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+                </br>
+                <table class="slds-table slds-table_cell-buffer slds-table_fixed-layout">
+                    <thead>
+                        <tr>
+                            <th>
+                                Update Case Field Information
+                            </th>
+                            <th>
+                            </th>
+                        </tr>
+                    </thead>
+                </table>
+                <lightning-layout>
+                    <lightning-layout-item padding="horizontal-large" class="slds-col slds-size_12-of-12" >
+                        <div >
+                            <lightning-input type="text" label="Subject" class="subject" value={getNASODataInfo.caseSubject}></lightning-input>   
+                        </div>
+                        <div>
+                            <lightning-textarea class="description" label="Description" value={getNASODataInfo.caseDescription}></lightning-textarea>
+                        </div>
+                        
+                        <div>
+                            <lightning-dual-listbox name="NHTSA TREAD Category"
+                            label="NHTSA TREAD Category"
+                            source-label="Available Options"
+                            selected-label="Selected Options"
+                            options={treadCategory}
+                            onchange={selecttreadCategory}
+                            value={category}
+                            required="true"></lightning-dual-listbox>
+                        </div>                    
+                    </lightning-layout-item>
+                </lightning-layout>
+            </lightning-card>
+        </template>
+    </template>
+    <!-- 
+    * @description : Add new field called "NHTSA TREAD Category" to CMT only for North America
+    * @author San, Kang : SanKang@autoeveramerica.com | 2024-01-17 ~ 2024-01-19
+    * @tecket no: SO-311
+     -->
+    <template if:true={categoryInput}>
+        <lightning-card title="TREAD Category INPUT">
+            <template if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+            </template>
+            <lightning-button label="Finish" variant="brand" slot="actions" class="slds-m-left_x-small" onclick={handleUpdateBtn}></lightning-button>&nbsp;
+            <lightning-layout horizontal-align="space">
+                <lightning-layout-item padding="horizontal-large">
+                    <div style="color: red;">
+                        <p>Select appropriate NHTSA TREAD Category.</p>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            </br>
+            <table class="slds-table slds-table_cell-buffer slds-table_fixed-layout">
+                <thead>
+                    <tr>
+                        <th>
+                            Update Case Field Information
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+            <lightning-layout>
+                <lightning-layout-item padding="horizontal-large" class="slds-col slds-size_12-of-12" >
+                    <div >
+                        <lightning-input type="text" label="Subject" class="subject" value={getNASODataInfo.caseSubject}></lightning-input>   
+                    </div>
+                    <div>
+                        <lightning-textarea class="description" label="Description" value={getNASODataInfo.caseDescription}></lightning-textarea>
+                    </div>
+                    <div>
+                        <lightning-dual-listbox name="NHTSA TREAD Category"
+                        label="NHTSA TREAD Category"
+                        source-label="Available Options"
+                        selected-label="Selected Options"
+                        options={treadCategory}
+                        onchange={selecttreadCategory}
+                        value={category}
+                        required="true"></lightning-dual-listbox>
+                    </div>                    
+                </lightning-layout-item>
+            </lightning-layout>
+        </lightning-card>
+    </template>
+</template>

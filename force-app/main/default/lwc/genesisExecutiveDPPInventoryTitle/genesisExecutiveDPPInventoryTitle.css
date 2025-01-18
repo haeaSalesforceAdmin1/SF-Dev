@@ -1,0 +1,23 @@
+/**
+ * Created by User on 2024-03-29.
+ */
+
+.card {
+    color: #091A3E;
+    background-color: #E6D5CC;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.table {
+    border-collapse: collapse;
+    border: 1px solid #E0E5EE;
+    text-align: center;
+}
+
+.col {
+    height: 24px;
+    border: 1px solid #E0E5EE;
+    text-align: center;
+    padding: 1px;
+}

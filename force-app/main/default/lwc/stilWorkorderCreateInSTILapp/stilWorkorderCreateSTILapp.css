@@ -1,0 +1,62 @@
+.search-container {
+    position: relative;
+    width: 100%;
+}
+
+.lightning-input .slds-input {
+    width: 100%;
+}
+
+.slds-dropdown-stil{
+    left: 0%;
+    /* float: left; */
+    transform: translateX(0%);
+}
+
+.li_stil:hover{
+    background: rgb(88, 88, 88);
+}
+.li_stil{
+    z-index: 1000;
+}
+
+.slds-listbox {
+    position: absolute;
+    width: 100%;
+    z-index: 1000; /* ensures the dropdown appears above other content */
+    /* display: none;  */
+    /* hides by default */
+}
+.showStr_display {
+    display: block !important;  /* hides by default */
+}
+.showStr_hidden {
+    display: none !important;/* hides by default */
+}
+
+.search-container .slds-has-focus + .slds-listbox,
+.search-container .slds-listbox:hover {
+    display: block; /* shows on input focus or hover over the list */
+}
+
+.isHidden{
+    display: hidden !important; 
+}
+.isNotHidden{
+    display: block !important; 
+}
+
+.li_hover {
+    background-color: #006db9;
+    cursor: pointer;
+}
+
+.li_div > .li_stil:hover{
+    background-color : '#006db9';
+    cursor : 'pointer';
+}
+
+.li_normal {
+    background-color: transparent; /* or any default color */
+    cursor: default;
+}

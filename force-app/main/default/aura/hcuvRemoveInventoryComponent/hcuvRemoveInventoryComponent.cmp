@@ -1,0 +1,15 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:html tag="style">
+        .slds-modal {
+        visibility: hidden!important;
+        display: none!important;
+        }
+        .slds-backdrop{
+        display: none!important;
+        }  
+        
+    </aura:html>
+    <aura:attribute name="recordId" type="String" />
+   <c:hcuvInventoryQuickAction recordId="{!v.recordId}" hmaActionUrl="{!$Label.c.HCUV_Remove_Inventory}" gmaActionUrl="{!$Label.c.HCUV_GMA_Remove_Inventory_URL}" target="_blank" source="{!$Label.c.HCUV_RemoveInventory}" errorMsg="{!$Label.c.HCUV_Invalid_RemoveInv_Status}" onclosepopup="{!c.closePopup}"></c:hcuvInventoryQuickAction>
+ 
+</aura:component>

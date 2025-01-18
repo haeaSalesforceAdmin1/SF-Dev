@@ -1,0 +1,509 @@
+<apex:page renderAs="pdf" applyBodyTag="false"  controller="COPPLetterFlowController" >
+	<apex:variable var="LetterDate" value="{!$CurrentPage.parameters.LetterDate}"/>
+    <apex:variable var="regionName" value="{!$CurrentPage.parameters.regionName}"/>
+    <apex:variable var="regionCode" value="{!$CurrentPage.parameters.regionCode}"/>
+    <apex:variable var="DealerPrincipalName" value="{!$CurrentPage.parameters.DealerPrincipalName}"/>
+    <apex:variable var="DealershipName" value="{!$CurrentPage.parameters.DealershipName}"/>
+    <apex:variable var="DealerShip_Address" value="{!$CurrentPage.parameters.DealerShip_Address}"/>
+    <apex:variable var="City_State_Zip_Code" value="{!$CurrentPage.parameters.City_State_Zip_Code}"/>
+    <apex:variable var="Email_Address" value="{!$CurrentPage.parameters.Email_Address}"/> 
+	<apex:variable var="ChoosedTemplate" value="{!$CurrentPage.parameters.ChoosedTemplate}"/>
+    <apex:variable var="Salutation" value="{!$CurrentPage.parameters.Salutation}"/> <!--DPM-5861 added salutation -->
+
+    <!--DPM-5701 COPP Project  -->
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                @top-right {
+                    content: element(header);
+                }
+            	margin: 0;
+                background-color: {!IF(BrandCode == 'G', '#e6d5cc', 
+                                      IF(BrandCode == 'H', '#c8d4e4', 'white'))};
+                padding: 15px; 
+                height: 100vh; 
+            	
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+            html, body {
+                margin: 15px;
+            	background-color: #FFFFFF; 
+                padding: 0;
+                height: 96%;
+                width: 96%;
+            }
+
+            .border-container {
+            	
+            }
+            .content-container {
+                background-color: white; 
+                 
+                height: 90vh;
+            	min-height: 90vh;
+            }
+
+            {
+                margin: 0;
+                padding: 0;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            }
+
+            .letter{
+            	background-color: white;
+            }
+            div.content {
+                padding-top: 20px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            	font-size: 10px;
+            }
+
+            .line{
+                font-weight: bold;
+                text-decoration: underline;
+            }
+
+            .centered {
+                display: inline-block;
+                padding: 2%;
+            }
+
+            .centered {
+                text-align: center; 
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 15px;
+            }
+
+            .right {
+                text-align: right;
+            }
+            
+            .left {
+                text-align: left;
+            }
+            
+            .header {
+            	padding-left: {!IF(BrandCode == 'G', '560px', 
+                                      IF(BrandCode == 'H', '510px', '510px'))}; 
+            
+            }
+            .header.right{
+                position: fixed;
+                top: -80px; 
+                left: 0;
+                right: 0;
+                height: 80px;
+                text-align: right;
+                padding-right: 20px; 
+            }
+
+       
+            .basic-info {
+                padding: 5px;
+            }
+
+
+        </style>
+    </head>
+
+    <div class="border-container">
+        <div class="header" >
+            <apex:outputPanel rendered="{!BrandCode == 'H'}">
+                <apex:image url="{!$Resource.Hyundai_Logo}" height="45"/>
+            </apex:outputPanel>
+        
+            <apex:outputPanel rendered="{!BrandCode == 'G'}"  style="left: 620px">
+                <apex:image style="text-align: left;" url="{!$Resource.Genesis_Logo}" height="45"/>
+            </apex:outputPanel>
+        </div>
+        <div class="content-container">
+            <div class="headerContainer">
+                
+                
+                <div class="left" >
+                    {!today}
+                </div>
+                <div class="centered" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;"> 
+                    <apex:outputPanel >
+                        <div class="basic-info">
+                            <apex:outputPanel rendered="{!BrandCode == 'H'}">
+                                <apex:outputText value="Hyundai Motor America" />
+                            </apex:outputPanel>
+                        
+                            <apex:outputPanel rendered="{!BrandCode == 'G'}">
+                                <apex:outputText value="Genesis Motor America" />
+                            </apex:outputPanel>
+                            
+                        </div>
+                        <div class="basic-info">
+                            <apex:outputText value="Core Operational Performance Program" />
+                        </div>
+                        
+                    </apex:outputPanel>
+                </div>
+            </div>
+        
+            <div class="content" style="font-family: 'Arial Unicode MS', Arial, sans-serif;font-size:10pt;line-height:1.2">
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai1'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update – {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the July 2024 - December 2024 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.    
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on December 31, 2024. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Dec. 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.  
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+
+                <!--Hyundai template 2-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai2'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update – {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the July 2024 – December 2024 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on December 31, 2024. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Dec. 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>        
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Hyundai template 3-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai3'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the October 2024 - March 2025 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.   
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed. 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on March 31, 2025. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Mar. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>        
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Hyundai template 4-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Hyundai4'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide {!DealershipName} with a status update of its current performance under the Hyundai Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Hyundai Motor America (“HMA”) launched COPP to evaluate the Hyundai dealer network based on certain core performance metrics.  As part of the Program, HMA will provide regular updates of your dealership&rsquo;s performance during the September 2024 - February 2025 performance period. As previously indicated HMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter.  Moreover, your dealership should have implemented an updated action plan to address those deficiencies and achieve the related targets within the performance period. The action plan should identify specific actions, assign responsibility for those actions to specific dealership personnel, and provide specific dates by which the actions will be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ends on February 28, 2025. HMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Feb. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period. 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly.  If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!regionCode == 'WE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MS'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SC'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'EA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'CE'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'MA'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Regional General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Hyundai Motor America 
+                </apex:outputPanel>    
+                <!--Genesis template 1-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Genesis1'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide you with a status update of your dealership&rsquo;s current performance under the Genesis Motor America Core Operational Performance Program (“COPP” or “Program”).
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Genesis Motor America (“GMA”) launched COPP to evaluate the Genesis dealer network based on certain core performance metrics.  As part of the Program, GMA will provide regular updates of your dealership&rsquo;s performance during the August 2024 - January 2025 performance period. As previously indicated GMA will be including a GM report card with the regular updates during the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has an extended six-month performance period to achieve the assigned targets as noted in your {!LetterDate} performance deficiency letter. During this extended COPP performance period, Dealer must update their action plan and continue to work toward meeting its assigned targets. GMA will continue to work with and provide regular updates to Dealer&rsquo;s management regarding Dealer&rsquo;s performance under the Program.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note your current performance period end date is Jan. 31, 2025. GMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the Jan. 2025 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly. If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'CE', regionCode == 'SC')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE_SC}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'EA', regionCode == 'MA')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA_MA}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'WE', regionCode == 'MS')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE_MS}" height="35"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO_Gen}" height="35"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Genesis General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Genesis Motor America 
+                </apex:outputPanel>    
+                <!--Genesis template 2-->
+                <apex:outputPanel rendered="{!ChoosedTemplate == 'Genesis2'}">
+                    <br/>
+                    {!DealerPrincipalName}<br/>
+                    {!DealershipName}<br/>
+                    {!DealerShip_Address}<br/>
+                    {!City_State_Zip_Code}<br/>
+                    {!Email_Address}<br/>
+                    <br/>
+                
+                    <span style="font-weight: bold;">RE:</span>  <span class="line">Performance Deficiencies Progress Update - {!DealershipName}</span>
+                    <br/>
+                    <br/>
+                    Dear {!Salutation} {!DealerPrincipalName}, <br/>
+                    <br/>
+                    
+        
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    The purpose of this letter is to provide you with a status update of your {!DealershipName} current performance under the Genesis Motor America Core Operational Performance Program (“COPP” or “Program”).                                 
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    As you know, Genesis Motor America (“GMA”) launched COPP to evaluate its dealer network based on certain core performance metrics. As part of the Program, GMA will provide regular updates of your dealership&rsquo;s performance metrics during the June 2024 - November 2024 performance period. As previously indicated GMA will be including a GM report card with the regular updates during the performance period.
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Under COPP, your dealership has a six-month performance period from the month you were first placed in the Program to achieve the assigned targets set forth in your {!LetterDate} performance deficiency letter. Moreover, your dealership should now have drafted and implemented a comprehensive action plan to address those deficiencies and achieve the related targets within your dealership&rsquo;s performance period. The action plan should identify specific actions, who shall be responsible at your dealership for those actions, and specific dates by which the actions shall be completed.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please note that your dealership&rsquo;s performance period ended on November 30, 2024. GMA will continue to monitor your dealership&rsquo;s performance metrics and regularly provide progress trackers until the November 2024 R12 Sales and Registration efficiency is finalized, at which point you will receive a report detailing your dealership&rsquo;s performance over the performance period.  
+                    <br/><br/>
+                    &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                    Please review the COPP performance progress attachment in detail, sign for acknowledgement, and return to the region promptly. If you have any questions or concerns, please do not hesitate to contact our team.
+                    <br/><br/><br/>
+                    Sincerely, 
+
+                    <br/>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'CE', regionCode == 'SC')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_CE_SC}" height="45"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'EA', regionCode == 'MA')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_EA_MA}" height="45"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!OR(regionCode == 'WE', regionCode == 'MS')}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_WE_MS}" height="45"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!regionCode == 'SO'}">
+                        <apex:image style="text-align: left;" url="{!$Resource.COPP_RM_Signiture_SO_Gen}" height="45"/>
+                    </apex:outputPanel>
+                    <br/>
+                    Genesis General Manager <br/>
+                    {!regionName} <br/>
+        
+                    Genesis Motor America 
+                </apex:outputPanel>    
+            </div>
+        </div>
+    </div>
+</apex:page>

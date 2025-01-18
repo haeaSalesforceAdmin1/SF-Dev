@@ -1,0 +1,51 @@
+<!--
+ * Description: Displays buttons on the LR creation screen. 
+ * When moving to the next step, a modal is shown to inform the user that the LR will be created, but they can continue to add vehicle information.
+ * Created by Areum on 10-15-2024 for STIL-124
+-->
+
+<template>
+    <!-- Button -->
+    <div class="button-container">
+        <lightning-button label="Cancel" variant="destructive" onclick={handleFlowCancel}></lightning-button>
+        <lightning-button label="Next" variant="brand" onclick={handleFlowNext}></lightning-button>
+    </div>
+
+    <!-- Modal -->
+    <template if:true={isModalOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleCloseModal}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium">LR Creation</h2>
+                </header>
+
+                <div class="slds-modal__content slds-p-around_medium">
+                    <template if:true={hasSCSCaseNumber}>
+                        <p class="warning-text">
+                            Warning. Please ensure your information is correct before proceeding, as you will not be able to go back when Safety Case Number is selected.
+                        </p>
+                    </template>
+
+                    <template if:false={hasSCSCaseNumber}>
+                        <p class="warning-text">
+                            Warning, by clicking 'Next' one more time, the LR will be created but you will still be prompted to add affected vehicles. 
+                            Please ensure your information is correct before proceeding, as you will not be able to go back.
+                        </p>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Previous" variant="neutral" onclick={handleModalPrevious}></lightning-button>
+                    <lightning-button label="Cancel" variant="neutral" onclick={handleModalCancel}></lightning-button>
+                    <lightning-button label="Next" variant="brand" onclick={handleModalNext}></lightning-button>
+                </footer>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

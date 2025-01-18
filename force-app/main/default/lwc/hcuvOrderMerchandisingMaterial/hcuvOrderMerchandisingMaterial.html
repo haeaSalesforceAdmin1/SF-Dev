@@ -1,0 +1,41 @@
+<template>
+
+	<template if:true={showSpinner}>
+		<lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+			size="medium">
+		</lightning-spinner>
+	</template>
+
+	<div class="slds-p-bottom_small slds-grid slds-wrap">
+		<div class="slds-size_1-of-2" style="font-size: 18px; font-weight: bold; color: rgb(14, 14, 14);">
+			{merchandisingMaterials}
+		</div>
+	</div>
+	<div class="custom-table quick-links">
+		<table class="slds-table slds-table_cell-buffer slds-table_bordered">
+			<tbody>
+				<template for:each={referenceMaterialList} for:item="referenceMaterial" for:index="index">
+					<tr key={referenceMaterial.Id} class="slds-hint-parent">
+						<td>
+							<div class="slds-truncate link-name" title={referenceMaterial.Name}>
+								<template if:true={referenceMaterial.isVideo}>
+									<img src={hmaIcons.video} class="left-nav-sub-item-img slds-m-right_x-small">
+								</template>
+								<template if:false={referenceMaterial.isVideo}>
+									<img src={hmaIcons.pdf} class="left-nav-sub-item-img slds-m-right_x-small">
+								</template>
+								<template if:true={referenceMaterial.isClickable}>
+									<a data-id={referenceMaterial.Id} onclick={handleLinkClick}
+										class="slds-m-right_x-small message-text_bold">{referenceMaterial.Name}</a>
+								</template>
+								<template if:false={referenceMaterial.isClickable}>
+									<span class="slds-m-right_x-small message-text_bold">{referenceMaterial.Name}</span>
+								</template>
+							</div>
+						</td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+	</div>
+</template>

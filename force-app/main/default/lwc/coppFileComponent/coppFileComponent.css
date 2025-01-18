@@ -1,0 +1,106 @@
+/* .coppFileTable table th:first-child, .coppFileTable table td:first-child{
+    display: none !important;
+}
+
+
+
+.slds-cell-fixed .slds-th__action-button {
+    display: none !important;
+
+
+}
+
+
+.no-resize {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    resize: none !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.slds-cell-fixed {
+    overflow: hidden;
+}
+
+
+
+.slds-table tr th:nth-child(2),
+.slds-table tr td:nth-child(2) {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.slds-table tr th.slds-th__action:nth-child(1) {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.slds-is-resizable:nth-child(2){
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    white-space: nowrap;
+    overflow: hidden;
+}*/
+
+.coppFileTable .slds-table tr th.slds-th__action:nth-child(2) {
+    resize: none !important;
+} 
+
+.coppFileTable .slds-cell-fixed.slds-has-button-menu:nth-child(2),
+.coppFileTable .slds-cell-fixed.slds-has-button-menu:nth-child(2) * {
+    resize: none !important;
+}
+
+:host {
+    --slds-c-accordion-summary-color-background: #f3f3f3;
+}
+
+.icon-padding {
+    margin-right: -12px; 
+}
+
+/* 
+.slds-cell-fixed.slds-has-button-menu:nth-child(2) {
+    width: 540px !important;
+    min-width: 540px !important;
+    max-width: 540px !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.slds-cell-fixed.slds-has-button-menu:nth-child(3) {
+    width: 540px !important;
+    min-width: 540px !important;
+    max-width: 540px !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.slds-cell-fixed.slds-has-button-menu:nth-child(4) {
+    width: 540px !important;
+    min-width: 540px !important;
+    max-width: 540px !important;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+
+
+.slds-table tr th.slds-cell-fixed.slds-has-button-menu:nth-child(2) {
+    resize: none !important;
+}
+
+
+.slds-cell-fixed.slds-has-button-menu:nth-child(1) {
+    resize: none !important;
+}
+ */

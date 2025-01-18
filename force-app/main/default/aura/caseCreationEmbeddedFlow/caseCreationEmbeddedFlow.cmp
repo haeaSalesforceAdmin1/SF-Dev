@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:lightningQuickAction" access="global" controller="caseCreationEmbeddedFlowController">
+    <lightning:workspaceAPI aura:id="createCaseWorkspace"/>
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <aura:attribute name="showCancelBtn" type="Boolean" default="false"/>
+    <lightning:card>
+        <aura:set attribute="actions">
+            <aura:if isTrue="{!v.showCancelBtn}">
+                <lightning:button onclick="{!c.handleCancelBtn}" variant="destructive" label="Cancel"/>
+            </aura:if>
+        </aura:set>
+        <lightning:flow aura:id="flowPlaceHolder" onstatuschange="{!c.handleStatusChange}"/>
+   </lightning:card>
+</aura:component>

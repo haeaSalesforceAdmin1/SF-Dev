@@ -1,0 +1,21 @@
+<template>
+	<div class="wrapper">
+		<div class="titleHeading">
+		<span class="attachmentTitle">ATTACHMENT</span>
+		</div>
+		<template for:each={contentDocuments} for:item="selContentDocument" for:index="index">
+			<template if:true={selContentDocument.isVideo}>
+				<img key={selContentDocument.ContentDocumentId} src={hmaIcons.video}
+						class="left-nav-sub-item-img slds-m-right_x-small">
+				</template>
+				<template if:false={selContentDocument.isVideo}>
+					<img key={selContentDocument.ContentDocumentId} src={hmaIcons.pdf}
+						class="left-nav-sub-item-img slds-m-right_x-small">
+				</template>
+					<a key={selContentDocument.ContentDocumentId} data-id={selContentDocument.ContentDocumentId}
+						onclick={handleLinkClick}
+						class="slds-m-right_x-small message-text_bold">{selContentDocument.ContentDocument.Title}</a>
+					<br key={selContentDocument.ContentDocumentId} />
+			</template>
+	</div>
+</template>

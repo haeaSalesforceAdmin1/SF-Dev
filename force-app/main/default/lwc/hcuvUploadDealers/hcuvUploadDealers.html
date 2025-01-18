@@ -1,0 +1,29 @@
+<template>
+
+    <div class="slds-p-horizontal_large slds-p-vertical_large slds-is-relative">
+        <template if:true={showSpinner}>
+            <lightning-spinner class="slds-align_absolute-center slds-spinner_brand" alternative-text="Loading..."
+                size="medium">
+            </lightning-spinner>
+    	</template>
+
+        <template if:true={error}>
+            <span class="msg-text slds-p-bottom_small">{error}</span>
+        </template>
+
+        <template if:true={showFileUpload}>
+            <div class="msg-box">
+                <lightning-input type="file" label="Upload Dealers" name="fileUploader"
+                                    accept={acceptedFormats} onchange={handleUploadFinished}>
+                </lightning-input>
+                
+                <span class="msg-text slds-p-top_xx-small"> * File type must be CSV. Column name in the file must be Dealer Code.</span>
+            </div>
+        </template>
+
+        <template if:false={showFileUpload}>
+            {message}
+        </template>
+    </div>
+    
+</template>

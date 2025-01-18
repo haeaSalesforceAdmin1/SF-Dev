@@ -1,0 +1,21 @@
+<!--
+  @description       : 
+  @author            : inhokim
+  @group             : 
+  @last modified on  : 01-10-2024
+  @last modified by  : inhokim
+-->
+<template>
+    <template if:true={hasQuickTipMsg}>
+		<span><b>{quickTips}</b></span>
+			
+		<div class="slds-box slds-m-around_x-small hma-msg-wrap">
+		<div class="msg-center-inline">
+			<b if:true={quickTipTextVis}><span class="hma-msg-center-head">{constQuickTip}</span></b>
+			<div class="msg-center-desc-inline"> 
+				<lightning-formatted-rich-text value={quickTipMsg}> </lightning-formatted-rich-text>
+			</div>
+		</div>
+		</div>
+	</template>
+</template>

@@ -1,0 +1,12 @@
+<template>
+    <div class="button-container" style="display: flex;justify-content: center;gap: 30px;padding: 30px;">
+        
+        <lightning-button label="COPP Tracker" class="download-button" icon-name="doctype:pdf" icon-position="left" onclick={handleClickTracker}></lightning-button>
+        
+        <template if:true={showLetter}>
+            <lightning-button label="GM Scorecard" class="download-button" icon-name="doctype:pdf" icon-position="left" onclick={handleClickGMScorecard}></lightning-button>
+            <lightning-button class="download-button" label="Letter" icon-name="doctype:pdf" icon-position="left" onclick={handleClickLetter}></lightning-button>
+            <lightning-button class="download-button" label="All PDFs (Combined)" icon-name="doctype:pdf" icon-position="left" onclick={handleClickCombined}></lightning-button>
+        </template>
+    </div>
+</template>

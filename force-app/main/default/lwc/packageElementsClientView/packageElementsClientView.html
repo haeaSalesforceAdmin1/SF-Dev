@@ -1,0 +1,55 @@
+<!--
+ - Created by baltamimi on 2022-02-21.
+ -->
+
+<!-- Package Elements Client View -->
+<template>
+    <article class="slds-card slds-card_boundary">
+
+        <div class="slds-page-header slds-page-header_related-list">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate"
+                                              title="Package Elements">Package Elements</span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-meta">
+                    <p class="slds-page-header__meta-text">{packageElements.length} items • sorted by Section</p>
+                </div>
+                <div class="slds-page-header__col-controls">
+                    <div class="slds-page-header__controls">
+                        <div class="slds-page-header__control">
+                            <lightning-button-icon icon-name="utility:refresh" variant="border-filled"
+                                                   alternative-text="Refresh List" class="slds-m-left_xx-small"
+                                                   title="Refresh List"
+                                                   onclick={handleRefreshView}></lightning-button-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slds-grid" style="min-height: 500px;">
+            
+                <c-custom-types
+                        key-field={id}
+                        data={packageElements}
+                        columns={columns}
+                        hide-checkbox-column="true"
+                        show-row-number-column="true"
+                ></c-custom-types>
+            
+        </div>
+
+    </article>
+</template>

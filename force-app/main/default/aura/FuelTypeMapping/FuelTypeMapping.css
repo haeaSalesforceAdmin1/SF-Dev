@@ -1,0 +1,139 @@
+.THIS {
+}
+
+.THIS .custom-InputLeftAlign input {
+    text-align: left !important;
+    padding-left : 10px !important;
+}
+
+.THIS .custom-InputCenterAlign input {
+    text-align: center !important;
+}
+
+
+.THIS .custom-InputRightAlign input {
+    text-align: right !important;
+    padding-right : 10px !important;
+}
+
+
+.THIS .custom-width3rem{
+    text-align : center;
+    min-width: 3rem !important;
+    max-width: 3rem !important;
+}
+
+.THIS .custom-width5rem{
+    text-align : center;
+    min-width: 5rem !important;
+    max-width: 5rem !important;
+}
+.THIS .custom-width8rem{
+    text-align : center;
+    min-width: 8rem !important;
+    max-width: 8rem !important;
+}
+.THIS .custom-width10rem{
+    text-align : center;
+    min-width: 10rem !important;
+    max-width: 10rem !important;
+}
+
+.THIS .custom-width13rem{
+    text-align : center;
+    min-width: 13rem !important;
+    max-width: 13rem !important;
+}
+
+.THIS .custom-width15rem{
+    text-align : center;
+    min-width: 15rem !important;
+    max-width: 15rem !important;
+}
+
+.THIS .custom-width20rem{
+    text-align : center;
+    min-width: 20rem !important;
+    max-width: 20rem !important;
+
+}
+.THIS .custom-width25rem{
+    text-align : center;
+    min-width: 25rem !important;
+    max-width: 25rem !important;
+}
+
+.THIS .custom-width50Percent{
+    text-align : center;
+    min-width: 50% !important;
+    max-width: 50% !important;
+}
+
+.THIS .custom-width30px{
+    text-align : center;
+    min-width: 30px !important;
+    max-width: 30px !important;
+}
+
+.THIS .custom-width50px{
+    text-align : center;
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.THIS .custom-width80px{
+    text-align : center;
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
+.THIS .custom-width100px{
+    text-align : center;
+    min-width: 100px !important;
+    max-width: 100px !important;
+}
+
+.THIS .custom-width120px{
+    text-align : center;
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
+.THIS .custom-width150px{
+    text-align : center;
+    min-width: 150px !important;
+    max-width: 150px !important;
+}
+
+.THIS .custom-width180px{
+    text-align : center;
+    min-width: 180px !important;
+    max-width: 180px !important;
+}
+
+.THIS .custom-width200px{
+    text-align : center;
+    min-width: 200px !important;
+    max-width: 200px !important;
+}
+
+.THIS .custom-width250px{
+    text-align : center;
+    min-width: 250px !important;
+    max-width: 250px !important;
+}
+
+.THIS .custom-tdBold{
+    font-weight: bold;
+    font-size: 12px;
+    /*font-size: 14px;*/
+}
+
+.THIS .custom-button-padding {
+    padding: 5px;
+}
+
+.THIS .custom-Button-FontSize{
+    font-size: 15px;
+    margin-right: 5px;
+}

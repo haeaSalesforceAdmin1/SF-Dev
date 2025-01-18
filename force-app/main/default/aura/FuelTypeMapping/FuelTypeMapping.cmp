@@ -1,0 +1,238 @@
+<aura:component description="FuelTypeMapping" controller="FuelTypeMappingController"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,lightning:availableForFlowScreens,lightning:availableForFlowActions"
+                access="global">
+
+    <!-- Attribute -->
+    <aura:attribute name="showSpinner" type="boolean" default="false"/>
+    <aura:attribute name="PagePerCount" type="Integer" default="200" description="목록 페이지당 개수 통제"/>
+
+    <aura:attribute name="listPages" type="List" default="['1']" description="전체 검색한 목록 페이지"/>
+    <aura:attribute name="listKASOVinNow" type="List" default="[]" description="현재 페이지 데이터"/>
+    <aura:attribute name="NowPage" type="Integer" default="1" description="현재 선택된 페이지 번호"/>
+    <aura:attribute name="listKASOVin" type="List" default="[]" description="KASO Vin Mapping List"/>
+
+    <aura:attribute name="listChangeKASOVinData" type="List" default="[]" description="KASO Vin Change List"/>
+    <aura:attribute name="isNull" type="Boolean" default="false" description="빈 값 보기"/>
+    <aura:attribute name="keyword" type="String" default="" description="검색 키워드"/>
+
+    <!-- Handler -->
+    <aura:handler name="init" value="{!this}" action="{!c.fnInit}"/>
+    <aura:handler event="force:refreshView" action="{!c.fnInit}"/>
+
+    <div class="slds-card_boundary" style="position:relative">
+        <div class="slds-page-header">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                          <span class="slds-icon_container slds-icon-custom-custom5" title="">
+                                <lightning:icon iconName="" size="small"/>
+                          </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <h1>
+                                <span class="slds-page-header__title slds-truncate" title="Fuel Type Mapping"
+                                      style="font-size : 14px;">
+                                    Fuel Type Mapping
+                                </span>
+                            </h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-card">
+            <!-- Spinner -->
+            <aura:if isTrue="{!v.showSpinner}">
+                <lightning:spinner aura:id="spinner" alternativeText="Loading" size="medium" variant="brand"/>
+            </aura:if>
+
+            <div class="slds-card__body slds-card__body_inner" onkeyup="{!c.fnKeyUp}" style="margin-top:20px;">
+                검색어 (Enter를 누르시면 검색이 됩니다)
+                <lightning:layout>
+                    <lightning:layoutItem flexibility="auto">
+                        <lightning:input
+                                name="Keyword"
+                                label="검색어"
+                                variant="label-hidden"
+                                value="{!v.keyword}"
+                                placeholder="검색어를 입력해주세요."
+                                class="slds-m-right_xx-small"
+                        />
+                    </lightning:layoutItem>
+
+                    <lightning:layoutItem>
+                        <lightning:button
+                                label="검색"
+                                onclick="{!c.fnSearchKey}"
+                        />
+                    </lightning:layoutItem>
+                </lightning:layout>
+            </div>
+
+            <div class="slds-card__body slds-card__body_inner">
+
+                <div class="slds-col slds-size_12-of-12"
+                     style="margin-top: 20px; margin-bottom: 20px; font-size: 16px;">
+                    총 {!v.listKASOVin.length} 건의 데이터가 검색되었습니다.
+                </div>
+
+                <div style="text-align:right; margin-right:3px">
+                    <lightning:button
+                            label="{!v.isNull == true ? '전체 보기' : '빈 값 보기'}"
+                            onclick="{!c.fnNullListBtn}"
+                    />
+                    <lightning:button
+                            label="Save"
+                            onclick="{!c.fnAllChangeBtn}"
+                    />
+                </div>
+
+
+                <div class="slds-col slds-size_12-of-12 slds-grid_align-center" style="margin-top: 20px;">
+                    <div class="slds-col slds-size_12-of-12"
+                         style="display:flex; overflow: auto;">
+                        <table class="slds-scrollable">
+                            <thead>
+                            <tr class="slds-table slds-table_bordered">
+                                <td class="custom-width10rem custom-tdBold">Model</td>
+                                <td class="custom-width10rem custom-tdBold">Model InterfaceValue</td>
+                                <td class="custom-width10rem custom-tdBold">Engine</td>
+                                <td class="custom-width10rem custom-tdBold">Engine InterfaceValue</td>
+                                <td class="custom-width10rem custom-tdBold">Transmission</td>
+                                <td class="custom-width10rem custom-tdBold">Transmission InterfaceValue</td>
+                                <td class="custom-width8rem custom-tdBold">Fuel Type</td>
+                                <td class="custom-width8rem custom-tdBold">Last Modified Date</td>
+                                <td class="custom-width5rem custom-tdBold">Last Modified Name</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <aura:if isTrue="{!v.listKASOVinNow.length > 0}">
+
+                                <aura:iteration items="{!v.listKASOVinNow}" var="obj" indexVar="idx">
+                                    <tr>
+                                        <td class="custom-width10rem">
+                                            <!--Model Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.model}"
+                                                    disabled="true"
+                                                    variant="label-hidden"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width10rem">
+                                            <!--Model Interface Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.modelIF}"
+                                                    disabled="true"
+                                                    variant="label-hidden"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width10rem">
+                                            <!--Engine Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.engin}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width10rem">
+                                            <!--Engine Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.enginIF}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width10rem">
+                                            <!--Transmission Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.transmission}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width10rem">
+                                            <!--Transmission Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.transmissionIF}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width8rem">
+                                            <!--Fuel Type Value-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    aura:id="changeInput"
+                                                    onblur="{!c.fnValueChange}"
+                                                    value="{!obj.fuelType}"
+                                                    variant="label-hidden"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width8rem">
+                                            <!--Last Modified Date-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.lastModifiedDate}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                        <td class="custom-width5rem">
+                                            <!--Last Modified Name-->
+                                            <lightning:input
+                                                    type="text"
+                                                    name="{!idx}"
+                                                    value="{!obj.lastModifiedName}"
+                                                    variant="label-hidden"
+                                                    disabled="true"
+                                                    class="custom-InputCenterAlign"
+                                            />
+                                        </td>
+                                    </tr>
+                                </aura:iteration>
+                            </aura:if>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="slds-col slds-size_12-of-12 " style="margin-top:20px; text-align:center;">
+                    <aura:iteration items="{!v.listPages}" var="item">
+                        <lightning:button
+                                label="{!item}"
+                                onclick="{!c.fnPageChange}"
+                                disabled="{!item == v.NowPage ? true : false}"
+                                variant="Base"
+                                class="custom-Button-FontSize"
+                        />
+                    </aura:iteration>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</aura:component>

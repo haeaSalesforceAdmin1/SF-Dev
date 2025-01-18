@@ -1,0 +1,11 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,force:appHostable,flexipage:availableForAllPageTypes,force:hasRecordId" >
+    <img src="{!$Resource.Genesis_Logo}"/>
+	<wave:waveDashboard 
+                dashboardId="0FK3I0000004E0aWAE"
+                openLinksInNewWindow="false"
+                
+                showSharing="false"
+                height="1800"
+                showTitle="false"
+                showHeader="false"/>
+</aura:component>

@@ -1,0 +1,9 @@
+<aura:event type="COMPONENT">
+    <!-- Add aura:attribute tags to define event shape.
+         One sample attribute here. -->
+    <aura:attribute name="fileId" type="String"/>
+    <aura:attribute name="parentId" type="String"/>
+    <!-- DPM-5264 -->
+    <aura:attribute name="deletedfileId" type="String"/> 
+    <aura:attribute name="deletedFileparentId" type="String"/>
+</aura:event>

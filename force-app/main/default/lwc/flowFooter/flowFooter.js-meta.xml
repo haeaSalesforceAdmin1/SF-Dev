@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata" fqn="exampleFlowComponent">
+    <apiVersion>58.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="availableActions" type="String" />
+            <property name="fileIdsToDelete" type="String" />
+            <property name="contentDocumentId" type="String" label="ContentDocument ID" description="Should be set to {!contentDocumentId}"/>
+            <property name="filename" type="String" label="File Name" description="Should be set to {!filename}"/>
+            <property name="base64" type="String" label="base64" description="Should be set to {!base64}"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

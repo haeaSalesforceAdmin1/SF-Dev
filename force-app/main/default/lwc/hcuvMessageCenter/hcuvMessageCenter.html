@@ -1,0 +1,157 @@
+<!--
+  @description       : 
+  @author            : inhokim
+  @group             : 
+  @last modified on  : 01-11-2024
+  @last modified by  : inhokim
+-->
+<template>
+	<template if:true={loader}>
+		<lightning-spinner alternative-text="Loading..." size="small"></lightning-spinner>
+	</template>
+	<template if:true={isDisplay}>
+		<div class="slds-align_absolute-center hma-msg-wrap">
+			{noRecordFound}
+		</div>
+	</template>
+
+	<template if:true={latestMsg}>
+		<span><b>{messageCenter}</b></span>
+		<template if:false={showMsgs}>
+			<template if:true={latestMsg}>
+				<template if:false={showDetails}>
+					<div class="slds-box slds-m-around_x-small hma-msg-wrap">
+						<template for:each={data} for:item="HMA">
+
+							<div class="slds-grid slds-wrap slds-m-around_xxx-small" key={HMA.Id}>
+								<div class="slds-size_2-of-2 label-blue slds-m-bottom_xx-small lbl-border" key={HMA.Id}>
+									<a class="hma-msg-center-label" title={HMA.Label}>
+										<lightning-formatted-rich-text value={HMA.Label} class="hma-msg-center-head"
+											key={HMA.Id} data-id={HMA.Id} onclick={handleLabelClick}>
+										</lightning-formatted-rich-text>
+									</a>
+
+									<div class="slds-m-bottom_xxx-small hma-msg-center-dt-wrap" key={HMA.Id}>
+										<b><lightning-formatted-date-time value={HMA.StartDate}
+												class="hma-msg-center-dt"> </lightning-formatted-date-time></b>
+									</div>
+								</div>
+
+							</div>
+
+						</template>
+					</div>
+					<template if:true={showCurrentPage}>
+						<div class="slds-grid slds-wrap">
+							<div class="slds-size_1-of-2">
+								<lightning-button label=">" name="next" variant="base"
+									class="slds-float_right slds-m-left_small arrow-btn" onclick={handlePrevNext}
+									disabled={disableNext}>
+								</lightning-button>
+								<div class="slds-float_right slds-p-top_xx-small">
+									<template for:each={pages} for:item="page" for:index="index">
+										<span key={page.pageNo} data-id={page.pageNo} class={page.isSelectedCSS}
+											style="cursor: pointer;" onclick={handlePageClick}>{page.pageNo}</span>
+									</template>
+								</div>
+								<lightning-button label="<" name="prev" variant="base"
+									class="slds-float_right arrow-btn" onclick={handlePrevNext} disabled={disablePrev}>
+								</lightning-button>
+							</div>
+						</div>
+					</template>
+
+				</template>
+				<template if:true={showDetails}>
+					<div class="slds-theme_default hma-msg-wrap">
+						<lightning-icon icon-name="utility:back" title="Back" size="x-small"
+							class="slds-p-right_xx-small arrow" onclick={handleBack}>
+						</lightning-icon>
+						<div class="slds-box slds-m-around_x-small hma-msg-wrap">
+							<div class="slds-grid slds-wrap slds-m-around_xxx-small">
+								<div class="slds-size_1-of-2 label-blue slds-m-bottom_xx-small">
+									<span class="hma-msg-center-label">
+										<lightning-formatted-rich-text value={latestMsg.Label}
+											class="hma-msg-center-head">
+										</lightning-formatted-rich-text>
+									</span>
+								</div>
+								<div class="slds-size_1-of-2 slds-m-bottom_xx-small">
+								</div>
+								<div class="slds-size_2-of-2 slds-m-bottom_medium">
+									<lightning-formatted-rich-text value={latestMsg.Message}
+										class="hma-msg-center-text-output">
+									</lightning-formatted-rich-text>
+								</div>
+							</div>
+						</div>
+					</div>
+				</template>
+			</template>
+			<template if:false={latestMsg}>
+				<div class="slds-box slds-m-around_x-small hma-msg-wrap">
+					<div class="slds-grid slds-wrap slds-m-around_xxx-small">
+						No records to display
+					</div>
+				</div>
+			</template>
+		</template>
+	</template>
+
+	<template if:true={showMsgs}>
+		<div class="slds-theme_default hma-msg-wrap">
+			<div class="slds-box slds-m-around_x-small">
+				<div class="slds-grid slds-wrap slds-m-around_xxx-small head-row-wrap">
+					<div class="slds-size_1-of-2 slds-m-bottom_xx-small">
+						<b><lightning-formatted-rich-text value="Subject"> </lightning-formatted-rich-text></b>
+					</div>
+					<div class="slds-size_1-of-2 slds-m-bottom_xxx-small">
+						<b><lightning-formatted-rich-text value="Date"> </lightning-formatted-rich-text></b>
+					</div>
+				</div>
+				<div class="slds-grid slds-wrap slds-m-around_xxx-small row-data-bind">
+					<template for:each={data} for:item="HMA">
+						<div class="slds-size_1-of-2 label-blue slds-m-bottom_xx-small" key={HMA.Id}>
+							<b><a>
+									<lightning-formatted-rich-text value={HMA.Label} data-id={HMA.Id}
+										class="hma-msg-center-head" key={HMA.Id} onclick={handleLabelClick}>
+									</lightning-formatted-rich-text>
+								</a>
+							</b>
+						</div>
+						<div class="slds-size_1-of-2 slds-m-bottom_xxx-small" key={HMA.Id}>
+							<lightning-formatted-date-time value={HMA.StartDate}></lightning-formatted-date-time>
+						</div>
+						<div class="slds-size_2-of-2 slds-m-bottom_medium row-meta" key={HMA.Id}>
+							<lightning-formatted-rich-text value={HMA.ShortMessage} class="hma-msg-text">
+							</lightning-formatted-rich-text>
+						</div>
+					</template>
+				</div>
+				<br />
+				<template if:true={showCurrentPage}>
+					<div class="slds-grid slds-wrap">
+						<div class="slds-size_1-of-2">
+							<lightning-button label=">" name="next" variant="base"
+								class="slds-float_right slds-m-left_small arrow-btn" onclick={handlePrevNext}
+								disabled={disableNext}>
+							</lightning-button>
+							<div class="slds-float_right slds-p-top_xx-small">
+								<template for:each={pages} for:item="page" for:index="index">
+									<span key={page.pageNo} data-id={page.pageNo} class={page.isSelectedCSS}
+										style="cursor: pointer;" onclick={handlePageClick}>{page.pageNo}</span>
+								</template>
+							</div>
+							<lightning-button label="<" name="prev" variant="base" class="slds-float_right arrow-btn"
+								onclick={handlePrevNext} disabled={disablePrev}>
+							</lightning-button>
+						</div>
+					</div>
+				</template>
+				<div class="slds-size_2-of-2 slds-m-bottom_xx-small">
+					<a onclick={getSingleMessage} class="slds-float--right hma-msg-center-link"><u>View Less</u></a>
+				</div>
+			</div>
+		</div>
+	</template>
+</template>

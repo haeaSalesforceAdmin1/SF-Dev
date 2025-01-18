@@ -1,0 +1,130 @@
+/**
+ * Created by User on 2023-06-29.
+ */
+ .percent:after {
+    content: '%';
+}
+.currency:before {
+    content: '$';
+}
+.red {
+    color: rgb(181, 14, 3);
+}
+.blue {
+    color: rgb(0, 0, 255);
+}
+.div-align-center,.div-align-center th,td {
+    text-align: center !important;
+}
+.program-width {
+    width: 210px;
+    padding-left:var(--lwc-spacingLarge,1.5rem);
+    background-color:rgb(243, 243, 243);
+    height:33px;
+}
+.achieved-width {
+    width: 180px;
+    background-color:rgb(243, 243, 243);
+    height:33px;
+}
+.common-width {
+    width: 80px;
+    background-color:rgb(243, 243, 243);
+    height:33px;
+}
+.slds-table_bordered tbody td {
+    padding-top:4px;
+    padding-bottom:4px;
+    border-color:rgb(201, 201, 201);
+}
+.slds-table_bordered, .slds-table_bordered tbody, .slds-table_bordered tbody tr {
+    border-color:rgb(201, 201, 201);
+}
+
+.card-title-box {
+    background-color: rgb(230, 236, 242);
+    height: 60px;
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+}
+.card-title-text {
+    color: rgb(9, 26, 62);
+    font-size: 24px;
+    text-align: left;
+    width: 964px;
+    margin: auto;
+    line-height: 60px;
+}
+.card-title-text-left {
+    display: inline-block;
+    width: 350px;
+}
+.card-title-text-right {
+    display: inline-block;
+    width: 550px;
+    margin-left: 34px;
+}
+.card-estimator {
+    width: 100%;
+    text-align: center;
+}
+.card-body {
+    width: 964px;
+    margin: auto;
+}
+
+.card-bottom-box {
+    width: 100%;
+    text-align: center;
+    
+}
+.card-bottom-text {
+    width: 964px;
+    margin: auto;
+    text-align: left;
+    font-size: 12px;
+    color: #7d98b3;
+}
+.link-box {
+    background-color: rgb(229, 212, 205);
+    border-radius: 16px;
+    width: 260px;
+    padding: 10px 0;
+    margin: 0 5px 10px 10px;
+    text-align: center;
+    color: rgb(51, 87, 121);
+    cursor: pointer;
+}
+.link-box .tooltip-text {
+    visibility: hidden;
+    width: 260px;
+    background-color: #032D60;
+    color: white;
+    padding: 10px 15px;
+    margin-top: 20px;
+    text-align: left;
+    position: absolute;
+    z-index: 1;
+    border-radius: 5px;
+}
+.link-box .tooltip-text:after {
+    bottom: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: "";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(3, 45, 97, 0);
+	border-bottom-color: #032d61;
+	border-width: 10px;
+	margin-left: -10px;
+}
+.link-box:hover .tooltip-text {
+    visibility: visible;
+}
+.hidden {
+    display: none;
+}

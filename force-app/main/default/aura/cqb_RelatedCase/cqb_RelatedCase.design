@@ -1,0 +1,8 @@
+<design:component label="Related Cases">
+	<design:attribute name="criteriaFields" label="Criteria Field API Names" />
+	<design:attribute name="limitResults" label="Limit to N results" />
+    <design:attribute name="maxHeight" label="List Height" Description="Height of scrollable list component as a string.  EX: '450px' OR 'Auto'"/>
+	<sfdc:objects>
+        <sfdc:object>Case</sfdc:object>
+    </sfdc:objects>
+</design:component>

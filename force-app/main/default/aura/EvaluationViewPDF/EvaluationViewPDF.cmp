@@ -1,0 +1,67 @@
+<aura:component controller="EvaluationPDFController" implements="flexipage:availableForRecordHome,lightning:availableForFlowScreens,force:hasRecordId,force:lightningQuickActionWithoutHeader">
+
+    <aura:html tag="style">
+        .quick-actions-panel{
+        overflow: hidden !important;
+        }
+    .cuf-content {
+        padding: 0 0rem !important;
+    }
+    .slds-p-around--medium {
+        padding: 0rem !important;
+    }
+    .slds-modal__content{
+        <!-- overflow: scroll !important;-->
+        overflow: hidden !important;
+        height:100vh !important;
+        max-height:unset !important;
+        min-height: 90vh !important;
+    }
+
+    .slds-modal__content .errors{
+          min-height: 50% !important;
+          height: 100vh !important;
+    }
+
+    .slds-modal__container{
+          max-width: 70% !important;
+          width:70% !important;
+          min-height: 90vh !important;
+    }
+    </aura:html>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="recordId" type="String"/>
+
+    <aura:attribute name="queueableCompleted" type="Boolean" default="false" />
+    <aura:attribute name="queueableFailed" type="Boolean" default="false" />
+
+    <aura:attribute name="queueableErrors" type="String" default="" />
+
+    <aura:attribute name="pollCount" type="Integer" default="0" />
+
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="existingDocumentURL" type="String"/>
+
+    <aura:if isTrue="{!v.showSpinner}">
+        <div class="exampleHolder">
+            <lightning:spinner alternativeText="Loading" size="large" />
+        </div>
+    </aura:if>
+
+    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+
+        <aura:if isTrue="{!v.existingDocumentURL != null}">
+            <div style="position:relative">
+                <iframe style="position:absolute;top:0px;width:100%;height:100vh;" frameborder="0" src="{!v.existingDocumentURL}"></iframe>
+            </div>
+        </aura:if>
+
+    </div>
+    <footer>
+        <div class="modal-footer slds-modal__footer attach-to-bottom">
+            <lightning:button label="Close" onclick="{!c.handleCloseClicked}"/>
+        </div>
+    </footer>
+
+</aura:component>

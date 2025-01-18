@@ -1,0 +1,23 @@
+<template>
+    <lightning-accordion allow-multiple-sections-open
+                         onsectiontoggle={handleSectionToggle}
+                         active-section-name={activeSections}>
+        
+                    <lightning-accordion-section name="COPPFiles" label="COPP Files" class="--slds-c-accordion-summary-color-background accordion">
+
+
+            <div class ='slds-card slds-card_boundary coppFileTable' style="left:45px;top:10px;height: 93px;width:50vw;background-color:#e6ecf2">
+                <lightning-datatable
+                    key-field="Id"
+                    class="coppFileTable"
+                    data={coppInfos}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    show-row-number-column="false">
+                </lightning-datatable>
+            </div>
+       
+
+        </lightning-accordion-section>
+    </lightning-accordion>
+</template>

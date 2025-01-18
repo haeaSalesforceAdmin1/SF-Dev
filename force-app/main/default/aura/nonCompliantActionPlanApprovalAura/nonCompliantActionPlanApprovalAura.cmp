@@ -1,0 +1,64 @@
+<aura:component implements="force:hasRecordId,force:lightningQuickActionWithoutHeader">
+
+    <aura:attribute name="showSpinner" type="boolean" default="true" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:html tag="style">
+        .cuf-content {
+            padding: 0 0rem !important;
+            background-color: unset !important;
+        }
+        .slds-p-around--medium {
+            padding: 0rem !important;
+        }
+        .slds-modal__content{
+            height:0vh !important;
+            max-height:0px !important;
+            min-height: 0px !important;
+        }
+    
+        .slds-modal__content .errors{
+              min-height: 0px !important;
+              height: 0px !important;
+        }
+    
+        .slds-modal__container{
+              max-width: 0px !important;
+              width:0px !important;
+              min-height: 0px !important;
+        }
+
+        .modal-header {
+            display:none !important;
+        }
+
+        .slds-spinner_container {
+            position: fixed !important;
+            width: 100% !important;
+            background-color: unset !important;
+        }
+
+        .baseDefault .forceChatterBasePublisher .forceChatterLightningComponent .runtime_platform_actionsQuickActionWrapper {
+            background: unset !important;
+        }
+
+        .desktop {
+            background-color: unset !important;
+        }
+        </aura:html>
+
+        
+        <c:actionPlanApproval actionPlanId="{!v.recordId}" 
+                            action="Approve" 
+                            status="Non-Compliant" 
+                            comments="Non-Compliant Approval"
+                            onapprovalcomplete="{!c.handleApprovalComplete}"/>
+
+
+        <aura:if isTrue="{!v.showSpinner}">
+            <div class="exampleHolder">
+                <lightning:spinner alternativeText="Loading" size="large" />
+            </div>
+        </aura:if>
+
+
+</aura:component>

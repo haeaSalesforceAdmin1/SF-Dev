@@ -1,0 +1,49 @@
+<template>
+   <div class="slds-page-header slds-page-header_record-home" style="background-color: white;">
+        <div class="slds-page-header__row">
+            <div class="slds-page-header__col-title">
+                <div class="slds-media">
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name={doctype} size="medium" alternative-text="File"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body" style="line-height: 13px;">
+                        <span>File</span>
+                        <span class="slds-page-header__title slds-truncate" title={nameField}>{nameField}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-page-header__col-actions">
+                <div class="slds-page-header__controls">
+                    <div class="slds-page-header__control">
+                        <lightning-button-group>
+                            <lightning-button label="Download" onclick={handleDownload}></lightning-button>
+                        </lightning-button-group>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="slds-page-header__row slds-page-header__row_gutters">
+            <div class="slds-page-header__col-details">
+              <ul class="slds-page-header__detail-row">
+                <li class="slds-page-header__detail-block">
+                  <div class="slds-text-title slds-truncate" title="Field 1">Size</div>
+                  <div class="slds-truncate" title="Filed 1 value">{fileSize}</div>
+                </li>
+                
+                <li class="slds-page-header__detail-block">
+                  <div class="slds-text-title slds-truncate" title="Field 2">File Extension</div>
+                  <div class="slds-truncate" title="Filed 2 value">{fileExtension}</div>
+                </li>
+                <template if:false={isHideOwnername}>
+                    <li class="slds-page-header__detail-block">
+                        <div class="slds-text-title slds-truncate" title="Field 3">Created by</div>
+                        <div class="slds-truncate" title="Filed 3 value"><a onclick={onOwnerclick}>{ownername}</a></div>
+                    </li>
+                </template>
+              </ul>
+            </div>
+        </div>
+   </div>
+</template>

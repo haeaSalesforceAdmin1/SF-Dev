@@ -1,0 +1,144 @@
+/*****************************************************************************
+            |          |           |                                            
+@Author     |  @Date   | @TicketNo | @ChangeDesc                               
+------------------------------------------------------------------------------
+inhoKim     | 24.01.23 |  CCSOM-6  | [Modify HCUV Main Page LWC Components' CSS to Align Height in Every Screen Size]
+            |          |           | changed .hma-msg-wrap height pixel to 380  
+------------------------------------------------------------------------------
+inhoKim     | 24.03.20 |  CCSOM-43 | [[SF] HCUV Landing Page image not fitting correctly inside widget]
+            |          |           | changed  .custom-slider .imageLink .slds-show  .dotposition modified                                                   
+*****************************************************************************/
+.label-blue{
+    color:#2574A9;
+}
+
+.hma-msg-center-head{
+    color: #1589EE;
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    padding-right:20px;
+}
+
+.hma-msg-center-dt{
+    font-weight: 600;
+    color: #706E6B;
+    font-size: 12px;
+}
+.hma-msg-center-label
+{
+    color: #0070D2;
+    font-size: 14px;
+    font-weight: 600;
+    display:block;
+    margin-bottom:3px;
+    padding-bottom: 3px;
+}
+
+.hma-msg-center-dt-wrap{
+    text-align:right;
+    white-space: nowrap;
+}
+.hma-msg-center-link
+{
+    color: #0070D2;
+    font-size: 14px;
+    font-weight: 600;
+    display:flex;
+    justify-content:flex-end;
+    float:none;
+}
+.hma-msg-center-text-output{
+    color: #706E6B;
+    font-size: 13px;
+    display:block;
+    width:80%;
+}
+
+.lbl-border{
+    border-bottom:1px solid rgb(212, 212, 212);
+    margin-bottom:14px;
+
+    display: flex;
+    justify-content:space-between;
+} 
+
+.hma-msg-wrap{
+    background-color:#fff;
+    margin-left:0px;
+    margin-right:0px;
+    height: 479px;
+    /* CCSOM-43,  527> 479 div>  fit width - not awkward*/
+    /*CCSOM-6 changed height into 410 > 380 pixels */
+}
+.hma-msg-wrap .slds-box
+{
+    margin-left:0px;
+    margin-right:0px;
+}
+
+.head-row-wrap{
+    background-color:#f2f2f2;
+    padding: 2px 5px;
+    border: 1px solid #939393;
+    text-transform:uppercase;
+    color:#99a4b8;
+    margin-bottom:25px;
+}
+
+.head-row-wrap .slds-m-bottom_xx-small{
+    margin-bottom:0px;
+}
+
+.row-data-bind {    
+    padding-bottom: 1rem;
+    /* border-bottom: 1px solid #ccc; */
+}
+
+.row-data-bind .row-meta{
+border-bottom: 1px solid #ccc;
+padding-bottom:1rem;
+}
+
+/* .text-normal{
+    color:#52aa58;
+    font-weight:600;
+}
+.text-high{
+    color:#f06a4c;
+    font-weight:600;
+}
+.text-low{
+    color: black;
+    font-weight:600;
+} */
+
+.active-page{
+    cursor: pointer;
+    background: #ccc;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.arrow-btn .slds-button,.arrow-btn{
+    font-size: 21px;
+    margin-top: -2px;
+    font-weight: 600;
+    color: #ccc !important;
+}
+
+.hma-msg-text{
+    display:block;
+    width:33.33%;
+    }
+@media (max-width:992px) {
+    .hma-msg-wrap{
+        margin:0px;
+        margin-bottom:10px;
+        margin-top:10px;
+    }
+}

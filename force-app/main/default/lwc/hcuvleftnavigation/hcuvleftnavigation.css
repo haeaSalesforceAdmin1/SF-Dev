@@ -1,0 +1,151 @@
+.leftNav{
+	color: #1C3760;
+	size: 13px;
+}
+
+.left-nav-item-img{
+	width:18px;
+	height:20px;
+}
+
+.left-nav-item{
+	cursor:pointer;
+	margin-left:5px;
+	font-size:12px;
+	margin-top:3px;
+}
+
+/* .left-nav-sub-item
+{
+	width: 12px;
+	height: 12px;
+	cursor: pointer;
+	 float: right;
+	 padding-right: 1%;
+} */
+
+.left-nav-sub-item-img{
+	width:18px;
+	height:18px;
+}
+
+.left-nav-sub-item-text{
+	margin-left:5px;
+}
+
+.left-nav-sub-item{
+	/* display:flex; */
+	/* margin-bottom:6px; */
+	margin-left:7px;
+	cursor:pointer;
+}
+.left-nav-sub-item-wrap{
+    display: flex;
+	margin:4px 0px;
+	padding-left:2.8rem;
+	padding-top:2px;
+	padding-bottom:2px;
+}
+.left-nav-item-ref-wrap{
+	display:flex;
+	justify-content:space-between;
+	cursor:pointer;
+	padding:0rem 1.2rem;
+	align-items: center;
+}
+
+.menu-close .collapseNavBtn{
+	transform:rotate(180deg);
+}
+
+.left-nav-item-ref{
+	display:flex;
+	cursor:pointer;
+	/* margin-bottom:8px; */
+	padding: 2px 0px;
+    margin: 3px 0px;
+}
+.menu-active{
+	background-color: #0088FF;
+}
+
+/* .menu-active .left-nav-item-ref{
+color:#000;
+} */
+.WhiteTheme .left-nav-item-ref-wrap.menu-active{
+    background-color: rgba(0, 136, 255, 0.4) !important;
+}
+.custom-left-nav{
+	margin:0px;
+    /* max-height: 500px;
+    overflow-y: auto; */
+}
+
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.themeChange{
+    position: static;
+    left: 0;
+    right: 0;
+    cursor: pointer;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto;
+    border: 0;
+    box-shadow: none;
+    margin:50px 0px 0px 80px;
+}
+
+.THIS  .collapseNavBtn{
+    width:55px;
+   
+}
+
+.THIS .BlueTheme .collapseNavBtn{
+    background: #061c3f;
+}
+
+/* .submenu-active{
+  background-color:#fff;
+  color:#333;
+} */
+
+@media(max-width:1024px){
+	.xs-nav-close
+	{
+		display: flex;
+		justify-content: flex-end;
+		padding: 14px 17px;
+		cursor: pointer;
+	}
+
+	.xs-nav-close img{
+		width:20px;
+	}
+}
+
+@media(max-width:992px) {
+
+	.custom-left-nav{
+		padding-top:20px;
+	}
+	
+}

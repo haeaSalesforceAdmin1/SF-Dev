@@ -1,0 +1,33 @@
+<template>
+    
+
+    <!--<aura:if isTrue="{!surveyQuestion.singleOptionSelection}">
+        <lightning:radioGroup name="{!sectionIndex + '-' + questionIndex}"
+                            aura:id="{!surveyQuestion.id}"
+                            options="{!surveyQuestion.options}"
+                            value="{!surveyQuestion.response}"
+                            onchange="{!c.handleRadioOptionChanged}"
+                            type="button">   
+        </lightning:radioGroup>
+    </aura:if>
+    <aura:if isTrue="{!surveyQuestion.multipleOptionSelection}">
+        <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex}" values="{!surveyQuestion.responseArray}" options="{!surveyQuestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+    </aura:if>
+
+    <aura:if isTrue="{!surveyQuestion.textquestiontype}">
+        <div class=" slds-p-right_xx-large">
+            <lightning:input type="text" value="{!surveyQuestion.response}" variant="label-hidden"/>
+        </div>
+    </aura:if>
+
+    <aura:if isTrue="{!surveyQuestion.numberquestiontype}">
+        <div class=" slds-p-right_xx-large">
+            <lightning:input type="number" value="{!surveyQuestion.response}" variant="label-hidden"/>
+        </div>
+    </aura:if>
+    <aura:if isTrue="{!surveyQuestion.multiselectwithinlineentry}">
+        <div class=" slds-p-right_xx-large">
+            <c:checkboxGroupComponent isMobile="{!v.isMobile}" name="{!sectionIndex + '-' + questionIndex}" values="{!surveyQuestion.responseArray}" options="{!surveyQuestion.options}" oncheckboxvalueupdate="{!c.handleMultiSelectChange}" />
+        </div>
+    </aura:if>-->
+</template>

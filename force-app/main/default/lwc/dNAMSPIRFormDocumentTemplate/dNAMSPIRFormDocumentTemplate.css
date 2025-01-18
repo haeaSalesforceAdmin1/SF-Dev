@@ -1,0 +1,8 @@
+.slds-col .custom-input {
+    margin: 0 !important; 
+    padding: 0 !important; 
+}
+
+.slds-col .input-spacing {
+    padding-bottom: 16px; 
+}

@@ -1,0 +1,9 @@
+<aura:component>
+
+    <div style="font-weight: bold; font-size:16px;">This survey will be completed!</div>
+    
+    <div style="font-weight: bold; font-size:16px;" class="slds-p-top_xx-small slds-p-bottom_xx-small">
+        Next Steps after completing survey: Click the Summary tab to review any action plans generated from Survey Questions.
+    </div>
+    
+</aura:component>

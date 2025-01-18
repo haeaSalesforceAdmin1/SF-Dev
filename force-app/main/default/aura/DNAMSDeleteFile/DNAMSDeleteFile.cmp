@@ -1,0 +1,95 @@
+<aura:component controller = "DNAMSDeleteFileHandler" implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <aura:attribute name="recordId" type="String"/>
+    <aura:attribute name="files" type="ContentDocument[]"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="Spinner" type="boolean" default="false"/>
+    <aura:attribute name="showConfirmation" type="boolean" default="false"/>
+    <aura:attribute name="currentDocId" type="string"/>
+    <aura:attribute name="showErrorScreen" type="boolean" default="false"/>
+	<aura:attribute name="errorMessage" type="string"/>
+    <lightning:card>
+        <div class="slds-text-heading_small slds-m-left_x-small slds-m-bottom_small"><b>File Manager</b>
+	        <lightning:buttonIcon class="slds-text-align_right slds-m-left_x-small" iconName="utility:refresh" alternativeText="Refresh" title="Refresh" size="medium" onclick="{!c.handleClick}"/>
+        </div>
+        <div class="contentbox">  
+            <div class="slds-form--compound" style="position:relative">
+				<table class="slds-table slds-table--bordered">
+				    <thead>  
+						<tr>  
+							<th>File Name</th>
+                            <th>Last Modified Date</th><!--DNA-986:Added Last Modified Date-->
+							<th>File Extension</th>
+							<th></th>
+						</tr>
+                    </thead>  
+					<tbody>
+						<aura:iteration items="{!v.files}" var="f">
+							<tr>
+                                <td>{!f.Title}</td>
+                                <td><lightning:formattedDateTime value="{!f.LastModifiedDate}" year="numeric" month="numeric" day="numeric" hour="2-digit"
+                                 minute="2-digit" timeZone="{! $Locale.timezone }"/></td><!--DNA-986:Added Last Modified Date-->
+                                <td>{!f.FileType}</td>
+                                <td><a href="javascript:void(0)" id="{!f.Id}" onclick="{!c.showConfirmationPopup}">Delete</a></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <aura:if isTrue="{!v.Spinner}">
+                    <div class="slds-spinner_container">
+                        <div class="slds-spinner slds-spinner--medium" aria-hidden="false" role="alert">
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+        </div>
+        <br/>
+        <br/>
+    </lightning:card>
+    <aura:if isTrue="{!v.showConfirmation}">
+     	<!--<c:DNAMSConfirmationPopUp/>-->
+        <!--DNA-953: Confirmation Popup -->
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Confirm Deletion</h2>
+                </div>
+                <div class="slds-modal__content">
+                    <p> </p>
+                    <p> </p>
+                    <div class="slds-align_absolute-center" style="height:5rem">Are you sure you want to delete this record?</div>
+                    <p> </p>
+                    <p> </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button label="Cancel" onclick="{!c.hideConfirmationPopup}" class="slds-button slds-button_neutral"/>
+                    <lightning:button label="Delete" onclick="{!c.delFilesAction}" class="slds-button slds-button_brand"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.showErrorScreen}">
+     	<!--<c:DNAMSConfirmationPopUp/>-->
+        <!--DNA-953: Confirmation Popup -->
+        <div class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Error</h2>
+                </div>
+                <div class="slds-modal__content">
+                    <p> </p>
+                    <p> </p>
+                    <div class="slds-align_absolute-center" style="height:5rem;margin-left:5rem;margin-right:5rem;">{!v.errorMessage}</div>
+                    <p> </p>
+                    <p> </p>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button label="Cancel" onclick="{!c.hideShowErrorPopup}" class="slds-button slds-button_neutral"/>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

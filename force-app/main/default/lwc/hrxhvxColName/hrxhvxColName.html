@@ -1,0 +1,45 @@
+<!--
+ - Created by User on 2024-04-03.
+-->
+
+<template>
+    <template lwc:if={hasOneColumn}> 
+        <div class="hrxhvx-card">
+            <div class="hrxhvx-group">
+                <div class="row">
+                    {columnName}
+                </div>
+            </div>
+        </div> 
+    </template>
+    <template lwc:else> 
+            <div class={positionContainerClass}>
+                <div class={positionGroupClass}>
+                    <div class="row">
+                        {columnName}
+                    </div>
+                </div>
+                <div class={positionGroupClass}>
+                    <div class="row">
+                        {columnName2}
+                    </div>
+                </div>
+                <div class={positionGroupClass}>
+                    <div class="row">
+                        {columnName3}
+                    </div>
+                </div>
+                <div class={positionGroupClass}>
+                    <div class="row">
+                        {columnName4}
+                    </div>
+                </div>
+                <div class={positionGroupClass}>
+                    <div class="row">
+                        {columnName5}
+                    </div>
+                </div>
+            </div> 
+    </template>    
+    
+</template>

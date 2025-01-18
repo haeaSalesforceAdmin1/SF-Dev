@@ -1,0 +1,166 @@
+.THIS {
+}
+
+.THIS .centerspinner {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+}
+
+.THIS .slds-accordion__summary-heading{
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.THIS .hr.solid {
+    border-top: 2px inset #bbb;
+}
+
+.THIS .hr {
+    margin: none;
+}
+
+.THIS .slds-page-header {
+    background-color: white;
+    border: none;
+    box-shadow: none;
+}
+
+.THIS .attach-to-bottom{
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+}
+
+.THIS .attach-to-top {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+}
+
+.THIS .modal-header .slds-modal__header {
+    position: absolute !important;
+}
+
+
+.THIS .modal-header .slds-modal__header .slds-size_1-of-1 .cSurveyQuestionComp {
+    position: absolute !important;
+}
+
+.THIS .strong-text{
+    font-weight: bold;
+    font-size: 120%;
+    color: black;
+}
+
+/*.THIS .slds-radio_button [type=radio][disabled]:checked+.slds-radio_faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio_button [type=radio][disabled]:checked+.slds-radio--faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio_button [type=radio][disabled]:checked~.slds-radio_faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio_button [type=radio][disabled]:checked~.slds-radio--faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio_button [type=radio][disabled]:checked+.slds-radio_button__label .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio_button [type=radio][disabled]:checked+.slds-radio--button__label .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked+.slds-radio_faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked+.slds-radio--faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked~.slds-radio_faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked~.slds-radio--faux .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked+.slds-radio_button__label .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+.THIS .slds-radio--button [type=radio][disabled]:checked+.slds-radio--button__label .readonlyclass {
+    background-color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+    color: white;
+}
+
+
+
+.THIS .slds-radio_button [type=radio]:disabled+.slds-radio_faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio_button [type=radio]:disabled+.slds-radio--faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio_button [type=radio]:disabled~.slds-radio_faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio_button [type=radio]:disabled~.slds-radio--faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio_button [type=radio]:disabled+.slds-radio_button__label .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210))
+}
+
+.THIS .slds-radio_button [type=radio]:disabled+.slds-radio--button__label .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210))
+}
+
+.THIS .slds-radio--button [type=radio]:disabled+.slds-radio_faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio--button [type=radio]:disabled+.slds-radio--faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio--button [type=radio]:disabled~.slds-radio_faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio--button [type=radio]:disabled~.slds-radio--faux .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210));
+}
+
+.THIS .slds-radio--button [type=radio]:disabled+.slds-radio_button__label .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210))
+}
+
+.THIS .slds-radio--button [type=radio]:disabled+.slds-radio--button__label .readonlyclass {
+    color: var(--lwc-brandAccessible,rgb(0, 112, 210))
+}*/

@@ -1,0 +1,59 @@
+/**
+ * Created by User on 2024-04-03.
+ */
+
+ .hrxhvx-card{
+    color: #000000;
+    background-color: #FFFFFF;
+    font-size: 11px;
+    font-weight: normal;
+    text-align : center;
+    padding-top: 5px;
+}
+
+.hrxhvx-container {
+    height: 100%;
+}
+.hrxhvx-container-sales {
+    height: 100%;
+}
+.hrxhvx-container-service {
+    height: 100%;          
+}
+.hrxhvx-group-sales:nth-child(3) {
+    height: 27px;           
+}
+
+.hrxhvx-group {
+    margin-top: 1px;
+    padding-bottom: 15px;
+    padding-left: 9px;
+    font-size: 11px;
+    align-content: normal;
+}
+
+
+
+.hrxhvx-group-sales {
+    margin-top: 2px;
+    padding-bottom: 18px;
+    padding-left: 9px;
+    font-size: 11px;
+    align-content: normal;
+}
+
+.hrxhvx-group-service {
+    margin-top: 5px;
+    padding-bottom: 13px;
+    padding-left: 9px;
+    font-size: 11px;
+    align-content: normal;
+}
+
+.hrxhvx-group-sales > div  {
+    height : 17px ;
+}
+
+.hrxhvx-group-service > div  {
+    height : 17px ;
+}

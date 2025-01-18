@@ -1,0 +1,135 @@
+.down-arrow{
+	border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 7px solid #919191;
+    width: 0;
+    margin: -5% 2%;
+}
+
+/* .userProfile{
+	margin: 2% -16%;
+} */
+
+.profile-icon-wrap{
+  display:flex;
+  width:63px;
+  align-items:center;
+  cursor: pointer;
+}
+
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown {
+  font-size: 1em;
+  border: none;
+  outline: none;
+  color: blue;
+  padding: 1em;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+
+
+/* .dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 100px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+  z-index: 1;
+	border-radius: 2%;
+} */
+
+/* .dropdown-content:after{
+    content:''; 
+    position: absolute;
+    top: 0;
+    left: 15%;
+    width: 0;
+    z-index:1;
+    height: 0;
+    border-bottom: solid 15px #FFF; 
+    border-left: solid 15px transparent;
+    border-right: solid 15px transparent; 
+} */
+
+
+.dropdown{
+  /* opacity: .7; */
+  /* padding:0px; */
+}
+
+
+.dropdown-content a {
+  /* opacity: .6; */
+}
+
+
+.dropdown .dropdown-content {
+  display: block;
+}
+
+
+.dropdown-content a {
+  float: none;
+  color: #333;
+  padding: 11px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.profile-wrap{
+  position: relative;
+  justify-content:flex-end;
+  width:100%;
+  flex-wrap:nowrap;
+  align-items:center;
+}
+
+.profile-wrap .dropdown-content{
+  position:absolute;
+  /* left:-140px; */
+  right:0px;
+  width:200px;
+  top:40px;
+  background: #fff;
+  border: 1px solid #ccc;
+  z-index:999;
+}
+.profile-wrap .dropdown-content a{
+  white-space: nowrap;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+}
+
+.dropdown-content a:hover{
+  background-color:#061c3f;
+  color:#fff;
+}
+
+.rotate{
+  rotate: 180deg;
+}
+
+.profile-wrap .user-right-brdr{
+margin-right:8px;
+width:83%;
+
+}
+
+
+/* .profile-wrap .user-right-brdr span{
+  margin-left:15px;
+  display: block;
+  
+  } */
+
+  .profile-wrap .slds-rich-text-editor__output{
+    margin-left:15px;
+    display: block;
+  }

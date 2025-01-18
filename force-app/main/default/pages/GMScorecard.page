@@ -1,0 +1,419 @@
+<apex:page renderas="PDF" applyBodyTag="false" standardStylesheets="false" showHeader="false" standardController="Account" extensions="COPPScorecardController" action="{!handleLoad}">
+    <apex:variable value="{!$CurrentPage.parameters.recordId}" var="recordId"/> 
+    <apex:variable value="{!$CurrentPage.parameters.CommentsValue}" var="CommentsValue" />
+
+<!--DPM-5916 COPP Project  -->
+    <head>
+        <style type="text/css" media="print">
+            @page {
+                size: A4; 
+                @top-right {
+                    content: element(header);
+                }
+            	margin: 0;
+                background-color: {!IF(BrandCode == 'G', '#e6d5cc', 
+                                      IF(BrandCode == 'H', '#c8d4e4', 'white'))};
+                padding: 15px; 
+                height: 100vh; 
+            	
+            }
+
+            @page {
+                @bottom-left {
+                    content: element(footer);
+                }
+            }
+
+            html, body {
+                margin: 15px;
+            	background-color: #FFFFFF; 
+                padding: 0;
+                height: 96%;
+                width: 96%;
+            }
+
+            {
+                margin: 100px;
+                padding: 100px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+            }
+
+            div.content {
+                padding-top: 5px;
+                font-family: 'Arial Unicode MS', Arial, sans-serif;
+                flex: 1;
+                
+                
+            }
+
+            div.footer {
+                position: relative;
+                padding: 10px;
+                padding-top: 60px;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                font-size: 8px;
+                page-break-inside:avoid;
+            }
+            
+            .tracker-container {
+                min-height: 100vh; 
+                display: flex;
+                flex-direction: column; 
+            }
+
+            .centered {
+                text-align: center; 
+                width: 100%;
+                margin-bottom: 6px;
+                font-size: 20px;
+            	display: inline-block;
+                padding: 2%;
+            }
+
+            .right {
+                text-align: right;
+            }
+            
+            .left {
+                text-align: left;
+            }
+            
+            .header {
+                text-align: left;
+                padding: 10px;
+            	position: relative;
+            }
+            
+            .logo{
+                position: absolute;
+            	top: 10px;
+            	left:  {!IF(acc.BrandCode__c == 'G', '550px', 
+                                      IF(acc.BrandCode__c == 'H', '500px', '500px'))};
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+    			box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+             th, td {
+                border-collapse: collapse;
+            	box-shadow: none;  
+            	border: 0.5px solid #000;
+            }
+
+            .basic-info {
+                padding: 5px;
+            }
+
+            .caption {
+                caption-side: bottom;
+                text-align: left;
+                font-size: 5pt;
+            }
+            
+            .information {
+                
+                border: 0.5px solid black;
+                width: 100%;
+                cellpadding: 5; 
+                cellspacing: 0; 
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                
+            }
+
+            .information-header {
+                font-size: 12pt;
+                text-align: center;
+                color: #ffffff;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationSubtitle{
+                font-size:10pt;
+                width: 20%;
+                text-align: center;
+                color: #ffffff;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            
+            }
+            
+            .informationDetail{
+                font-size:10pt;
+            }
+
+            .information th, .information td {
+                border: 0.5px solid black; 
+                padding: 5px 10px; 
+            }
+
+
+            .table-comments{
+                width: 96%;
+                font-size: 10pt;
+                border: 0.5px solid black; 
+            	vertical-align: top;!important;
+            	white-space: pre; 
+                 padding-left: 10px; 
+            	 padding-right: 10px;
+            	padding-top: 5px;
+            	 
+            }
+
+            .table-container:first-of-type .state-represented {
+                margin-top: 3px;
+                font-size: 8pt;
+                text-align: left;
+            }
+            .table-container {
+                display: inline-block;
+                margin-top: 20px;
+                margin-right: 10px; 
+                
+            }
+           
+                
+            .state-represented {
+                margin-top: -20px;
+                font-size: 8pt;
+                text-align: left;
+            }
+
+            .timePeriod{
+                width: 106px;
+                border: 0.5px solid black; 
+                font-size:9pt;
+                text-align: center;
+            }
+
+            .kpiTable{
+                border: 0.5px solid black; 
+                width: 182.7px;
+                font-size:9pt;
+                text-align: center;
+            }
+
+            .kpiTableHeader{
+                text-align: center;
+                color: #ffffff;
+                font-size:10pt;
+                height: 20px;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+
+            .kpiSubHeader{
+                text-align: center;
+                height: 40px;
+                color: #ffffff;
+                font-size:9pt;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+                
+            }
+            
+            .kpiContent{
+            	width: 33.3%;
+            }
+
+            .value{
+                height: 20px;
+            }
+
+            .timePeriodHeader{
+                height: 60px;
+                text-align: center;
+                color: #ffffff;
+                font-size:10pt;
+                background-color: {!IF(acc.BrandCode__c == 'G', '#1a1a1a', 
+                                      IF(acc.BrandCode__c == 'H', '#091a3e', 'white'))};
+            }
+            
+        </style>
+    </head>
+    <div class="tracker-container">
+        <div class="header">
+            <div class="logo" >
+                <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                    <apex:image url="{!$Resource.Hyundai_Logo}" height="45px"/>
+                </apex:outputPanel>
+            
+                <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}" style="left: 640px">
+                    <apex:image url="{!$Resource.Genesis_Logo}" height="45px"/>
+                </apex:outputPanel>
+            </div>
+            <div class="left" style="margin-left: 10px;font-family: 'Arial Unicode MS', Arial, sans-serif;"> 
+                <apex:outputPanel >
+                    <div class="basic-info">
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                            <apex:outputText value="Hyundai Motor America" />
+                        </apex:outputPanel>
+                    
+                        <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                            <apex:outputText value="Genesis Motor America" />
+                        </apex:outputPanel>
+                    </div>
+                    <div class="basic-info">
+                        <apex:outputText value="COPP Report Month: {!reportMonth}" />
+                    </div>
+                    <div class="basic-info">
+                        <apex:outputText value="Performance Period: {!fromMonth} - {!toMonth}" />
+                    </div>
+                </apex:outputPanel>
+            </div>
+        </div>
+    
+        <div class="content" style="font-family: 'Arial Unicode MS', Arial, sans-serif;">
+            <table class="information">
+                <tr class="information-header">
+                    <th colspan="2">GM SCORECARD</th>
+                </tr>
+                <tr>
+                    <td class="informationSubtitle">Dealer</td>
+                    <td class="informationDetail">{!dealerName}</td>
+                </tr>
+                <tr>
+                    <td class="informationSubtitle">Dealer Code</td>
+                    <td class="informationDetail">{!acc.DealerCode__c}</td>
+                </tr>
+            </table>
+    
+            <div style='margin-top:0px'>
+                <div class="table-container">
+                    
+                    <table class='timePeriod' border="1">
+                        <tr><th class='timePeriodHeader' >Time Period</th></tr>
+                        <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                            <tr><td class="value" style="text-align: right;padding-right: 5px;"><apex:outputText value="{!monthWrapper.month}" /></td></tr>
+                        </apex:repeat>
+                        <tr><td class="value" style="background-color:#E4E6E6">Program Average</td></tr>
+                    </table>
+                    
+                </div>
+                
+
+                <div class="table-container">
+                    <table class='kpiTable' border="1">
+                        <tr><th class='kpiTableHeader' colspan="3">Sales (MTD)</th></tr>
+                        <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Actual Sales" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Expected Sales" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Sales Efficiency*" /></td>
+                        </tr>
+                        <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                            <tr>
+                                <td class="value" ><apex:outputText value="{!monthWrapper.actualSales}" /></td>
+                                <td class="value" ><apex:outputText value="{!monthWrapper.expectedSales}" /></td>
+                                <td class="value" >
+                                    <apex:outputText value="{!monthWrapper.salesEfficiency}" />
+                                    <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.salesEfficiency))}">%</apex:outputPanel>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                        <tr class="average">
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageActualSales}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageExpectedSales}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageSalesEfficiency}" />%
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="table-container">
+                    <table class='kpiTable' border="1">
+                        <tr><th class='kpiTableHeader' colspan="3">
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                                <apex:outputText value="HRX (R1M)" />
+                            </apex:outputPanel>
+                        
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                                <apex:outputText value="GBX (R1M)" />
+                            </apex:outputPanel>
+                            </th>
+                        </tr>
+                        <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Dealer" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Region" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="DLR % Region" /></td>
+                        </tr>
+                        <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                            <tr>
+                                <td class="value"><apex:outputText value="{!monthWrapper.HRXDealer}" /></td>
+                                <td class="value"><apex:outputText value="{!monthWrapper.HRXRegion}" /></td>
+                                <td class="value">
+                                    <apex:outputText value="{!monthWrapper.HRXDLR}" />
+                                    <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.HRXDLR))}">%</apex:outputPanel>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                        <tr class="average">
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHRXDealer}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHRXRegion}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHRXDLR}" />%
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="table-container" style="margin-right: 0px; ">
+                    <table class='kpiTable' border="1">
+                        <tr><th class='kpiTableHeader' colspan="3">
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'H'}">
+                                <apex:outputText value="HVX (R1M)" />
+                            </apex:outputPanel>
+                        
+                            <apex:outputPanel rendered="{!acc.BrandCode__c == 'G'}">
+                                <apex:outputText value="GSX (R1M)" />
+                            </apex:outputPanel>
+                            </th>
+                        </tr>
+                        <tr class='kpiSubHeader'>
+                            <td class="kpiContent" style="border-top: 0.5px solid #797978;"><apex:outputText value="Dealer" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="Region" /></td>
+                            <td class="kpiContent" style="border-left: 0.5px solid #797978;border-top: 0.5px solid #797978;"><apex:outputText value="DLR% Region" /></td>
+                        </tr>
+                        <apex:repeat value="{!monthWrappers}" var="monthWrapper">
+                            <tr>
+                                <td class="value"><apex:outputText value="{!monthWrapper.HVXDealer}" /></td>
+                                <td class="value"><apex:outputText value="{!monthWrapper.HVXRegion}" /></td>
+                                <td class="value">
+                                    <apex:outputText value="{!monthWrapper.HVXDLR}" />
+                                    <apex:outputPanel rendered="{!NOT(ISBLANK(monthWrapper.HVXDLR))}">%</apex:outputPanel>
+                                </td>
+                            </tr>
+                        </apex:repeat>
+                        <tr class="average">
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHVXDealer}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHVXRegion}" /></td>
+                            <td class="value" style="background-color:#E4E6E6"><apex:outputText value="{!averageHVXDLR}" />%
+                            </td>
+                        </tr>
+                    </table> 
+                </div>
+            </div>
+            <p class="state-represented" >
+                <apex:outputText value="*State Represented" />
+            </p>
+
+            <apex:outputPanel rendered="{!NOT(ISBLANK(TRIM(CommentsValue)))}" style="display:block ">
+                <div style="margin-top: 35px; font-size: 10pt;">
+                    <apex:outputText value="Comments: " />
+                </div>
+                <!-- <apex:outputText style="margin-top: 150px;font-size:10pt" value="Comments: " /> -->
+                <div class="table-comments">
+                     <apex:outputText value="{!CommentsValue}" escape="false" style="white-space: pre;" />
+                  
+                </div>
+            </apex:outputPanel>
+        </div>
+    </div>
+</apex:page>

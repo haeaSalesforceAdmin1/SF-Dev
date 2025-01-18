@@ -1,0 +1,16 @@
+.THIS {
+
+}
+
+.THIS .centerspinner {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+}
+
+.THIS .attach-to-bottom {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+}

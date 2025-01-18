@@ -1,0 +1,20 @@
+<template>
+    
+    <template if:false={isMobile}>
+        <div class="slds-button-group">
+            <template for:each={options} for:item="option">
+                <button key={option.label}  data-target-id={option.label} name={option.label} onclick={handleClick} class={option.classVal}>{option.label}</button>
+            </template>
+        </div>
+    </template>
+
+    <template if:true={isMobile}>
+        <template for:each={options} for:item="option">
+            <div key={option.label} class="slds-grid slds-p-bottom_xxx-small">
+                <div class="slds-col slds-size-1_of-1">
+                    <button key={option.label}  data-target-id={option.label} name={option.label} onclick={handleClick} class={option.classVal}>{option.label}</button>
+                </div>
+            </div>
+        </template>
+    </template>
+</template>

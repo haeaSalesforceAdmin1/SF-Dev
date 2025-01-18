@@ -1,0 +1,19 @@
+<!-- DPM-5633 -->
+<aura:component implements="force:appHostable,forceCommunity:availableForAllPageTypes" controller="FilePreviewController">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="fileId" type="String" />
+    <aura:attribute name="isCompleted" type="String" default="false"/>
+    <aura:attribute name="isModalHidden" type="Boolean" default="true" description="Flag to control modal window"  />
+
+    
+    <aura:if isTrue="{!v.isCompleted}">
+        <div class="button" style="margin-left: 80.2%;width: 220px;margin-bottom: -7%;">
+            <lightning:button label="View Approved Action Plan" title="View Approved Action Plan" onclick="{! c.openModal }" />
+        </div>
+    </aura:if>
+        
+    <c:previewGenesisActionPlan  fileId="{!v.fileId}" isHidden="{!v.isModalHidden}" cancelLabel="cancel" onSaveClick="{! c.onConfirm }" onCancelClick="{! c.onCancel }">
+       
+    </c:previewGenesisActionPlan>
+</aura:component>

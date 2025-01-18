@@ -1,0 +1,98 @@
+<template>
+    <!-- Table -->
+    <lightning-card title="Affected Vehicles">
+
+
+        <div>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_fixed-layout slds-table_striped" aria-label=" Example headless table of Opportunities with cell content wrapped ">
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                      <div class="slds-truncate" title="Typical Column Header">Make</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Wrapped, line clamped">Model</div>
+                      </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">Year</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">Model Code</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Wrapped, line clamped">Drivetrain</div>
+                      </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">Fuel Type</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">Engine</div>
+                    </th>
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="Typical Column Header">Transmission</div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <template for:each={vehicleOptions} for:item="vehicle">
+                        <!-- When in View only mode -->
+                        <tr class="slds-hint-parent" key={vehicle.id}>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <div class="slds-line-clamp" title="">
+                                    {vehicle.Make__c}
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <div class="slds-line-clamp" title="">
+                                    {vehicle.Model__c}
+                                </div>
+                            </td>
+
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.VehicleYear__c}
+                                </span>
+                            </td>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.ModelCode__c}
+                                </span>
+                            </td>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.DrivetrainDescription__c}
+                                </span>
+                            </td>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.FuelType__c}
+                                </span>
+                            </td>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.EngineDescription__c}
+                                </span>
+                            </td>
+                            <td class="slds-cell-wrap" data-label="Wrapped, line clamped">
+                                <span>
+                                    {vehicle.TransmissionDescription__c}
+                                </span>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <c-confirmation-dialog title=''
+                           message='Are you sure you want to delete?'
+                           confirm-label='Yes'
+                           cancel-label='No'
+                           visible={isConfDialogVisible}
+                           original-message=""
+                           name="confirmModal"
+                           onclick={handleConfirmationClick}>
+        </c-confirmation-dialog>
+    </lightning-card>
+</template>

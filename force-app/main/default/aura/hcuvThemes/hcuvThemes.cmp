@@ -1,0 +1,158 @@
+<aura:component implements="forceCommunity:themeLayout" extends="forceCommunity:navigationMenuBase" access="global" description="HCUV Custom Theme Layout">
+    <aura:attribute name="profileMenu" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="search" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="navBar" type="Aura.Component[]" required="false"/>
+    <aura:attribute name="showMenuNames" type="Boolean" required="false"/> 
+    <aura:attribute name="showBlueTheme" type="Boolean" required="false"/>
+    <aura:attribute name="menuItems" type="Object[]"/> 
+    <aura:attribute name="leftNavItems" type="Object[]"/>
+    <aura:attribute name="showTopNav" type="Boolean"/>
+    <aura:attribute name="showLeftNav" type="Boolean"/>
+    <aura:attribute name="showVINSearch" type="Boolean"/>
+    <aura:attribute name="dealerName" type="String"/>
+    <aura:attribute name="siteName" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.initialize}"/>
+    
+    <!-- Mobile View Starts -->
+    <aura:if isTrue="{!$Browser.formFactor == 'PHONE'}">
+        <div class="c-container">          
+            <aura:if isTrue="{!v.showLeftNav}">
+                <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                    <div class="{!v.showLeftNav? 'slds-modal__container slide-left-menu-wrap slide-menu-active':'slds-modal__container slide-top-menu-wrap'}">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                        </button>
+                        <div class="slds-modal__content" id="modal-content-id-1">
+                            <div class="{!v.showMenuNames? v.showBlueTheme? 'slds-border_right main-leftnav xs-leftnav-slide BlueTheme menu-open': 'slds-border_right main-leftnav xs-leftnav-slide WhiteTheme menu-open': v.showBlueTheme? 'IconsLeftNav main-leftnav xs-leftnav-slide slds-border_right BlueTheme menu-close':'IconsLeftNav main-leftnav xs-leftnav-slide slds-border_right WhiteTheme menu-close'}">
+                                <c:hcuvleftnavigation showMenuNames="{!v.showMenuNames}" showBlueTheme="{!v.showBlueTheme}" leftNavItems="{!v.leftNavItems}"
+                                                      oncollapse="{!c.handleLeftNavBar}" onthemeChange="{!c.handleThemeChange}"></c:hcuvleftnavigation>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+            </aura:if>
+            <aura:if isTrue="{!v.showTopNav}">  
+                <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                    <div class="{!v.showTopNav? 'slds-modal__container slide-top-menu-wrap slide-top-menu-active slds-modal_full':'slds-modal__container slide-top-menu-wrap slds-modal_full'}">
+                        <button class="slds-button slds-button_icon slds-modal__close">
+                            <lightning:icon iconName="utility:close" size="large" alternativeText="sss" onclick="{!c.handleSearchOut}"/>
+                        </button>
+                        <div class="slds-modal__content" id="modal-content-id-1">   
+                            <aura:if isTrue="{!v.showVINSearch}">
+                                <!--<div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_left">
+                                    <lightning:icon class="slds-icon slds-input__icon slds-input__icon_left slds-icon-text-default" iconName="utility:search" size="x-small" alternativeText="Search address"/>
+                                    <input id="text-input-id-1" class="slds-input" type="text" value="" />
+                                </div>-->
+                                <lightning:input type="search" placeholder="VIN Search" onkeypress="{!c.handleEnter}">
+                                </lightning:input>
+                                <aura:set attribute="else">
+                                    <c:hcuvTopnavigation aura:id="mNavItem" menuItems="{!v.menuItems}" onnavigateto="{!c.navigateToPage}" onsearchVIN="{!c.handleSearchVIN}" onclearSessions="{!c.clearSession}" oncollapse="{!c.handleLeftNavBar}"></c:hcuvTopnavigation>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+            </aura:if>
+            
+            <div class="header-wrapper">
+                <lightning:layout class="slds-wrap top-nav-wrap">
+                    <lightning:layoutItem class="slds-size_1-of-3 brand-name-wrap" >
+                        
+                        <!-- <img src="{!$Resource.HyundaiLogo}"/> -->                   
+                        <aura:if isTrue="{!$Browser.formFactor == 'PHONE'}">
+                            <div class="xs-custom-box">
+                                <!--{!v.navBar} -->
+                                <div class="d-flex">
+                                    <div class="xs-top-hamburger">
+                                        <img src="{!$Resource.hcuvHamburgTopNav}" onclick="{!c.showTopNavMobile}"/>
+                                    </div>
+                                    <div class="xs-brand-name">
+                                        <span>Hyundai</span>
+                                        <span>Certified Used Vehicles</span> 
+                                    </div>
+                                </div>
+                            </div>
+                        </aura:if>
+                        
+                    </lightning:layoutItem>
+                    
+                    <lightning:layoutItem class="slds-size_1-of-3 profile-name-wrap">
+                        <div class="profileMenuRegion">
+                            <c:hcuvUserProfile></c:hcuvUserProfile>
+                        </div>
+                    </lightning:layoutItem>
+                </lightning:layout>
+                
+                <div class="topNav xs-topNav">
+                    <img src="{!$Resource.hcuvHamburgLeftNav}" onclick="{!c.showLeftNavMobile}"/>
+                    <span class="xs-Dealername">{!v.dealerName}</span>        
+                </div>
+                <!--
+       <c:hcuvTopnavigation aura:id="navItem" menuItems="{!v.menuItems}" onnavigateto="{!c.navigateToPage}" onclearSession="{!c.clearSession}"></c:hcuvTopnavigation>
+    -->
+            </div>
+            <div class="mainContentArea">
+                <div class="content-area">
+                    {!v.body}
+                </div>
+            </div>
+        </div>
+        <!-- Mobile View Ends -->
+        <!-- Desktop View Starts -->
+        <aura:set attribute="else">
+            <div class="c-container">
+                <div class="header-wrapper">
+                    <lightning:layout class="slds-wrap top-nav-wrap">
+                        <lightning:layoutItem class="slds-size_1-of-3 brand-name-wrap" >                            
+                            <div class="custom-box">
+                                <!-- <img src="{!$Resource.HyundaiLogo}"/> -->
+                                <aura:if isTrue="{!v.siteName == 'HMA'}">
+                                    <!--<span>Hyundai</span>
+                                    <span>Certified Used Vehicles</span>-->
+                                    <!-- [CCSOM-66] Remove span tag, add img tag -->
+                                    <img src="{!$Resource.HCUV_2024_Logo_RGB_cropped_png}"  style="height:2.75rem;"/>
+                                </aura:if>
+                                <aura:if isTrue="{!v.siteName == 'GMA'}">
+                                    <img src="{!$Resource.hcuvGMATopNavIcon}"/>
+                                </aura:if>
+                            </div>
+                            
+                        </lightning:layoutItem>                        
+                        <lightning:layoutItem class="slds-size_1-of-3 brand-name-wrap brand-name-wrap-search" >
+                            <div class="searchRegion">
+                                {!v.search}
+                            </div>                            
+                        </lightning:layoutItem>
+                        <lightning:layoutItem class="slds-size_1-of-3 profile-name-wrap">
+                            <div class="profileMenuRegion">                                 
+                                <c:hcuvUserProfile></c:hcuvUserProfile>
+                            </div>
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                    <div class="appLauncher">
+               			<forceCommunity:appLauncher/>
+         			</div>
+                    <c:hcuvTopnavigation aura:id="navItem" menuItems="{!v.menuItems}" onnavigateto="{!c.navigateToPage}" onclearSession="{!c.handleClearSession}"></c:hcuvTopnavigation>
+                </div>            
+                <div class="mainContentArea gms">
+                    <div class="{!v.showMenuNames? v.showBlueTheme? 'leftNav slds-border_right BlueTheme menu-open':'leftNav slds-border_right WhiteTheme menu-open': v.showBlueTheme? 'IconsLeftNav slds-border_right BlueTheme menu-close':'IconsLeftNav slds-border_right WhiteTheme menu-close'}">
+                        <!--<button class="{!v.showBlueTheme? 'collapseNavBtn': 'WhiteTheme collapseNavBtn'}" onclick="{!c.handleLeftNavBar}"> -->
+                        <!-- <img class="slds-m-around_x-small" style="cursor: pointer;width:17px;height:17px;" src="{!$Resource.HMALeftArrow}"/> -->
+                        <!--  <img class="nav-ico"  src="{!$Resource.HMALeftArrow}"/>
+                </button>-->
+                        <c:hcuvleftnavigation showMenuNames="{!v.showMenuNames}" showBlueTheme="{!v.showBlueTheme}" leftNavItems="{!v.leftNavItems}" oncollapse="{!c.handleLeftNavBar}" onthemeChange="{!c.handleThemeChange}"></c:hcuvleftnavigation>
+                        <!--<button class="{!v.showBlueTheme? 'BlueTheme themeChange': 'WhiteTheme themeChange'}" onclick="{!c.handleThemeChange}">
+                    <img class="slds-m-around_x-small" src="{!$Resource.HMAThemeChange}"/>
+                </button>-->
+                    </div>
+                    <div class="{!v.showMenuNames? 'content content-area' : 'Iconscontent content-area'}">
+                        {!v.body}
+                    </div>
+                </div>
+            </div>
+        </aura:set>
+        <!-- Desktop View Ends -->
+    </aura:if> 
+</aura:component>

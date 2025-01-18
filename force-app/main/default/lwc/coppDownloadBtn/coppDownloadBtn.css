@@ -1,0 +1,6 @@
+.THIS{}
+
+.THIS .download-button::slotted(lightning-primitive-icon) {
+    width: 30px; 
+    height: 30px;
+}

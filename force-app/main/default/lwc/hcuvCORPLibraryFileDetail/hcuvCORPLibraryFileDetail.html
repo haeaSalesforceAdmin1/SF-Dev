@@ -1,0 +1,118 @@
+<template>
+
+
+  <template lwc:if={isComponentOpen}>
+
+
+
+    <div style="padding:1rem;background-color:white;">
+      <div style="
+          font-size: var(--lwc-fontSize5, 1rem);
+          font-weight: var(--lwc-fontWeightBold, 400);
+          border-bottom: 1px solid #444444;
+          font-variant: contextual;
+          margin-bottom: -0.1rem;
+          margin-top: -0.1rem;
+          padding-bottom: 0.5rem;
+          padding-left: 0.25rem;
+          ">CUV/CPO Files</div>
+      <div style="height:1rem"></div>
+
+      <template lwc:if={isEditFormOpen}>
+        <div>
+          <lightning-flow flow-api-name="HCUV_CORPLibraryVersionFileEditScreen" flow-input-variables={inputVariables}
+            onstatuschange={handleFlowStatusChange}> </lightning-flow>
+
+        </div>
+
+      </template>
+
+      <!-- VIEW PAGE FORM -->
+      <template lwc:else> <!-- View Record -->
+          <template lwc:if={isVisible_mngr}>
+            <!-- MANAGER - PRE -->
+            <template lwc:if={isPrepublished}>
+              <lightning-record-view-form record-id={cvRecordId} object-api-name="ContentVersion">
+                <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                  <lightning-output-field field-name="Publish_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                  <lightning-output-field field-name="PublishTargetFolderStringCUV__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                </div>
+                <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                  <lightning-output-field field-name="Expiration_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                </div>
+                <div class="actionsContainer">
+                  <div class="button-container-inner slds-float_none">
+                    <lightning-button variant="brand" type="button" onclick={openEditForm} name="EditDateFields"
+                      label="Edit CUV Fields">
+                    </lightning-button>
+                  </div>
+                </div>
+              </lightning-record-view-form>
+            </template>
+            <!-- MANAGER - MAIN -->
+            <template lwc:elseif={isMain}>
+              <lightning-record-view-form record-id={cvRecordId} object-api-name="ContentVersion">
+
+                <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                  <lightning-output-field field-name="Publish_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                  <lightning-output-field field-name="Expiration_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                </div>
+
+                <div class="actionsContainer" if:true={isEditButtonVisible}>
+                  <div class="button-container-inner slds-float_none">
+                    <lightning-button variant="brand" type="button" onclick={openEditForm} name="EditDateFields"
+                      label="Edit CUV Fields">
+                    </lightning-button>
+                  </div>
+                </div>
+              </lightning-record-view-form>
+            </template>
+            <!-- MANAGER - DELETED -->
+            <template lwc:elseif={isDeleted}>
+              <lightning-record-view-form record-id={cvRecordId} object-api-name="ContentVersion">
+                <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                  <lightning-output-field field-name="Publish_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                  <lightning-output-field field-name="Expiration_Date__c" class="slds-size_6-of-12">
+                  </lightning-output-field>
+                </div>
+
+              <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                <lightning-output-field field-name="Folder_Before_Deletion__c" class="slds-size_6-of-12">
+                </lightning-output-field>
+              </div>              
+            </lightning-record-view-form>
+            </template>
+          </template>
+
+
+          <!-- VIEWER MAIN -->
+          <template lwc:elseif={isVisible_viewer}>
+            <lightning-record-view-form record-id={cvRecordId} object-api-name="ContentVersion">
+              <div class="slds-col slds-size_12-of-12 slds-grid slds-wrap">
+                <lightning-output-field field-name="Publish_Date__c" class="slds-size_6-of-12">
+                </lightning-output-field>
+                <lightning-output-field field-name="Expiration_Date__c" class="slds-size_6-of-12">
+                </lightning-output-field>
+              </div>
+            </lightning-record-view-form>
+          </template>
+      </template>
+      <!-- // END VIEW PAGE FORM -->
+    </div>
+
+
+  </template>
+
+
+  <!-- If user has no permission -->
+  <template lwc:else>
+    <!-- This part is to remove unknown blank space of this component when it it lwc:false -->
+    <div style="margin-bottom: calc(var(--lwc-cardSpacingMargin) * -1)"></div>
+  </template>
+</template>
