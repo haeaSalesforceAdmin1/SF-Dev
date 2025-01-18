@@ -100,12 +100,23 @@ public without sharing class HMAUserProvisioningService {
     /**
      * [Method Description] 
      * Created by [Author] on [Date] for [Ticket #]
-     * Edited by [MinheeKim] on [24.04.08] for [DPM-5447]  added exception 
+     * Edited by [MinheeKim] on [04.08.24] for [DPM-5447]  added exception 
+     * Edited by [MinheeKim] on [01.17.25] for [DPM-6005]  added logic to check if the user is the extenal user who has access to temporary account
     */
     private static void provisionPermissionSetGroupAccess(List<HMAUserProvisioning__c> listOfHMAUserProvisionings, Map<Id, List<String>> mapUserProvisionAccessTypes, Set<String> accessTypes) {
     
+        /**DPM-6005 If the user is the extenal user who has access to temporary account,
+         * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
+        */
+        Map<Id, List<String>> userTempAccesstype = getTempAccess(mapUserProvisionAccessTypes).size()>0 ? getTempAccess(mapUserProvisionAccessTypes) : null;
+        if(userTempAccesstype.size()>0){
+            for(Id usrId : userTempAccesstype.keySet()){
+                for(String accesstype: userTempAccesstype.get(usrId)){
+                    accessTypes.add(accesstype);
+                }
+            }
+        }//DPM-6005 end
         Map<String, AccessType__mdt> permissionSetGroupAccessTypes = populateAccessTypes(accessTypes, HMAConstants.METADATA_PERMISSIONSET_GROUP_FIELD);
-    
         Set<String> newPermissionSetGroupsAssigned = new Set<String>();
         List<String> listOfPermissionSetGroupNames = new List<String>();
         Map<String, List<String>> accessTypeToPermissionSetGroupAPINameMap = new Map<String, List<String>>();
@@ -130,6 +141,9 @@ public without sharing class HMAUserProvisioningService {
             //accessTypeToPermissionSetGroupAPINameMap.put(accessType.DeveloperName, ((String)accessType.get(HMAConstants.METADATA_PERMISSIONSET_GROUP_FIELD)).split(','));
 
         }
+
+        
+        System.debug('6005 userTempAccesstype : '+userTempAccesstype);
     
         Map<Id, Map<String, Id>> userIdToPermissionSetGroupNamesMap = getExistingPermissionSetGroupsForUsers(mapUserProvisionAccessTypes.keySet());
         Map<String, Id> permissionSetGroupNameToPermissionIdMap = getPermissionSetGroupMap(listOfPermissionSetGroupNames);
@@ -139,7 +153,12 @@ public without sharing class HMAUserProvisioningService {
             
             if(mapUserProvisionAccessTypes.containsKey(userProvisionng.User__c)) {
                 List<String> userAccessTypes = mapUserProvisionAccessTypes.get(userProvisionng.User__c);
-                
+                /**DPM-6005 If the user is the extenal user who has access to temporary account,
+                 * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
+                */
+                if(userTempAccesstype.containsKey(userProvisionng.User__c)){
+                    userAccessTypes.addALL(userTempAccesstype.get(userProvisionng.User__c));
+                }//DPM-6005 end
                 for(String userAccessType : userAccessTypes) {
                     
                     if(accessTypeToPermissionSetGroupAPINameMap.containsKey(userAccessType)) {
@@ -1793,6 +1812,57 @@ public without sharing class HMAUserProvisioningService {
         }   
 
         return accountMapByDealerCodes;
+    }
+
+    /**
+     * [Method Description] Check if the external user has 
+     * Created by [MinheeKim] on [01.17.25] for [DPM-6005] Created
+    */
+    private static Map<Id, List<String>> getTempAccess(Map<Id, List<String>> mapUserProvisionAccessTypes){
+        Map<Id, List<String>> userTempAccesstype = new Map<Id, List<String>>();
+        Map<Id, Id> conUserMap = new Map<Id, Id>();
+        List<User> userList = [SELECT Id, ContactId FROM User WHERE Id IN :mapUserProvisionAccessTypes.keySet()];
+        for(User usr : userList){
+           if(usr.ContactId!=null) conUserMap.put(usr.ContactId,usr.Id);
+        }
+
+        Map<Id, List<String>> contactDNAMSMap = new Map<Id, List<String>>();
+        if(conUserMap.size()>0){
+            for(AccountContactRelation acr : [SELECT ContactId, DNAMSAccountUser__c, Account.Name, Account.Temporary_Dealer__c, Account.BrandCode__c
+                                                FROM AccountContactRelation 
+                                                WHERE ContactId IN :conUserMap.keySet() 
+                                                AND IsActive = true]) {
+                    if(acr.Account.Temporary_Dealer__c && acr.DNAMSAccountUser__c) {
+                        if(contactDNAMSMap.containsKey(acr.ContactId)) {
+                            List<String> accessList = contactDNAMSMap.get(acr.ContactId);
+                            if(acr.Account.BrandCode__c=='H'){
+                                accessList.add('DNA_HyundaiExt');
+                            }else if(acr.Account.BrandCode__c=='G'){
+                                accessList.add('DNA_GenesisExt');
+                            }
+                            contactDNAMSMap.put(acr.ContactId,accessList);
+                        }else{
+                            List<String> accessList = new List<String>();
+                            if(acr.Account.BrandCode__c=='H'){
+                                accessList.add('DNA_HyundaiExt');
+                            }else if(acr.Account.BrandCode__c=='G'){
+                                accessList.add('DNA_GenesisExt');
+                            }
+                            contactDNAMSMap.put(acr.ContactId,accessList);
+                        }
+                        
+                    }
+            }
+        }
+
+        if(contactDNAMSMap.size()>0){
+            for(Id conId : contactDNAMSMap.keySet()){
+                userTempAccesstype.put(conUserMap.get(conId), contactDNAMSMap.get(conId));
+            }
+        }
+        System.debug('6005 userTempAccesstype : '+userTempAccesstype);
+        return userTempAccesstype;
+        
     }
 
 }
