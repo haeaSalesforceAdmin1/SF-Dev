@@ -46,7 +46,7 @@ public without sharing class DNAMSUserProvisioningServiceQueueable implements Qu
 
         if(!setNewDealerUserIds.isEmpty()) {
             //Provision new dealer user records
-            provisionNewDealerUsers(setNewDealerUserIds);
+            //provisionNewDealerUsers(setNewDealerUserIds); //Changed to comments - DPM-6020 by MinheeKim 01.21.2025
         }
         if(!setRevokedDealerUserIds.isEmpty()) {
             //Remove provisioned permission sets and public groups from dealer records.
@@ -70,77 +70,78 @@ public without sharing class DNAMSUserProvisioningServiceQueueable implements Qu
     /*
      * @description:    Create permission sets and assign public group memberships for new DNAMS Dealer Users
      * @params:         setNewDealerUserIds - Set of User IDs
+     * Changed to comments - DPM-6020 by MinheeKim 01.21.2025
      */
-    public void provisionNewDealerUsers(Set<Id> setNewDealerUserIds) {
+    // public void provisionNewDealerUsers(Set<Id> setNewDealerUserIds) {
         
-        List<PermissionSetAssignment> lstPermissionSets = new List<PermissionSetAssignment>();
-        List<GroupMember> lstDNAGroupMembers = new List<GroupMember>();
+    //     List<PermissionSetAssignment> lstPermissionSets = new List<PermissionSetAssignment>();
+    //     List<GroupMember> lstDNAGroupMembers = new List<GroupMember>();
         
-        //Query existing PermissionSetAssignments and construct a unique tag for each assignment.
-        Set<String> strPermSetAssigneeCombo = new Set<String>();
-        for(PermissionSetAssignment psa : [SELECT Id, PermissionSetId, AssigneeId
-                                            FROM PermissionSetAssignment
-                                            WHERE PermissionSetId IN :lstDNAPermSets AND AssigneeId IN :setNewDealerUserIds
-                                            LIMIT 1000]) {
-            strPermSetAssigneeCombo.add(psa.PermissionSetId + '-' + psa.AssigneeId);
-        }
+    //     //Query existing PermissionSetAssignments and construct a unique tag for each assignment.
+    //     Set<String> strPermSetAssigneeCombo = new Set<String>();
+    //     for(PermissionSetAssignment psa : [SELECT Id, PermissionSetId, AssigneeId
+    //                                         FROM PermissionSetAssignment
+    //                                         WHERE PermissionSetId IN :lstDNAPermSets AND AssigneeId IN :setNewDealerUserIds
+    //                                         LIMIT 1000]) {
+    //         strPermSetAssigneeCombo.add(psa.PermissionSetId + '-' + psa.AssigneeId);
+    //     }
 
-        //Query existing GroupMembers and construct a unique tag for each group member.
-        Set<String> strGroupUserCombo = new Set<String>();
-        for(GroupMember gm : [SELECT Id, GroupId, UserOrGroupId
-                                FROM GroupMember
-                                WHERE GroupId IN :lstDNAPublicGroups AND UserOrGroupId IN :setNewDealerUserIds
-                                LIMIT 1000]) {
-            strGroupUserCombo.add(gm.GroupId + '-' + gm.UserOrGroupId);
-        }
+    //     //Query existing GroupMembers and construct a unique tag for each group member.
+    //     Set<String> strGroupUserCombo = new Set<String>();
+    //     for(GroupMember gm : [SELECT Id, GroupId, UserOrGroupId
+    //                             FROM GroupMember
+    //                             WHERE GroupId IN :lstDNAPublicGroups AND UserOrGroupId IN :setNewDealerUserIds
+    //                             LIMIT 1000]) {
+    //         strGroupUserCombo.add(gm.GroupId + '-' + gm.UserOrGroupId);
+    //     }
 
-        //Query active users with ID in setNewDealerUserIds
-        for (User u : [SELECT Id
-                        FROM User
-                        WHERE Id IN :setNewDealerUserIds AND IsActive = true
-                        LIMIT 10000]) {
+    //     //Query active users with ID in setNewDealerUserIds
+    //     for (User u : [SELECT Id
+    //                     FROM User
+    //                     WHERE Id IN :setNewDealerUserIds AND IsActive = true
+    //                     LIMIT 10000]) {
 
-            //Create Permission Set Assignment and add to lstPermissionSets.
-            for(PermissionSet ps : lstDNAPermSets) {
-                //If the PermissionSetAssignment already exists, skip to the next record in FOR loop.
-                if(strPermSetAssigneeCombo.contains(ps.Id + '-' + u.Id)) {
-                    continue;
-                }
+    //         //Create Permission Set Assignment and add to lstPermissionSets.
+    //         for(PermissionSet ps : lstDNAPermSets) {
+    //             //If the PermissionSetAssignment already exists, skip to the next record in FOR loop.
+    //             if(strPermSetAssigneeCombo.contains(ps.Id + '-' + u.Id)) {
+    //                 continue;
+    //             }
 
-                //Duplicates avoided. Proceed with creating PermissionSetAssignment records.
-                PermissionSetAssignment psa = new PermissionSetAssignment();
-                psa.PermissionSetId = ps.Id;
-                psa.AssigneeId = u.Id;
+    //             //Duplicates avoided. Proceed with creating PermissionSetAssignment records.
+    //             PermissionSetAssignment psa = new PermissionSetAssignment();
+    //             psa.PermissionSetId = ps.Id;
+    //             psa.AssigneeId = u.Id;
 
-                lstPermissionSets.add(psa);
-            }
+    //             lstPermissionSets.add(psa);
+    //         }
 
-            //Create GroupMembers and add to lstDNAGroupMembers.
-            for(Group g : lstDNAPublicGroups) {
-                //If the GroupMember already exists, skip to the next record in FOR loop.
-                if(strGroupUserCombo.contains(g.Id + '-' + u.Id)) {
-                    continue;
-                }
+    //         //Create GroupMembers and add to lstDNAGroupMembers.
+    //         for(Group g : lstDNAPublicGroups) {
+    //             //If the GroupMember already exists, skip to the next record in FOR loop.
+    //             if(strGroupUserCombo.contains(g.Id + '-' + u.Id)) {
+    //                 continue;
+    //             }
 
-                //Duplicates avoided. Proceed with creating GroupMember records.
-                GroupMember gm = new GroupMember();
-                gm.GroupId = g.Id;
-                gm.UserOrGroupId = u.Id;
+    //             //Duplicates avoided. Proceed with creating GroupMember records.
+    //             GroupMember gm = new GroupMember();
+    //             gm.GroupId = g.Id;
+    //             gm.UserOrGroupId = u.Id;
 
-                lstDNAGroupMembers.add(gm);
-            }
-        }
+    //             lstDNAGroupMembers.add(gm);
+    //         }
+    //     }
 
-        //Insert the Permission Set Assignments
-        if(!lstPermissionSets.isEmpty()) { 
-            insert lstPermissionSets;  
-        }
+    //     //Insert the Permission Set Assignments
+    //     if(!lstPermissionSets.isEmpty()) { 
+    //         insert lstPermissionSets;  
+    //     }
 
-        //Insert the public group memberships
-        if(!lstDNAGroupMembers.isEmpty()) {
-            insert lstDNAGroupMembers;  
-        }
-    }
+    //     //Insert the public group memberships
+    //     if(!lstDNAGroupMembers.isEmpty()) {
+    //         insert lstDNAGroupMembers;  
+    //     }
+    // }
 
     /*
      * @description:    Remove previously provisioned permission sets and public group assignments for dealer users

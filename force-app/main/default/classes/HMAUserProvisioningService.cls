@@ -109,7 +109,7 @@ public without sharing class HMAUserProvisioningService {
          * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
         */
         Map<Id, List<String>> userTempAccesstype = getTempAccess(mapUserProvisionAccessTypes).size()>0 ? getTempAccess(mapUserProvisionAccessTypes) : null;
-        if(userTempAccesstype.size()>0){
+        if(userTempAccesstype!=null && userTempAccesstype.size()>0){
             for(Id usrId : userTempAccesstype.keySet()){
                 for(String accesstype: userTempAccesstype.get(usrId)){
                     accessTypes.add(accesstype);
@@ -156,7 +156,7 @@ public without sharing class HMAUserProvisioningService {
                 /**DPM-6005 If the user is the extenal user who has access to temporary account,
                  * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
                 */
-                if(userTempAccesstype.containsKey(userProvisionng.User__c)){
+                if(userTempAccesstype!=null && userTempAccesstype.containsKey(userProvisionng.User__c)){
                     userAccessTypes.addALL(userTempAccesstype.get(userProvisionng.User__c));
                 }//DPM-6005 end
                 for(String userAccessType : userAccessTypes) {
@@ -511,7 +511,8 @@ public without sharing class HMAUserProvisioningService {
                         }
 
                         //Added by Areum on 11-01-2024 for DNAMS PIR
-                        if(user.DPM_User__c == false && user.CUV_User__c == false && (user.DNAMS_User__c == true || user.DNAMS_Internal_User__c == true) && userAccessTypes.size() == 1) {
+                        //Changed the condition from (user.DNAMS_User__c == true || user.DNAMS_Internal_User__c == true) to  user.DNAMS_User_Flag__c == true [DPM-6020] by Minhee Kim 01.21.2025
+                        if(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true && userAccessTypes.size() == 1) {
                             user.UserRoleId = null;
                         }
 
@@ -522,7 +523,8 @@ public without sharing class HMAUserProvisioningService {
                     
                     if(prioriyIndexProfile == null && currentUserProfileLicenseType != null) {
                         // Soyeon Kim changes for DPM-4640
-                        User minimumUser = [select DNAMS_User__c, DNAMS_Internal_User__c, DNAMS_User_Flag__c from User where Id = :user.Id];
+                         //Removed  DNAMS_Internal_User__c, DNAMS_User_Flag__c from query [DPM-6020] by Minhee Kim - 01.21.2025
+                        User minimumUser = [select DNAMS_User_Flag__c from User where Id = :user.Id];
                     
                         /*if(!minimumUser.DNAMS_User__c && !minimumUser.DNAMS_Internal_User__c){ //DPM-5015 added '!minimumUser.DNAMS_Internal_User__c' condition by MinheeKim - 24.04.11
                             user.ProfileId = minimumProfileLicenseTypeToProfileIdMap.get(currentUserProfileLicenseType);
@@ -537,11 +539,13 @@ public without sharing class HMAUserProvisioningService {
                         //DPM-5015 end
                         // Soyeon Kim changes finish
 
-                        if(!minimumUser.DNAMS_Internal_User__c && !minimumUser.DNAMS_User__c){ //DPM-5015 added '!minimumUser.DNAMS_Internal_User__c' condition by MinheeKim - 24.04.11
+                        if(!minimumUser.DNAMS_User_Flag__c){ //DPM-5015 added '!minimumUser.DNAMS_Internal_User__c' condition by MinheeKim - 24.04.11
+                        //Changed the condition from !minimumUser.DNAMS_Internal_User__c && !minimumUser.DNAMS_User__c to !minimumUser.DNAMS_User_Flag__c [DPM-6020] by Minhee Kim - 01.21.2025
                             user.ProfileId = minimumProfileLicenseTypeToProfileIdMap.get(currentUserProfileLicenseType); 
                         }
                         //DPM-5015 added else if condition to provide hyundai user internal profile to DNAMS internal user with no access type by  MinheeKim - 24.04.11
-                        else if(minimumUser.DNAMS_Internal_User__c && userProvisionng.FederationIdentifier__c!=null){
+                        else if(minimumUser.DNAMS_User_Flag__c && userProvisionng.FederationIdentifier__c!=null){ 
+                            //Changed the condition from minimumUser.DNAMS_Internal_User__c to minimumUser.DNAMS_User_Flag__c [DPM-6020] by Minhee Kim - 01.21.2025
                             if(userProvisionng.FederationIdentifier__c.toLowerCase().contains(HYUNDAI) || userProvisionng.FederationIdentifier__c.toLowerCase().contains(GENESIS)){
                                 user.ProfileId = profileNameToProfileIdMap.get(HYUNDAIprofile);
                             }
@@ -1413,13 +1417,15 @@ public without sharing class HMAUserProvisioningService {
     * Edited by [Minhee Kim] on [2024-03-26] for [DPM-5418] changed user assignment not to get DNAMS only user
     * Edited by [Minhee Kim] on [2024-04-11] for [DPM-5015] added DNAMS_Internal_User__c to query
     * Edited by Areum on 11-04-2024 for DNAMS PIR
+    * Edited by [Minhee Kim] on [2025-01-21] for [DPM-6020] remove DNAMS_Internal_User__c to consolidate the flags
     */
     
     private static Map<Id, User> getUserMap(Set<Id> userIds) {
         try{
             Map<Id, User> userMap = new Map<Id, User>(); 
             //DPM-5015 DNAMS_Internal_User__c
-            for(User user:[select Id, Profile.Name, UserRole.DeveloperName, UserRoleId, Profile.UserLicense.Name, IsActive, DPM_User__c, CUV_User__c, DNAMS_User__c, DNAMS_Internal_User__c, isRegionManager__c, RM_Region_Codes__c, DNAMS_User_Flag__c from User where Id in :userIds]) {
+            //Remove DNAMS_Internal_User__c, DNAMS_User__c from query [DPM-6020] by Minhee Kim - 01.21.2025
+            for(User user:[select Id, Profile.Name, UserRole.DeveloperName, UserRoleId, Profile.UserLicense.Name, IsActive, DPM_User__c, CUV_User__c,  isRegionManager__c, RM_Region_Codes__c, DNAMS_User_Flag__c from User where Id in :userIds]) {
                 //Changes Made by Dhiraj starts here DPM-4466 
                 System.debug('user');
                 System.debug(user);

@@ -865,15 +865,15 @@ public without sharing class UserTriggerHelper {
                 }
             }
 
-            for (User usr: [SELECT Id, AccessTypes__c, UserRoleId, UserRole.Name, Safety_User__c, DPM_User__c, DNAMS_Internal_User__c, DNAMS_User__c, DNAMS_User_Flag__c, ProfileId, Profile.Name, ContactId 
+            for (User usr: [SELECT Id, AccessTypes__c, UserRoleId, UserRole.Name, Safety_User__c, DPM_User__c, DNAMS_User_Flag__c, ProfileId, Profile.Name, ContactId 
                               FROM User
-                             WHERE Id IN: listUserId]) {
+                             WHERE Id IN: listUserId]) { //Removed DNAMS_Internal_User__c, DNAMS_User__c from query [DM-6020] by MinheeKim 01.21.2025
                                     
                 usr.Safety_User__c = FALSE;
                 usr.DPM_User__c = FALSE;
                 usr.CUV_User__c = false;
-                usr.DNAMS_Internal_User__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR
-                usr.DNAMS_User_Flag__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR
+                // usr.DNAMS_Internal_User__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR //Changed to comments [DPM-6020] by MinheeKim 01.21.2025
+                 usr.DNAMS_User_Flag__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR
 
                 //DPM-6005 Update DNAMS_User_Flag__c = true
                 if(usr.ContactId != null && contactDNAMSMap.containsKey(usr.ContactId)) {
@@ -902,7 +902,7 @@ public without sharing class UserTriggerHelper {
                                 if(at.containsIgnoreCase('DNA_HyundaiExt') || at.containsIgnoreCase('DNA_GenesisExt')) {
                                     usr.DNAMS_User_Flag__c = true;
                                 } else {
-                                    usr.DNAMS_Internal_User__c = true; 
+                                   // usr.DNAMS_Internal_User__c = true; //Changed to comments [DPM-6020] by MinheeKim 01.21.2025
                                     usr.DNAMS_User_Flag__c = true;
                                 }
                             }
@@ -1063,7 +1063,7 @@ public without sharing class UserTriggerHelper {
      * [Method Description] 
      * Prevent isActive from being false when DNAMS_Internal_User__c is true.
      * Created by [Jonghoon Kim] on [24-08-27] for [Ticket DPM-5754]
-     * Edited by [Author] on [Date] for [Ticket #]
+     * Edited by [Minhee Kim] on [01.21.2025] for [DPM-6020]
     */
     public static void DNAMsIUActive(Map<Id, User> oldMap, Map<Id, User> newMap) {  
         try {
@@ -1071,7 +1071,7 @@ public without sharing class UserTriggerHelper {
                 User newUser = newMap.get(userId);
                 User oldUser = oldMap.get(userId);
                 
-                if (newUser.DNAMS_Internal_User__c == true) {
+                if (newUser.DNAMS_User_flag__c == true) { //Changed from DNAMS_Internal_User__c to DNAMS_User_flag__c [DPM-6020] by MinheeKim 01.21.2025
                     if (newUser.IsActive == false) {
                         newUser.IsActive = true;
                     }
@@ -1140,7 +1140,7 @@ public without sharing class UserTriggerHelper {
                 newUser.Safety_User__c = FALSE;
                 newUser.DPM_User__c = FALSE;
                 newUser.CUV_User__c = false;
-                newUser.DNAMS_Internal_User__c = false;
+                //newUser.DNAMS_Internal_User__c = false; //Changed to comments by MinheeKim [DPM-6020] 01.21.2025
                 newUser.DNAMS_User_Flag__c = false;
 
                 newUser.RegionCodes__c= null;

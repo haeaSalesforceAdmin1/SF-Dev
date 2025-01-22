@@ -1237,7 +1237,7 @@ public with sharing class UserTriggerHandlerTest {
         
         Test.startTest();
         testUser.IsActive = false;
-        testUser.DNAMS_Internal_User__c = true;
+        testUser.DNAMS_User_Flag__c = true; //Changed from DNAMS_Internal_User__c to DNAMS_User__c [DPM-6020] by Minhee Kim - 01.21.2025
         
         update testUser;
         Test.stopTest();
