@@ -117,6 +117,7 @@ public without sharing class UserTriggerHelper {
                     Contact con = new Contact();
                     con.Id = usr.ContactId;
                 
+
                 if (String.isNotBlank(usr.AccessTypes__c)) {
                     con.Access_Types__c = prepareAccessTypes(usr.AccessTypes__c);
                     // Soyeon Kim changes for DPM-4448
@@ -135,15 +136,9 @@ public without sharing class UserTriggerHelper {
                         con.Active_CUV_User__c = false; 
                     }
                     // CUV Program Changes - End
-
-                    
+ 
                     // DNAMS
-                    if(contactDNAMSMap.containsKey(usr.ContactId)) {
-                        //DPM-6005 Update DNAMS_Active_User__c = true
-                        System.debug('### Maintaining Contact DNAMS access');
-                        con.DNAMS_Active_User__c = true;
-                    } 
-                    else if(usr.AccessTypes__c.contains('DNA')){ // Added by Areum on 11-01-2024 for DNAMS PIR
+                    if(usr.AccessTypes__c.contains('DNA')){ // Added by Areum on 11-01-2024 for DNAMS PIR
                         con.DNAMS_Active_User__c = true;
                     } else if(!usr.AccessTypes__c.contains('DNA')){
                         con.DNAMS_Active_User__c = false;
@@ -163,6 +158,12 @@ public without sharing class UserTriggerHelper {
                     con.DNAMS_Role__c = null; // Added by Areum on 11-01-2024 for DNAMS PIR
                 }
                 
+                //DPM-6005 Update DNAMS_Active_User__c = true
+                if(contactDNAMSMap.containsKey(usr.ContactId)) {
+                    System.debug('### Maintaining Contact DNAMS access');
+                    con.DNAMS_Active_User__c = true;
+                }
+
                 listConToUpd.add(con);
                 
             }

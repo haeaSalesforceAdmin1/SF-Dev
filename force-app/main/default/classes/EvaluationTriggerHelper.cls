@@ -7,7 +7,33 @@
  * ---------------------------
  */
 public without sharing class EvaluationTriggerHelper {
-    
+
+     /**Start - [TBD] To fix error occuring while many files at COPP Comfidential button */
+    private static String cachedUserProfileName;
+    private static RecordType cachedSalesRecType;
+    private static RecordType cachedServiceRecType;
+
+    public static String getUserProfileName() {
+        if (cachedUserProfileName == null) {
+            cachedUserProfileName = [SELECT Profile.Name FROM User WHERE Id = :UserInfo.getUserId()].Profile.Name;
+        }
+        return cachedUserProfileName;
+    }
+
+    public static RecordType getSalesRecType() {
+        if (cachedSalesRecType == null) {
+            cachedSalesRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Sales' LIMIT 1];
+        }
+        return cachedSalesRecType;
+    }
+
+    public static RecordType getServiceRecType() {
+        if (cachedServiceRecType == null) {
+            cachedServiceRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' LIMIT 1];
+        }
+        return cachedServiceRecType;
+    }
+     /**End - [TBD] To fix error occuring while many files at COPP Comfidential button */
     /**
      * Description: [Prevent Duplicate Reocrd] 
      * Created by [JonghoonKim] on [11-08-2024] for [Ticket 5924]
@@ -897,14 +923,18 @@ public static void evaluationDPMRTopicChange(List<Evaluation__c> newEvaluations,
    * Prevent the record to be edited when the status is Completed
    * @param {List<Evaluation__c>} newEvaluations - new Evaluation list
    * @param {Map<Id, Evaluation__c>} oldEvaluationsMap 
-   * 
+   * Edited by [Minhee Kim] on [01-27-2025] for [TBD] To fix error occuring while many files at COPP Comfidential button
    */
      public static void updateGenesisEvaluation(List<Evaluation__c> newEvaluations,Map<Id, Evaluation__c> oldEvaluationsMap){
-         // Get the profile name of the current user
-        String userProfileName = [SELECT Profile.Name FROM User WHERE Id = :UserInfo.getUserId()].Profile.Name;
-        RecordType salesRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Sales' LIMIT 1];
-        RecordType serviceRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' LIMIT 1];
+         /**Start - [TBD] To fix error occuring while many files at COPP Comfidential button */
+        // String userProfileName = [SELECT Profile.Name FROM User WHERE Id = :UserInfo.getUserId()].Profile.Name;
+        // RecordType salesRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Sales' LIMIT 1];
+        // RecordType serviceRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' LIMIT 1];
 
+        String userProfileName = getUserProfileName();
+        RecordType salesRecType =  getSalesRecType();
+        RecordType serviceRecType = getServiceRecType();
+        /**End -[TBD] To fix error occuring while many files at COPP Comfidential button */
         for(Evaluation__c evaluation:newEvaluations) {
             Evaluation__c oldEval = oldEvaluationsMap.get(evaluation.Id);
             if(evaluation.RecordTypeId !=null && (evaluation.RecordTypeId==salesRecType.Id||evaluation.RecordTypeId==serviceRecType.Id)){
