@@ -244,9 +244,60 @@
         });
         $A.enqueueAction(actionGetNeworkId);
     },
+
+    /**
+     * Edited by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
+     saveWarrantyData:function(component,event,helper,warrantyStatus){        
+        var isSave = helper.validateWarrantyData(component,event,helper);
+
+        if(isSave){
+        
+            var surveyWarrantyQuestionsToUpdate = [];
+            var surveySectionQuestionsList = component.get("v.surveyWarrantyQuestionList");
+
+            var surveyQuestion={};
+            surveyQuestion.Id = component.get("v.surveyId");
+            surveyQuestion.Status__c =warrantyStatus;
+           	surveyWarrantyQuestionsToUpdate.push(surveyQuestion);
+
+
+            //Updating the Survey
+            var action = component.get("c.updateWarrantySurveyQuestion");
+        	action.setParams({"questions": surveySectionQuestionsList, "surveyId" : surveyQuestion.Id, "surveyStatus": surveyQuestion.Status__c});
+        	action.setCallback(this, function(response) { 
+        		
+                if(response.getState()==="SUCCESS"){
+                    
+                    component.set("v.showSpinner", false);
+                    helper.getWarrantySurveyQuestions(component,event,helper);
+                    //location.reload();
+                    //getWarrantySurveyQuestions(component,event,helper);
+                    $A.get('e.force:refreshView').fire();
+                    component.set("v.isSubmitted", true);
+
+                    component.set("v.showReadonlyPage", true);
+                    if(warrantyStatus=='Completed'){
+                        component.set("v.hasEditAccess", false);
+                    }
+                }else{
+                    console.log('Something wrong happen');
+                }
+            });
+            $A.enqueueAction(action);
+        }else{
+    		component.set("v.showSpinner", false);
+		}
+  
+    },
+
   
     //Dhiraj Warranty Warranty Review DPM-4390
-    saveWarrantyData:function(component,event,helper,warrantyStatus){
+    /**
+     * Changed to comments by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
+    /**
+     * saveWarrantyData:function(component,event,helper,warrantyStatus){
         helper.validateWarrantyData(component,event,helper);
         var isSave = false;
         if(component.get("v.showQ15")) {  //  Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]
@@ -417,7 +468,7 @@
     		component.set("v.showSpinner", false);
 		}
   
-    },
+    },*/
     
 
     //DPM-4390
@@ -522,7 +573,78 @@
     },
    
     //Dhiraj Warranty Review DPM-4390
+    /**
+     * Edited by [Minhee Kim] on [01.21.2025] for [DPM-5871] To use dynamic variable for survey questions
+     */
     validateWarrantyData:function(component,event,helper){
+        var warrantyQuestionList =component.get("v.surveyWarrantyQuestionList");
+        var customError = component.get("v.customError");
+        customError.length = surveyWarrantyQuestionList.length;
+        customError.fill("");
+        let firstNum = warrantyQuestionList[0].Response_Number_2__c;
+        let secInput = (warrantyQuestionList[1].Response_Number_2__c!==''||  warrantyQuestionList[1].Response_Number_2__c!==undefined) ? firstNum - warrantyQuestionList[1].Response_Number_2__c : firstNum;
+        var inputCompare = 0;
+            
+    	warrantyQuestionList.forEach((warQuestions, index)=>{
+            
+                if(firstNum>=0 && firstNum!='' && firstNum!=undefined){
+                    if(index==1){
+                        if(secInput>=0 && warQuestions.Response_Number_2__c>=0 && warQuestions.Response_Number_2__c!=='' && warQuestions.Response_Number_2__c!=undefined){
+                            warQuestions.Other_Response_Text__c = ((warQuestions.Response_Number_2__c/firstNum)*100).toString()+'%';
+                            //component.set('v.warQuestions.values.PercentageNUMBEROFROSWITHDATEMILEAGEDISCREPANCY',(warQuestions.values.NUMBEROFROSWITHOUTANYDISCREPANCIES/warQuestions.values.NUMBEROFROSREVIEWED)*100);
+                        }else{
+                            customError[index] ="Value must be less than Q1";
+                        }
+                        //Compare value    	                Q1                                          Q2
+                        inputCompare =  (warrantyQuestionList[1].Response_Number_2__c!==''||  warrantyQuestionList[1].Response_Number_2__c!==undefined) ?  firstNum-warrantyQuestionList[1].Response_Number_2__c : firstNum;
+                    }else if(index!==1 || index!==0){
+                        let tempInput=0; 
+                        if(warQuestions.Response_Number_2__c ==undefined ||warQuestions.Response_Number_2__c ==''){
+                            tempInput =inputCompare;
+                        }else{                                      //Q3
+                            tempInput =inputCompare - warQuestions.Response_Number_2__c;
+                        }
+                        if(tempInput>=0){
+                            if(warQuestions.Response_Number_2__c ==undefined || warQuestions.Response_Number_2__c==''){
+                                warQuestions.Other_Response_Text__c ='0%';
+                                }
+                            else{
+                                let percent = (warQuestions.Response_Number_2__c/firstNum)*100;
+                                warQuestions.Other_Response_Text__c =percent.toString()+'%';
+                                
+                            }
+                            customError[index] = ""; 
+                        }else{
+                            customError[index] = `Value must be less than or equal ${inputCompare}`;
+                        }
+                    }
+
+                }
+                else{
+                    customError[0] = "Please Enter Value";                     
+            }
+    
+        });
+
+        component.set("v.surveyWarrantyQuestionList" , warrantyQuestionList);
+        component.set("v.customError",customError);
+
+        let noError=true;
+        customError.forEach(error=>{
+            if(error!=""){
+                noError=false;
+            }else if(!noError){
+                return noError;
+            }
+        });		
+        return noError;
+	},
+
+    //Dhiraj Warranty Review DPM-4390
+    /**
+     * Changed to comments by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
+    /**validateWarrantyData:function(component,event,helper){
         var warrantyQuestionList =component.get("v.surveyWarrantySectionQuestionsMapData");
 
     		warrantyQuestionList.forEach(warQuestions=>{
@@ -802,10 +924,45 @@
             }
         });
  				
-	},
+	},*/
    
     //Dhiraj Warranty review DPM-4390
+    /**
+     * Edited by [Minhee Kim] on [01.21.2025] for [DPM-5871] To use dynamic variable for survey questions
+     */
     getWarrantySurveyQuestions:function(component,event,helper){
+       
+        var action = component.get("c.getSurveyWarrantyReviewQuestions");
+        var recordId = component.get("v.recordId");
+
+        action.setParams({"recordId": recordId, launchedFromEval : component.get("v.launchedFromEval")});
+        action.setCallback(this, function(response) {
+            
+            var results = response.getReturnValue();
+            var surveyId = results[0].Id;
+            component.set("v.surveyId", surveyId);
+            
+            //Show Read Only permission checking
+            var results = response.getReturnValue();
+            if(results.length > 0) {
+                if(results[0].Status__c == 'Completed') {
+                    component.set("v.showReadonlyPage", true); 
+                    component.set("v.isSurveyCompletion",true);
+                }
+            }
+            component.set("v.surveyWarrantyQuestionList", results);
+            console.log('surveyWarrantyQuestionList: '+ component.get("v.surveyWarrantyQuestionList"));
+            component.set("v.showSpinner", false);
+
+        });
+        $A.enqueueAction(action);
+    },
+
+    /**
+     * Changed to comments by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
+    /**
+     *getWarrantySurveyQuestions:function(component,event,helper){
        
         var action = component.get("c.getSurveyWarrantyReviewQuestions");
         var recordId = component.get("v.recordId");
@@ -827,17 +984,16 @@
                     component.set("v.isSurveyCompletion",true);
                 }
             }
-            component.set("v.surveyWarrantyQuestionList", results);
             
-            /**  Changed to comments by Minhee Kim - 01.16.2025 [DPM-5871]
+            
             //Handling Questions
             let surveyWarrantySectionTemp=[];
             let surveyWarrantySectionQuestionsMapDataTemp=[];
             var surveyWarrantyQuestionMap={};
             var inputQuestionList={};
-             /**  Changed to comments by Minhee Kim - 01.16.2025 [DPM-5871]
             if(results.length > 0) {
                 results.forEach(record => {
+                    
                     let questionsList={};
                     questionsList.NUMBEROFROSREVIEWED = record.NumberOfRosReviewed__c;
 
@@ -884,20 +1040,23 @@
                     questionsList.NumberOfRosWithInsufficientDigtalDoc = record.NumberOfRosWithInsufficientDigtalDoc__c;
                     questionsList.PercentageNumberOfRosWithInsufficientDigtalDoc = record.PerNumberOfRosWithInsufficientDigtalDoc__c;
 
-                    inputQuestionList.push(questionsList);
+                    //inputQuestionList.push(questionsList);
 
 
-                    inputQuestionList=questionList;
+                    //inputQuestionList=questionList;
                     surveyWarrantyQuestionMap.values=questionsList;
                     surveyWarrantySectionQuestionsMapDataTemp[0]=surveyWarrantyQuestionMap;
                     component.set("v.showSpinner", false);
                 });
-            }*/
-                component.set("v.showSpinner", false);
-			  //component.set("v.surveyWarrantySectionQuestionsMapData", surveyWarrantySectionQuestionsMapDataTemp);// Changed to comments by Minhee Kim - 01.16.2025 [DPM-5871]
+            }
+               
+			  component.set("v.surveyWarrantySectionQuestionsMapData", surveyWarrantySectionQuestionsMapDataTemp);
         });
         $A.enqueueAction(action);
     },
+     */
+
+
     
     
     getEvaluationAccountContacts : function(component, event, helper, accountId) {

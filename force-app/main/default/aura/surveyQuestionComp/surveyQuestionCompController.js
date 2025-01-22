@@ -39,13 +39,6 @@
         //component.set("v.showSpinner", true);
 
         var evaluation = response.getReturnValue();
-
-        // Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]
-        if (evaluation && evaluation.Name.includes('2024 Q4')) {
-            component.set("v.showQ15", true); 
-        } else {
-            component.set("v.showQ15", false);
-        }
             
         component.set("v.warrantyReview22", evaluation.Survey__r.X22_Warranty_Review__c);
 
@@ -63,7 +56,11 @@
             $A.enqueueAction(action);
 
             helper.getWarrantySurveyQuestions(component,event,helper);
-        }else{
+        }else if(evaluation.Evaluation_Type__c.includes('Warranty RO Review')){ /**Start : DPM-5871 added else if by Minhee Kim 01.21.2025 */
+            component.set("v.customError", []);
+            helper.getWarrantySurveyQuestions(component,event,helper);
+        } /**End : DPM-5871 added else if by Minhee Kim 01.21.2025 */
+        else{
 
             if(component.get("v.launchedFromEval")) {
                 helper.getEvaluationDetails(component, event, helper);

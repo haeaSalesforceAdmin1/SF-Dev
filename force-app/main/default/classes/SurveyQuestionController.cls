@@ -47,11 +47,12 @@ public without sharing class SurveyQuestionController {
             String surveyId = evals[0].Survey__c;
             //sql +=' from Survey_Question__c where Survey__c = :surveyId order by Section_Number__c NULLS LAST, Question_Number_Text__c NULLS LAST';
            // sql +=' from Survey__c where Id = :surveyId order by CreatedDate ASC'; //changed to comment by Minhee Kim - 01.10.2025 [DPM-5871]
-           sql +=' from Survey_Question__c where Survey__c= :recordId order by Survey__c, Question_Number__c asc';
+           sql +=' from Survey_Question__c where Survey__c= :surveyId order by Survey__c, Question_Number__c asc';
 
         }
         surveyQuestions = Database.query(sql);  
 
+        System.debug('surveyQuestions: '+surveyQuestions);
         return surveyQuestions;
     }
 
@@ -91,8 +92,33 @@ public without sharing class SurveyQuestionController {
         }
     }
 
-    //DPM-4390
+    /**
+     * Created by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
     @AuraEnabled
+        public static void updateWarrantySurveyQuestion(Survey_Question__c questions, String surveyId, String surveyStatus) {
+            Survey__c survey = [SELECT Id, Status__c FROM Survey__c WHERE Id=: surveyId LIMIT 1];
+
+            try{
+                if(survey!=null){
+                    survey.Status__c = surveyStatus;
+                    update survey;
+                }
+                update questions;
+                
+            }catch (AuraHandledException e) { 
+                throw e;
+            } catch(Exception e) {
+                System.debug(e.getMessage());
+            }
+
+        }
+
+    //DPM-4390
+   /**
+     * Changed to comments by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
+     */
+    /** @AuraEnabled
     public static void updateWarrantySurveyQuestion(String surveyJSON){
         try {
 
@@ -141,7 +167,7 @@ public without sharing class SurveyQuestionController {
         catch(Exception e) {
             System.debug(e.getMessage());
         }
-    }
+    } */
     
     
     @AuraEnabled
@@ -190,6 +216,7 @@ public without sharing class SurveyQuestionController {
     @AuraEnabled
     public static Evaluation__c retrieveEvaluationDetails(String recordId, Boolean launchedFromEval) {
         //DPM-5399 added Survey__r.Status__c by Minhee - 24.03.07
+        //DPM-5871 added Evaluation_Type__c  by Minhee - 01.21.2025
         // Add X22_Warranty_Review__c by Dhiraj
         if(launchedFromEval) {
             return [
@@ -200,7 +227,7 @@ public without sharing class SurveyQuestionController {
                     , Account__c
                     , PrimaryContactName__c
                     , PrimaryContactDate__c
-                    , ApprovalStatus__c, Survey__c, Survey__r.Status__c, Total_Score__c, No_Review_Needed__c,Survey__r.X22_Warranty_Review__c
+                    , ApprovalStatus__c, Survey__c, Survey__r.Status__c, Total_Score__c, No_Review_Needed__c,Survey__r.X22_Warranty_Review__c,Evaluation_Type__c 
                 FROM    Evaluation__c
                 WHERE   Id = :recordId
             ];
