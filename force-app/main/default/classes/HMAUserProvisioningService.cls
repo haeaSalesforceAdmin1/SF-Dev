@@ -102,6 +102,7 @@ public without sharing class HMAUserProvisioningService {
      * Created by [Author] on [Date] for [Ticket #]
      * Edited by [MinheeKim] on [04.08.24] for [DPM-5447]  added exception 
      * Edited by [MinheeKim] on [01.17.25] for [DPM-6005]  added logic to check if the user is the extenal user who has access to temporary account
+     * Edited by [MinheeKim] on [01.22.25] for [DPM-6032]  Added condition to check null for userTempAccesstype
     */
     private static void provisionPermissionSetGroupAccess(List<HMAUserProvisioning__c> listOfHMAUserProvisionings, Map<Id, List<String>> mapUserProvisionAccessTypes, Set<String> accessTypes) {
     
@@ -109,7 +110,7 @@ public without sharing class HMAUserProvisioningService {
          * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
         */
         Map<Id, List<String>> userTempAccesstype = getTempAccess(mapUserProvisionAccessTypes).size()>0 ? getTempAccess(mapUserProvisionAccessTypes) : null;
-        if(userTempAccesstype!=null && userTempAccesstype.size()>0){
+        if(userTempAccesstype!=null && userTempAccesstype.size()>0){ //DPM-6032 Added condition 'userTempAccesstype!=null && ' by MinheeKim 01.22.2025
             for(Id usrId : userTempAccesstype.keySet()){
                 for(String accesstype: userTempAccesstype.get(usrId)){
                     accessTypes.add(accesstype);
@@ -156,7 +157,7 @@ public without sharing class HMAUserProvisioningService {
                 /**DPM-6005 If the user is the extenal user who has access to temporary account,
                  * Add DNA_GenesisExt or DNA_HyundaiExt to accessTypeToPermissionSetGroupAPINameMap
                 */
-                if(userTempAccesstype!=null && userTempAccesstype.containsKey(userProvisionng.User__c)){
+                if(userTempAccesstype!=null && userTempAccesstype.containsKey(userProvisionng.User__c)){ //DPM-6032 Added condition 'userTempAccesstype!=null && ' by MinheeKim 01.22.2025
                     userAccessTypes.addALL(userTempAccesstype.get(userProvisionng.User__c));
                 }//DPM-6005 end
                 for(String userAccessType : userAccessTypes) {

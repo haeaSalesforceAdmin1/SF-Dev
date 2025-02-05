@@ -62,6 +62,7 @@ public without sharing class UserTriggerHelper {
     * @param  oldUsersMap map of old User
     * @return none     
     * @author Vinit [10 Nov 2021] [IBM] Ticket DPM-177
+    * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] edit condition to run the method when the accesstype is not changed
     */
     public static void updateAccessTypeOnContact(List<User> newUsersList, Map<Id,User> oldUsersMap){
         ContactTriggerHandler.runByUserTrigger=true;
@@ -69,15 +70,13 @@ public without sharing class UserTriggerHelper {
         List<Id> listUserId = new List<Id>();
     
             for (User usr : newUsersList) {
-            
-                if((oldUsersMap == NULL  
-                    || (oldUsersMap != NULL && usr.AccessTypes__c != oldUsersMap.get(usr.Id).AccessTypes__c))
-                    && usr.IsActive) { //String.isNotBlank(usr.AccessTypes__c) DPM-4454 to comment to run Contact trigger when accesstype is null
+                if(usr.IsActive) { //String.isNotBlank(usr.AccessTypes__c) DPM-4454 to comment to run Contact trigger when accesstype is null
+                    // DPM-5620 changed to comment by MinheeKim 01.30.2025 : (oldUsersMap == NULL  || (oldUsersMap != NULL && usr.AccessTypes__c != oldUsersMap.get(usr.Id).AccessTypes__c))&& 
                         listUserId.add(usr.Id);
                 }
             }
             
-            if (listUserId != NULL && listUserId.size() > 0) {
+            if (listUserId != NULL && listUserId.size() > 0 && !System.isBatch() && !System.isfuture()) {
                 updateAccessType(listUserId);
                 if (!System.isBatch() && !System.isfuture()) {
                     updateAccConChanges(listUserId);
@@ -114,10 +113,9 @@ public without sharing class UserTriggerHelper {
             }
 
             for (User usr : users) {
-                    Contact con = new Contact();
-                    con.Id = usr.ContactId;
+                Contact con = new Contact();
+                con.Id = usr.ContactId;
                 
-
                 if (String.isNotBlank(usr.AccessTypes__c)) {
                     con.Access_Types__c = prepareAccessTypes(usr.AccessTypes__c);
                     // Soyeon Kim changes for DPM-4448
@@ -145,6 +143,7 @@ public without sharing class UserTriggerHelper {
                         con.DNAMS_Role__c = null;
                     }
                     
+                    
                     if(usr.IsActive){
                         con.Salesforce_Active_User__c = TRUE;
                     } else {
@@ -156,21 +155,24 @@ public without sharing class UserTriggerHelper {
                     con.Active_CUV_User__c = false;
                     con.DNAMS_Active_User__c = false;
                     con.DNAMS_Role__c = null; // Added by Areum on 11-01-2024 for DNAMS PIR
-                }
+
                 
-                //DPM-6005 Update DNAMS_Active_User__c = true
-                if(contactDNAMSMap.containsKey(usr.ContactId)) {
-                    System.debug('### Maintaining Contact DNAMS access');
-                    con.DNAMS_Active_User__c = true;
                 }
 
+
+                //DPM-6005 Skip the temp account
+                if(contactDNAMSMap.containsKey(usr.ContactId)) {
+                    con.DNAMS_Active_User__c = true;
+                    
+                }
+                System.debug('### update Contact DNAMS access and role:'+con);
                 listConToUpd.add(con);
-                
             }
         
             if (listConToUpd != NULL && listConToUpd.size() >0) {
                 // Added by Areum on 11-01-2024 for DNAMS PIR
                 updateDNAMSRoles(listConToUpd);
+                
                 try {
                     update listConToUpd;
                 } catch(Exception e) {
@@ -201,6 +203,7 @@ public without sharing class UserTriggerHelper {
                 dnamsContactMap.put(con.Id, con);
             }
         }
+
         System.debug('### allContactIds: ' + allContactIds);
         System.debug('### dnamsContactMap: ' + dnamsContactMap);
         
@@ -232,7 +235,7 @@ public without sharing class UserTriggerHelper {
         }
         System.debug('### contactAccessTypes: ' + contactAccessTypes);
        
-        List<AccountContactRelation> existingACRs = [SELECT Id, Roles, ContactId, Account.DealerCode__c, Account.Name, DNAMSUser__c, DNAMSAccountUser__c, Account.Temporary_Dealer__c  
+        List<AccountContactRelation> existingACRs = [SELECT Id, Roles, ContactId, Account.DealerCode__c, Account.Name, DNAMSUser__c, DNAMSAccountUser__c, Account.Temporary_Dealer__c, Contact.DNAMS_Role__c  
                                                     FROM AccountContactRelation 
                                                     WHERE IsActive = true
                                                     AND ContactId IN :allContactIds];
@@ -250,9 +253,20 @@ public without sharing class UserTriggerHelper {
             if(dnamsContactMap.containsKey(acr.ContactId)) {
                 //DPM-6005 Skip the temp account
                 if(isTempAccount && acr.DNAMSAccountUser__c) {
-                    System.debug('### Maintaining DNAMS access for TEMP account: ' + acr.Account.Name);
-                    System.debug('### Maintaining DNAMS access for TEMP account: ' + acr.DNAMSAccountUser__c);
+                    System.debug('### Maintaining DNAMS access for TEMP account: ' + acr.Account.Name + '/' + acr.DNAMSAccountUser__c);
                     acrsToUpdate.add(acr);
+
+                    if(String.isNotBlank(acr.Roles)) {
+                        Set<String> contactRoles = new Set<String>(acr.Roles.split(';'));
+                        String dnamsRole = getDNAMSRoleByPriority(contactRoles);
+                        if(dnamsRole != null) {
+                            contactToRoleMap.put(acr.ContactId, dnamsRole);
+                        }
+                    }
+                    else if(String.isNotBlank(acr.Contact.DNAMS_Role__c)) {
+                        contactToRoleMap.put(acr.ContactId, acr.Contact.DNAMS_Role__c);
+                    }
+                    
                     continue;
                 }
 
@@ -271,6 +285,10 @@ public without sharing class UserTriggerHelper {
                             }
                         }
                     }
+                }
+                else {
+                    //DPM-6005 skip the temp account 
+                    acr.DNAMSAccountUser__c = false;
                 }
                 
                 /*if(String.isNotBlank(acr.Roles)) {
@@ -378,6 +396,8 @@ public without sharing class UserTriggerHelper {
                 con.DNAMS_Role__c = null;
             }
         }
+
+        System.debug('### updateDNAMSRoles:'+contacts);
     }
 
     public class ACRDMLException extends Exception {}
@@ -817,6 +837,7 @@ public without sharing class UserTriggerHelper {
     * @param  oldUsersMap map of old User
     * @return none     
     * @author Vinit [27 May 2022] [IBM] Ticket DPM-177
+    * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] changed to comment the condition to filter same accesstype as before
     */
     public static void updateUserAppType(List<User> newUsersList, Map<Id,User> oldUsersMap) {
     
@@ -828,7 +849,7 @@ public without sharing class UserTriggerHelper {
                 if (oldUsersMap == NULL && (usr.UserRoleId != NULL || usr.AccessTypes__c != NULL)){
                     listOfUser.add(usr.Id);
             
-                } else if (oldUsersMap != NULL && usr.AccessTypes__c != oldUsersMap.get(usr.Id).AccessTypes__c){
+                } else if (oldUsersMap != NULL){ //DPM-5620 changed to comment the condition by MinheeKim 01.30.2025 : && usr.AccessTypes__c != oldUsersMap.get(usr.Id).AccessTypes__c
                     listOfUser.add(usr.Id);
                 }
                 if (listOfUser.size() >0 && !System.isfuture() && !System.isBatch()) {

@@ -9,7 +9,7 @@ public with sharing class EvaluationTriggerHandlerTest {
         insert CE;
         User user1 = TestUtility.createInternalUser('TestOwnerUser', 'TestOwnerUser', 'System Administrator');
         User user2 = TestUtility.createInternalUser('TestOwnerUser2', 'TestOwnerUser2', 'System Administrator');
-        User user3 = TestUtility.createInternalUser('TestOwnerUser3', 'TestOwnerUser3', 'System Administrator');
+        // User user3 = TestUtility.createInternalUser('TestOwnerUser3', 'TestOwnerUser3', 'System Administrator');
 
         TestUtility.createOrganizations();
         List<Region__c> regions = TestUtility.createRegionsForOrganizations(TestUtility.HYUNDIA_ORG);
@@ -45,7 +45,9 @@ public with sharing class EvaluationTriggerHandlerTest {
         //District__c genesisDistrict = new District__c(Name = 'SELECT SOUTH 2', Organization__c = genOrg.Id, GenesisArea__c = genArea.Id );
         //insert genesisDistrict;
         Evaluation__c eval = new Evaluation__c(Name='GenesisEval',Account__c = account.Id, Organization__c = 'Genesis', Type__c='Service',MarketManager__c=user1.Id,OwnerId=user2.Id);
+        EvaluationTriggerHandler.run=false;
         insert eval;
+        EvaluationTriggerHandler.run=true;
 
         
         ContentVersion cv = new Contentversion();

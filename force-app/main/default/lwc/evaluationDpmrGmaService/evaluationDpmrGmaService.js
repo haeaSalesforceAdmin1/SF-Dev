@@ -62,6 +62,7 @@ export default class EvaluationDpmrGmaService extends NavigationMixin(LightningE
         { label: 'Campaign Completion', value: 'Campaign Completion' },
         { label: 'Customer Experience', value: 'Customer Experience' },
         { label: 'CVP/Valet', value: 'CVP/Valet' },
+        { label: 'CX Process Improvement', value: 'CX Process Improvement' }, // DPM-6029
         { label: 'Facility Inspection', value: 'Facility Inspection' },
         { label: 'Financial Performance', value: 'Financial Performance' },
         { label: 'Keystone Program', value: 'Keystone Program' },

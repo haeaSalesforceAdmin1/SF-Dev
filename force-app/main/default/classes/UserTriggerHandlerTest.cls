@@ -8,7 +8,7 @@ public with sharing class UserTriggerHandlerTest {
 
     @TestSetup
     static void makeData(){
-
+        ContentDocumentLinkTriggerHandler.run = false;
        TestUtility.createInternalUser('TestUser', 'UserAfterUpdate', 'System Administrator');
        TestUtility.createInternalUser('TestUser', 'UserBeforeUpdate', 'Hyundai User Internal');
        TestUtility.createDPMConfigurationSettings();
@@ -27,7 +27,7 @@ public with sharing class UserTriggerHandlerTest {
        accList.add(acc2);
        Account acc3 = new Account(Name = 'Test Account3', DealerCode__c='TX090');
        accList.add(acc3);
-       Account acc4 = new Account(Name = 'Test Account4', DealerCode__c='TX704');
+       Account acc4 = new Account(Name = 'Test Account4', DealerCode__c='TWE00001');
        accList.add(acc4);
        insert accList;
 
@@ -39,7 +39,7 @@ public with sharing class UserTriggerHandlerTest {
        Contact con3 = new Contact(LastName = 'DPM test contact user', Email='test3@test.con', AccountId=acc.Id, Salesforce_Active_User__c =true);
        insert con3;
         
-       Contact con4 = new Contact(LastName = 'DNA test contact user', Email='test4@test.con', AccountId=acc.Id, Salesforce_Active_User__c =true, DNAMS_Active_User__c=true);
+       Contact con4 = new Contact(LastName = 'DNA test contact user', Email='test4@test.con', AccountId=acc.Id, Salesforce_Active_User__c =true, DNAMS_Active_User__c=true, DNAMS_Role__c='Dealer Principal');
        insert con4;
 
        AccountContactRelation acr1 = [SELECT Id, AccountId, ContactId, JobCode__c FROM AccountContactRelation WHERE ContactId = :con.Id]; 
@@ -108,7 +108,7 @@ public with sharing class UserTriggerHandlerTest {
         testUser3.LocaleSidKey = 'en_US';
         testUser3.EmailEncodingKey = 'ISO-8859-1';
         testUser3.LanguageLocaleKey = 'en_US';
-        testUser3.AccessTypes__c = 'DNA_GenesisExt/TX704,DNA_HyundaiExt/TX090,DPM_BasicExt/MD703,DPM_FinExtGMA/MD703,DPM_AP_ExtRO/MD034,DPM_BasicExt/MD034,DPM_GenUserExt,DPM_HyundaiExt,DNA_BasicExt/MD034,DNA_BasicExt/MD703';
+        testUser3.AccessTypes__c = 'DNA_GenesisExt/TWE00001,DNA_HyundaiExt/TX090,DPM_BasicExt/MD703,DPM_FinExtGMA/MD703,DPM_AP_ExtRO/MD034,DPM_BasicExt/MD034,DPM_GenUserExt,DPM_HyundaiExt,DNA_BasicExt/MD034,DNA_BasicExt/MD703';
         insert testUser3;
 
         List<AccountContactRelation> acrList = new List<AccountContactRelation>();
@@ -1382,5 +1382,6 @@ public with sharing class UserTriggerHandlerTest {
         Test.stopTest();
 
     }
+
 
 }

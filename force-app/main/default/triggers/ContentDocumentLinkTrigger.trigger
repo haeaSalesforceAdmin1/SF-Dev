@@ -9,7 +9,8 @@ trigger ContentDocumentLinkTrigger on ContentDocumentLink (before insert, after 
             linkedIds.add(c.LinkedEntityId);
         }
         List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>();
-        List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where id in: linkedIds];
+        List<PIR_Element__c> pirelementList= new List<PIR_Element__c>();
+        // List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where id in: linkedIds]; // 012125
         Set<Id> pirelementIds = new Set<Id>();
         
         for(PIR_Element__c p : pirelementList){
@@ -36,7 +37,8 @@ trigger ContentDocumentLinkTrigger on ContentDocumentLink (before insert, after 
         }
         
         List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>();
-        List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where Id in:linkedIds];
+        List<PIR_Element__c> pirelementList= new List<PIR_Element__c>();
+        // List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where Id in:linkedIds]; // 012125
         Set<Id> pirelementIds = new Set<Id>();
         
         for(PIR_Element__c p : pirelementList){
@@ -61,7 +63,7 @@ trigger ContentDocumentLinkTrigger on ContentDocumentLink (before insert, after 
             linkedIds.add(c.LinkedEntityId);
         }
         List<ContentDocumentLink> cdlList = new List<ContentDocumentLink>();
-        List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where Id in: linkedIds];
+        List<PIR_Element__c> pirelementList= [select id from PIR_Element__c where Id in: linkedIds]; 
         Set<Id> pirelementIds = new Set<Id>();
         
         for(PIR_Element__c p : pirelementList){

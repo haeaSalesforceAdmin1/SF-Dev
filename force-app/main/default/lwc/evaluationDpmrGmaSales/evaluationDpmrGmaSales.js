@@ -66,6 +66,7 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
         { label: 'Certified Pre-Owned', value: 'Certified Pre-Owned' },
         { label: 'Customer Experience', value: 'Customer Experience' },
         { label: 'CVP', value: 'CVP' },
+        { label: 'CX Process Improvement', value: 'CX Process Improvement' }, // DPM-6029
         { label: 'Facility Inspection', value: 'Facility Inspection' },
         { label: 'Financial Performance', value: 'Financial Performance' },
         { label: 'Inventory / Pipeline', value: 'Inventory / Pipeline' },

@@ -53,7 +53,8 @@ public class Action_PlanTriggerHandler extends Trigger_Framework.baseHandler {
 
         //if(!accountUpdateActionPlans.isEmpty() || !RegionUpdateActionPlans.isEmpty()|| true) {
         // DPM-4754
-        //ActionPlanTriggerHelper.populateActionPlanFromAccount(newMapGeneric.values(), oldMap);
+        // DPM- 133
+        ActionPlanTriggerHelper.populateActionPlanFromAccount(newMapGeneric.values(), oldMap);
         //}
         // DPM-4548
         

@@ -165,6 +165,7 @@ public without sharing class ContentDocumentLinkTriggerHandler extends Trigger_F
         Map<Id, ContentDocumentLink> newMap = (Map<Id, ContentDocumentLink>) newMapGeneric;
         ContentDocumentLinkHelper.handlePopulatingFlagForActionPlan(newMapGeneric.values());
         ContentDocumentLinkHelper.handleEvaluationFiles(newMapGeneric.values());//DPM-5879 added by MinheeKim - 12.09.2024
+        // EvaluationFilesQueueable.handleEvaluationFiles(newMapGeneric.values());
         /*AFTER INSERT METHODS START*/
         /*AFTER INSERT METHODS END*/
     }

@@ -5,6 +5,24 @@ public without sharing class ContactTriggerHelper {
     public static final String INACTIVE = 'Inactive';
     public static final String GeneralManager = 'GM'; //DPM-5400 added by Minhee Kim - 24.04.26
 
+    /**DPM-5620 add to get current ACR */
+    private static List<AccountContactRelation> cachedACRs = new List<AccountContactRelation>();
+    private static Boolean nonACR = false;
+
+    /**
+    * Description: get AccountContactRelation
+    * ----- Change Log -----
+    * Author : [Minhee Kim] / [01-31-2025] / [DPM-5620] / Created
+    * ---------------------------
+    */
+    public static List<AccountContactRelation> getACRs(Contact newCon) {
+        if (cachedACRs.size()==0 && !nonACR) {
+            cachedACRs = [SELECT AccountId, isActive, Account.DealerCode__c, DPMAccountUser__c, DNAMSUser__c, DPM_User_Active__c, DNAMSAccountUser__c, Active_CUV_User__c FROM AccountContactRelation WHERE ContactId=:newCon.Id];
+            if(cachedACRs.size()==0) nonACR = true;
+        }
+        return cachedACRs;
+    }/**DPM-5620 end*/
+
     public static void handleExternalSharingForContacts(List<Contact> contacts) {
 //      DPM-4548
         Map<Id, Contact> contactMap = new Map<Id, Contact>();
@@ -60,6 +78,7 @@ public without sharing class ContactTriggerHelper {
     /**
      * @description:    
      * @params:         newMap - Trigger.newMap, oldMap - Trigger.oldMap
+     * Edited by  [MinheeKim] on [01-30-2025] for [DPM-5620] changed the logic to use Map<String,List<AccountContactRelation>> acrMap
      */
 
     public static void updateAccountId( Map<Id, Contact> newMap, Map<Id, Contact> oldMap) {
@@ -71,33 +90,39 @@ public without sharing class ContactTriggerHelper {
             for(Id con : newMap.keySet()){
                 Contact newCon = newMap.get(con);
                 Contact oldCon = oldMap.get(con);
-                Map<String,List<Account>> accMap = compareAccesstype(newCon, oldCon);
+                Map<String,List<AccountContactRelation>> acrMap = compareAccesstype(newCon);
                 Set<Id> inactiveAccSet = new Set<Id>();
-                Boolean haveToChangeAccount = [SELECT isActive FROM AccountContactRelation WHERE ContactId=:oldCon.Id AND AccountId=:oldCon.AccountId LIMIT 1].IsActive;
+
+                /**DPM-5620 start */
+                for(AccountContactRelation acr: acrMap.get(INACTIVE)){
+                    if(acr.AccountId == newCon.AccountId && acrMap.get(ACTIVE).size()>0){
+                        newCon.AccountId = acrMap.get(ACTIVE)[0].AccountId;
+                        break;
+                    }
+                }/**DPM-5620 end */
+                // Boolean haveToChangeAccount = [SELECT isActive FROM AccountContactRelation WHERE ContactId=:oldCon.Id AND AccountId=:oldCon.AccountId LIMIT 1].IsActive;
         
                 
-                if(accMap.get(INACTIVE).size()>0 || !haveToChangeAccount){
-                    for(Account acc: accMap.get(INACTIVE)){
-                        inactiveAccSet.add(acc.Id);
-                    }
+                // if(accMap.get(INACTIVE).size()>0 || !haveToChangeAccount){
+                //     for(Account acr: acrMap.get(INACTIVE)){
+                //         inactiveAccSet.add(acr.Id);
+                //     }
 
-                    if((inactiveAccSet.contains(newCon.AccountId) && newCon.Access_Types__c!=null && newCon.Access_Types__c!='') || !haveToChangeAccount){
-                        Integer ACRCount = [SELECT COUNT() FROM AccountContactRelation WHERE ContactId=:newCon.Id AND AccountId!=:newCon.AccountId AND isActive=true];
-                        if(ACRCount>0){
-                            Id replaceAcc = [SELECT AccountId FROM AccountContactRelation WHERE ContactId=:newCon.Id AND isActive=true LIMIT 1].AccountId;
-                            if(replaceAcc!=null){
-                                newCon.AccountId=replaceAcc;
-                            }
-                            System.debug(LoggingLevel.ERROR, 'new Account: '+newCon.AccountId);
-                        }else if(accMap.get(ACTIVE).size()>0){
-                            newCon.AccountId = accMap.get(ACTIVE)[0].Id;
-                        }
+                //     if((inactiveAccSet.contains(newCon.AccountId) && newCon.Access_Types__c!=null && newCon.Access_Types__c!='') || !haveToChangeAccount){
+                //         Integer ACRCount = [SELECT COUNT() FROM AccountContactRelation WHERE ContactId=:newCon.Id AND AccountId!=:newCon.AccountId AND isActive=true];
+                //         if(ACRCount>0){
+                //             Id replaceAcc = [SELECT AccountId FROM AccountContactRelation WHERE ContactId=:newCon.Id AND isActive=true LIMIT 1].AccountId;
+                //             if(replaceAcc!=null){
+                //                 newCon.AccountId=replaceAcc;
+                //             }
+                //             System.debug(LoggingLevel.ERROR, 'new Account: '+newCon.AccountId);
+                //         }else if(accMap.get(ACTIVE).size()>0){
+                //             newCon.AccountId = accMap.get(ACTIVE)[0].Id;
+                //         }
                         
-                    }
-                    // else{
-                    //     newCon.AccountId=null;
-                    // }
-                }
+                //     }
+                    
+                // }
             }
         }
      
@@ -106,30 +131,42 @@ public without sharing class ContactTriggerHelper {
     /**
      * [Method Description] Split contact's access type
      * Created by [MinheeKim] on [2023-12-12] for [DPM-4454]
+     * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] changed the return value from List<String> to Set<String>
     */
-    public static Map<String,List<String>> contactAccessType(Contact con) {
+    public static Map<String,Set<String>> contactAccessType(Contact con) {
         System.debug('====== contactAccessType Start ======');
         System.debug('Original Access_Types__c: ' + con.Access_Types__c);
     
         List<String> accesstypes = con.Access_Types__c.split('</p>');
         System.debug('After </p> split: ' + accesstypes);
         System.debug(accesstypes);
-        Map<String,List<String>> accesstypeMap = new Map<String,List<String>>();
+        Map<String,Set<String>> accesstypeMap = new Map<String,Set<String>>();
 
         if(accesstypes.size()>0){
             for(String accesstype: accesstypes){
                 String splitAccesstype='';
                 splitAccesstype = accesstype.split(' ')[1];
+                /**DPM-5620 start: trim the apptype*/
+                String appType = splitAccesstype.split('/')[0];
+                if(appType.contains('DPM')){
+                    appType = 'DPM';
+                }else if(appType.contains('CUV')){
+                    appType = 'CUV';
+                }else if(appType.contains('DNA')){
+                    appType = 'DNA';
+                }
+                /**DPM-5620 end */
                 if(splitAccesstype.contains('/') && accesstypeMap.containsKey(splitAccesstype.split('/')[1])){
                     System.debug('Existing dealer code found: ' + splitAccesstype.split('/')[1]);
-                    List<String> preAccesstypes = accesstypeMap.get(splitAccesstype.split('/')[1]);
-                    List<String> accesstypePerAccount = preAccesstypes;
-                    accesstypePerAccount.add(splitAccesstype.split('/')[0]);
+                    Set<String> preAccesstypes = accesstypeMap.get(splitAccesstype.split('/')[1]);
+                    Set<String> accesstypePerAccount = preAccesstypes;
+                    
+                    accesstypePerAccount.add(appType);
                     accesstypeMap.put(splitAccesstype.split('/')[1], accesstypePerAccount);   
                 }else if(splitAccesstype.contains('/')){
                     System.debug('New dealer code found: ' + splitAccesstype.split('/')[1]);
-                    List<String> accesstypePerAccount = new List<String>();
-                    accesstypePerAccount.add(splitAccesstype.split('/')[0]);
+                    Set<String> accesstypePerAccount = new Set<String>();
+                    accesstypePerAccount.add(appType);
                     accesstypeMap.put(splitAccesstype.split('/')[1], accesstypePerAccount);  
                 }
 
@@ -146,22 +183,85 @@ public without sharing class ContactTriggerHelper {
      * [Method Description] Check whether there is any deleted access type.
      * Created by [MinheeKim] on [2023-12-12] for [DPM-4454]
      * Edited by [MinheeKim] on [2024-07-10] for [DPM-5613] add logic to check the app type for each accesstype
+     * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] change the logic to compare with existing ACR and new accesstype
     */
-    public static Map<String,List<Account>> compareAccesstype(Contact newCon, Contact oldCon){
-        Map<String,List<String>> newAccesstype = new Map<String,List<String>>();
-        Map<String,List<String>> oldAccesstype = new Map<String,List<String>>();
-        Map<String,List<Account>> accMap = new Map<String,List<Account>>();
+    public static Map<String,List<AccountContactRelation>> compareAccesstype(Contact newCon){//DPM-5620 changed the paramaneter from newCon, oldCon to newCon
+        Map<String,Set<String>> newAccesstype = new Map<String,Set<String>>();
+        // Map<String,List<String>> oldAccesstype = new Map<String,List<String>>();//DPM-5620 changed to comment
+        Map<String,List<AccountContactRelation>> acrMap = new Map<String,List<AccountContactRelation>>();
 
         if(newCon.Access_Types__c!='' && newCon.Access_Types__c!=null) newAccesstype = contactAccessType(newCon);
-        if(oldCon.Access_Types__c!='' && oldCon.Access_Types__c!=null) oldAccesstype = contactAccessType(oldCon);
+        //if(oldCon.Access_Types__c!='' && oldCon.Access_Types__c!=null) oldAccesstype = contactAccessType(oldCon); //DPM-5620 changed to comment
+        List<AccountContactRelation> ACRList = getACRs(newCon); //DPM-5620 added to get existingACRs
 
         System.debug('newAccesstype: '+newAccesstype);
-        System.debug('oldAccesstype: '+oldAccesstype);
         Map<String,Set<String>> inactiveACR = new Map<String,Set<String>>(); //Map of dealer code and app
         Map<String,Set<String>> activeACR = new Map<String,Set<String>>();
-        List<Account> inactiveAcc = new List<Account>();
-        List<Account> activeAcc = new List<Account>();
+        Set<String> existingAcc = new Set<String>();
+        //List<Account> inactiveAcc = new List<Account>();
+        //List<Account> activeAcc = new List<Account>();
+        List<AccountContactRelation> acrToUpsert = new List<AccountContactRelation>();
+        List<AccountContactRelation> acrToDelete = new List<AccountContactRelation>();
+        
+        /**DPM-5620 start: added to compare the ACRs with accesstype */
+        if(ACRList.size()>0){
+            for(AccountContactRelation acr : ACRList){
+                if(newCon.Access_Types__c!='' && newCon.Access_Types__c!=null && newAccesstype.containsKey(acr.Account.DealerCode__c)){
+                    //If the dealer code of existing ACR is in new Accesstype, remain the ACR and check the flags
+                    if(acr.DPMAccountUser__c==false && newAccesstype.get(acr.Account.DealerCode__c).contains('DPM')){
+                        acr.DPMAccountUser__c = true;
+                    }else if(acr.DPMAccountUser__c==true && !(newAccesstype.get(acr.Account.DealerCode__c).contains('DPM'))){
+                        acr.DPMAccountUser__c = false;
+                    }
+                        
+                    if(acr.DNAMSAccountUser__c==false && newAccesstype.get(acr.Account.DealerCode__c).contains('DNA')){
+                        acr.DNAMSAccountUser__c = true;
+                    }else if(acr.DNAMSAccountUser__c==true && !(newAccesstype.get(acr.Account.DealerCode__c).contains('DNA'))){
+                        acr.DNAMSAccountUser__c = false;
+                    }
 
+                    if(!acr.isActive){
+                        acr.isActive = true;
+                    }
+                    acrToUpsert.add(acr);
+                        
+                }else{
+                    //If the dealer code of existing ACR isn't in new Accesstype, put the acr in list to inactive
+                    acr.isActive = false;
+                    acr.DNAMSAccountUser__c = false;
+                    acr.DPMAccountUser__c = false;
+                    acrToDelete.add(acr);
+                }
+                existingAcc.add(acr.Account.DealerCode__c);
+            }
+        }
+        //If there's no existing ACR and new access type isn't blank, create new ACR
+        if(newAccesstype.size()>0) {
+            Map<Account,Set<String>> accountAppMap =getAccountApptypeMap(newAccesstype);
+            for(Account acc : accountAppMap.keySet()){ 
+                if(!existingAcc.contains(acc.DealerCode__c)){
+                    AccountContactRelation newACR = new AccountContactRelation(AccountId = acc.Id, ContactId = newCon.Id, isActive = true);
+                    Set<String> appType = accountAppMap.get(acc);
+                    if(appType.contains('DPM')){
+                        newACR.DPMAccountUser__c = true;
+                    }else{
+                        newACR.DPMAccountUser__c = false;
+                    }
+
+                    if(appType.contains('DNA')){ //Added by Areum on 11-01-2024 for DNAMS PIR
+                        newACR.DNAMSAccountUser__c = true;
+                    }else{
+                        newACR.DNAMSAccountUser__c = false;
+                    }
+                    acrToUpsert.add(newACR);
+                }
+            }
+        }
+            
+        
+        
+        /**DPM-5620 end: added to compare the ACRs with accesstype */
+        /** DPM-5620 Changed to comments
         if(!oldAccesstype.isEmpty()){
             for(String oldDealerCode: oldAccesstype.keySet()){
                 if(newAccesstype.containsKey(oldDealerCode)){
@@ -209,16 +309,38 @@ public without sharing class ContactTriggerHelper {
                     activeACR.put(newDealerCode, appType);
                 }
             }
-        }
+        } */
 
-        activeAcc=activeAccountContactRelation(newCon, activeACR);
-        inactiveAcc=inactiveAccountContactRelation(oldCon, inactiveACR);
-        accMap.put(ACTIVE,activeAcc);
-        accMap.put(INACTIVE,inactiveAcc);
-        return accMap;
+        //activeAcc=activeAccountContactRelation(newCon, activeACR);
+        //inactiveAcc=inactiveAccountContactRelation(oldCon, inactiveACR);
+
+        try {
+            System.debug('acrToUpsert: '+acrToUpsert);
+            System.debug('acrToDelete: '+acrToDelete);
+            if(acrToUpsert.size()>0) upsert acrToUpsert;
+            if(acrToDelete.size()>0) upsert acrToDelete;
+        } catch(Exception e) {
+            System.debug(e.getMessage());
+        }
+        acrMap.put(ACTIVE,acrToUpsert);
+        acrMap.put(INACTIVE,acrToDelete);
+        return acrMap;
 
     }
     
+    /**
+     * [Method Description] get Account Apptype map
+     * Created by [MinheeKim] on [01-30-2025] for [DPM-5620]
+     * */
+    public static Map<Account,Set<String>> getAccountApptypeMap(Map<String,Set<String>> newAccesstypeMap){
+        List<Account> accList = [SELECT Id, DealerCode__c FROM Account WHERE DealerCode__c IN : newAccesstypeMap.keySet()];
+        Map<Account,Set<String>> accountAppMap = new Map<Account,Set<String>>();
+        for(Account acc : accList){
+            accountAppMap.put(acc,newAccesstypeMap.get(acc.DealerCode__c));
+        }
+
+        return accountAppMap;
+    }
 
     /**
      * [Method Description] Deactive ACR for deleted accesstype
@@ -226,7 +348,9 @@ public without sharing class ContactTriggerHelper {
      * Edited by [MinheeKim] on [2024-03-29] for [DPM-5469] change to prevent inactive DNAMS ACR
      * Edited by [MinheeKim] on [2024-07-10] for [DPM-5613] add logic to turn off DPMAccountUser flag when user loses DPM access for the account
      * Edited by Areum on 11-01-2024 for DNAMS PIR / add DNAMS logic 
+     * Edited by [MinheeKim] on [01-31-2025] for [DPM-5620] Change to comments
     */
+    /**
     public static List<Account> inactiveAccountContactRelation(Contact oldCon, Map<String,Set<String>> oldDealerCode){
         //search
         List<Account> accList = [SELECT Id FROM Account WHERE DealerCode__c IN :oldDealerCode.keySet()];
@@ -253,15 +377,16 @@ public without sharing class ContactTriggerHelper {
         }
 
         return accList;
-    }
+    } */
 
     /**
      * [Method Description] Active ACR for deleted accesstype
      * Created by [MinheeKim] on [2023-12-13] for [DPM-4454]
      * Edited by [MinheeKim] on [2024-07-10] for [DPM-5613] add logic to turn on DPMAccountUser flag when user gets DPM access for the account
      * Edited by Areum on 11-01-2024 for DNAMS PIR / add DNAMS logic 
+     * Edited by [MinheeKim] on [01-31-2025] for [DPM-5620] Change to comments
     */
-    public static List<Account> activeAccountContactRelation(Contact newCon, Map<String,Set<String>> newDealerCode){
+    /**public static List<Account> activeAccountContactRelation(Contact newCon, Map<String,Set<String>> newDealerCode){
 
         //search
         List<Account> accList = [SELECT Id , DealerCode__c FROM Account WHERE DealerCode__c IN :newDealerCode.keySet()];
@@ -318,7 +443,7 @@ public without sharing class ContactTriggerHelper {
 
         }
         return accList;
-    }
+    }*/
 
      /**
      * [Method Description] Delete the ACR 

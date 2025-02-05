@@ -985,26 +985,39 @@
                             <!--DPM-5887-->
                             <td  class="{!IF(ISBLANK(kpiWrapper.currentInitialDiff), 'diagonal-stripes', '')}">
                                 <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentInitialDiff))}">
-                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
-                                        <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
-                                    </apex:outputPanel> 
-                                    <apex:outputPanel rendered="{!kpiWrapper.isRank}">
-                                        <apex:outputPanel rendered="{!kpiWrapper.isPositiveInitialDiff}">
-                                            <apex:outputText value="+" style="color: blue" />
+                                    <!--When the color logic is normal -DPM-6035 by MinheeKim 01.22.2025-->
+                                    <apex:outputPanel rendered="{!not(kpiWrapper.oppositeColor)}">
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                            <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
+                                        </apex:outputPanel> 
+                                        <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPositiveInitialDiff}">
+                                                <apex:outputText value="+" style="color: blue" />
+                                            </apex:outputPanel>
+                                            <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
                                         </apex:outputPanel>
-                                        <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};"  />
-                                    </apex:outputPanel>
-                                    
-                                    
-                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
-                                        <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="ppt"/>
-                                    </apex:outputPanel>
-                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
-                                        <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
-                                            <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="%"/>
+                                        
+                                        
+                                        <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                                <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff < 0, 'red', IF(kpiWrapper.currentInitialDiff > 0, 'blue', 'black'))};" value="%"/>
+                                            </apex:outputPanel>
                                         </apex:outputPanel>
                                     </apex:outputPanel>
-                                    
+                                <!--When the color logic is opposite -DPM-6035 by MinheeKim 01.22.2025-->
+                                    <apex:outputPanel rendered="{!kpiWrapper.oppositeColor}">
+                                        <apex:outputText value="{!kpiWrapper.currentInitialDiff}"  style="color: {!IF(kpiWrapper.currentInitialDiff > 0, 'red', IF(kpiWrapper.currentInitialDiff < 0, 'blue', 'black'))};"  />
+                                        <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff > 0, 'red', IF(kpiWrapper.currentInitialDiff < 0, 'blue', 'black'))};" value="ppt"/>
+                                        </apex:outputPanel>
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                                <apex:outputText style="color: {!IF(kpiWrapper.currentInitialDiff > 0, 'red', IF(kpiWrapper.currentInitialDiff < 0, 'blue', 'black'))};" value="%"/>
+                                        </apex:outputPanel>
+
+                                    </apex:outputPanel>
                                 </apex:outputPanel>
 
                             </td>
@@ -1019,27 +1032,40 @@
                                 
                             </td>
                             <td class="{!IF(ISBLANK(kpiWrapper.currentTargetDiff), 'diagonal-stripes', '')}">
-                                <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentTargetDiff))}">
-                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
-                                        <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
-                                    </apex:outputPanel> 
-                                    <apex:outputPanel rendered="{!kpiWrapper.isRank}">
-                                        <apex:outputPanel rendered="{!kpiWrapper.isPositiveTargetDiff}">
-                                            <apex:outputText value="+" style="color: blue" />
+                                <!--When the color logic is normal -DPM-6035 by MinheeKim 01.22.2025-->
+                                <apex:outputPanel rendered="{!not(kpiWrapper.oppositeColor)}">
+                                    <apex:outputPanel rendered="{!NOT(ISBLANK(kpiWrapper.currentTargetDiff))}">
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}">
+                                            <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
+                                        </apex:outputPanel> 
+                                        <apex:outputPanel rendered="{!kpiWrapper.isRank}">
+                                            <apex:outputPanel rendered="{!kpiWrapper.isPositiveTargetDiff}">
+                                                <apex:outputText value="+" style="color: blue" />
+                                            </apex:outputPanel>
+                                            <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
                                         </apex:outputPanel>
-                                        <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};"  />
-                                    </apex:outputPanel>
-                                    
-                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
-                                        <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="ppt"/>
-                                    </apex:outputPanel>
-                                    <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}"> 
-                                        <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
-                                            <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="%"/>
+                                        
+                                        <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="ppt"/>
+                                        </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isRank)}"> 
+                                            <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                                <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff < 0, 'red', IF(kpiWrapper.currentTargetDiff > 0, 'blue', 'black'))};" value="%"/>
+                                            </apex:outputPanel>
                                         </apex:outputPanel>
                                     </apex:outputPanel>
                                 </apex:outputPanel>
-                                <!-- When current vs targer is null -->
+                                <!--When the color logic is opposite -DPM-6035 by MinheeKim 01.22.2025-->
+                                <apex:outputPanel rendered="{!kpiWrapper.oppositeColor}">
+                                    <apex:outputText value="{!kpiWrapper.currentTargetDiff}"  style="color: {!IF(kpiWrapper.currentTargetDiff > 0, 'red', IF(kpiWrapper.currentTargetDiff < 0, 'blue', 'black'))};"  />
+                                    <apex:outputPanel rendered="{!kpiWrapper.isPercent}">
+                                        <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff > 0, 'red', IF(kpiWrapper.currentTargetDiff < 0, 'blue', 'black'))};" value="ppt"/>
+                                    </apex:outputPanel>
+                                        <apex:outputPanel rendered="{!not(kpiWrapper.isPercent)}">
+                                            <apex:outputText style="color: {!IF(kpiWrapper.currentTargetDiff > 0, 'red', IF(kpiWrapper.currentTargetDiff < 0, 'blue', 'black'))};" value="%"/>
+                                    </apex:outputPanel>
+
+                                </apex:outputPanel>
                             </td>
                         </tr>
                     </apex:repeat>

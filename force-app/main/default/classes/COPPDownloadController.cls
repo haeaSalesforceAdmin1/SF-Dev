@@ -24,7 +24,7 @@ public class COPPDownloadController {
         pdfPage.getParameters().put('ChoosedTemplate', ChoosedTemplate);
         pdfPage.getParameters().put('regionCode', regionCode);
         pdfPage.getParameters().put('Salutation', Salutation); //DPM-5861 added salutation 10-16-2024 by MinheeKim
-        CommentsValue = CommentsValue.replaceAll('\n', '<br/>'); //DPM-5916 added CommentsValue 11-19-2024 by JonghoonKim
+        CommentsValue = CommentsValue!=null? CommentsValue.replaceAll('\n', '<br/>') : ''; //DPM-5916 added CommentsValue 11-19-2024 by JonghoonKim //DPM-6035 added logic to check null by MinheeKim 01.22.2025 
         pdfPage.getParameters().put('CommentsValue', CommentsValue); //DPM-5916 added CommentsValue 11-19-2024 by JonghoonKim
 
 
@@ -54,6 +54,7 @@ public class COPPDownloadController {
      * Get values for tracker and GM scorecard
      * Created by [MinheeKim] on [MM-DD-YYYY] for [DPM-5701] 
      * Edited by [JonghoonKim] on [11-18-2024] for [DPM-5916]
+     * Edited by [MinheeKim] on [01-22-2025] for [DPM-6035] added logic to check null by MinheeKim 01.22.2025 
     */
     @AuraEnabled
     public static String generateTracker(Id recordId, String coppDownloadName, String CommentsValue) {
@@ -66,7 +67,7 @@ public class COPPDownloadController {
                 pdfPage = Page.GMScorecard; 
             }
             pdfPage.getParameters().put('recordId', recordId);
-            CommentsValue = CommentsValue.replaceAll('\n', '<br/>');
+            CommentsValue = CommentsValue!=null? CommentsValue.replaceAll('\n', '<br/>') : ''; //DPM-5916 added CommentsValue 11-19-2024 by JonghoonKim //DPM-6035 added logic to check null by MinheeKim 01.22.2025 
             pdfPage.getParameters().put('CommentsValue', CommentsValue);
 
             Blob pdfBlob =  Test.isRunningTest() ? Blob.valueOf('Unit Test Attachment') : pdfPage.getContentAsPDF();

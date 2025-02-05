@@ -385,53 +385,54 @@ public without sharing class DistrictTriggerHelper {
      * @param newList new List of District record.
      * @param oldMap old Map of District record.
      * @return none.
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
      */
-    public static void updateRelatedEvalAPAccount(List<District__c> newList, Map<Id, District__c> oldMap) {
+    // public static void updateRelatedEvalAPAccount(List<District__c> newList, Map<Id, District__c> oldMap) {
                 
-        Map<Id,Id> mapOfDistrictToDM = new Map<Id,Id>();
-        Map<Id,Id> mapOfDistrictToDSM = new Map<Id,Id>();
-        Map<Id,Id> mapOfDistrictToDPSM = new Map<Id,Id>();
-        Map<Id,Id> mapOfDistrictToGMM = new Map<Id,Id>();
+    //     Map<Id,Id> mapOfDistrictToDM = new Map<Id,Id>();
+    //     Map<Id,Id> mapOfDistrictToDSM = new Map<Id,Id>();
+    //     Map<Id,Id> mapOfDistrictToDPSM = new Map<Id,Id>();
+    //     Map<Id,Id> mapOfDistrictToGMM = new Map<Id,Id>();
         
 
-        for (District__c district : newList) {
+    //     for (District__c district : newList) {
 
-            //District Manager
-           /* if ((oldMap != NULL && district.DistrictManagerAlt__c != oldMap.get(district.Id).DistrictManagerAlt__c) 
-                || (oldMap == NULL && district.DistrictManagerAlt__c != NULL )) {
+    //         //District Manager
+    //        /* if ((oldMap != NULL && district.DistrictManagerAlt__c != oldMap.get(district.Id).DistrictManagerAlt__c) 
+    //             || (oldMap == NULL && district.DistrictManagerAlt__c != NULL )) {
 
-                        mapOfDistrictToDM.put(district.Id,district.DistrictManagerAlt__c);
+    //                     mapOfDistrictToDM.put(district.Id,district.DistrictManagerAlt__c);
                      
-            }
+    //         }
 
-            //District Sales Manager
-            if ((oldMap != NULL && district.DistrictSalesManagerAlt__c != oldMap.get(district.Id).DistrictSalesManagerAlt__c) 
-                || (oldMap == NULL && district.DistrictSalesManagerAlt__c != NULL )) {
-                        mapOfDistrictToDSM.put(district.Id,district.DistrictSalesManagerAlt__c);
+    //         //District Sales Manager
+    //         if ((oldMap != NULL && district.DistrictSalesManagerAlt__c != oldMap.get(district.Id).DistrictSalesManagerAlt__c) 
+    //             || (oldMap == NULL && district.DistrictSalesManagerAlt__c != NULL )) {
+    //                     mapOfDistrictToDSM.put(district.Id,district.DistrictSalesManagerAlt__c);
                     
-            }
+    //         }
 
-            //District Part Sales Manager
-            if ((oldMap != NULL &&  district.DistrictPartsServiceManagerAlt__c != oldMap.get(district.Id).DistrictPartsServiceManagerAlt__c) 
-                || (oldMap == NULL && district.DistrictPartsServiceManagerAlt__c != NULL )) {
+    //         //District Part Sales Manager
+    //         if ((oldMap != NULL &&  district.DistrictPartsServiceManagerAlt__c != oldMap.get(district.Id).DistrictPartsServiceManagerAlt__c) 
+    //             || (oldMap == NULL && district.DistrictPartsServiceManagerAlt__c != NULL )) {
 
-                    mapOfDistrictToDPSM.put(district.Id,district.DistrictPartsServiceManagerAlt__c);
+    //                 mapOfDistrictToDPSM.put(district.Id,district.DistrictPartsServiceManagerAlt__c);
                     
-            }*/
+    //         }*/
 
-            //Genesis Market Manager
-            if ((oldMap != NULL && district.GenesisMarketManagerAlt__c != oldMap.get(district.Id).GenesisMarketManagerAlt__c) 
-                || (oldMap == NULL && district.GenesisMarketManagerAlt__c != NULL )) {
+    //         //Genesis Market Manager
+    //         if ((oldMap != NULL && district.GenesisMarketManagerAlt__c != oldMap.get(district.Id).GenesisMarketManagerAlt__c) 
+    //             || (oldMap == NULL && district.GenesisMarketManagerAlt__c != NULL )) {
 
-                    mapOfDistrictToGMM.put(district.Id,district.GenesisMarketManagerAlt__c);
+    //                 mapOfDistrictToGMM.put(district.Id,district.GenesisMarketManagerAlt__c);
 
-            }
-        }
+    //         }
+    //     }
 
-        updateAccout(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
-        updateEvaluations(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
-        updateActionPlans(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
-    }
+    //     updateAccout(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
+    //     updateEvaluations(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
+    //     updateActionPlans(mapOfDistrictToDM,mapOfDistrictToDSM,mapOfDistrictToDPSM,mapOfDistrictToGMM);
+    // }
 
     /**
      * This method is used to update related Account Records
@@ -440,55 +441,56 @@ public without sharing class DistrictTriggerHelper {
      * @param mapOfDistrictToDPSM map of district to DPSM.
      * @param mapOfDistrictToGMM map of district to GMM.
      * @return none.
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
      */
-    @Future
-    public static void updateAccout(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
+    // @Future
+    // public static void updateAccout(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
 
-        Set<Id> setOfDistrictIds = new Set<Id>();
-        List<Account> listAccToUpdate = new List<Account>();
+    //     Set<Id> setOfDistrictIds = new Set<Id>();
+    //     List<Account> listAccToUpdate = new List<Account>();
 
-       /* if (mapOfDistrictToDM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
-        }
+    //    /* if (mapOfDistrictToDM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
+    //     }
 
-        if (mapOfDistrictToDSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
-        }
+    //     if (mapOfDistrictToDSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
+    //     }
 
-        if (mapOfDistrictToDPSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
-        }*/
+    //     if (mapOfDistrictToDPSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
+    //     }*/
 
-        if (mapOfDistrictToGMM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
-        }
+    //     if (mapOfDistrictToGMM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
+    //     }
         
 
-        for (Account acc : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c,Market__c 
-                            FROM Account 
-                            WHERE Market__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
-                            AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
+    //     for (Account acc : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c,Market__c 
+    //                         FROM Account 
+    //                         WHERE Market__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
+    //                         AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
 
-                               /* if (mapOfDistrictToDM.containsKey(acc.SalesDistrict__c)) {
-                                    acc.DistrictManagerAlt__c = mapOfDistrictToDM.get(acc.SalesDistrict__c);
-                                }
-                                if (mapOfDistrictToDSM.containsKey(acc.SalesDistrict__c)) {
-                                    acc.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(acc.SalesDistrict__c);
-                                }
-                                if (mapOfDistrictToDPSM.containsKey(acc.SalesDistrict__c)) {
-                                    acc.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(acc.SalesDistrict__c);
-                                }*/
-                                if (mapOfDistrictToGMM.containsKey(acc.Market__c)) {
-                                    acc.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(acc.Market__c);
-                                }
-                                listAccToUpdate.add(acc);
+    //                            /* if (mapOfDistrictToDM.containsKey(acc.SalesDistrict__c)) {
+    //                                 acc.DistrictManagerAlt__c = mapOfDistrictToDM.get(acc.SalesDistrict__c);
+    //                             }
+    //                             if (mapOfDistrictToDSM.containsKey(acc.SalesDistrict__c)) {
+    //                                 acc.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(acc.SalesDistrict__c);
+    //                             }
+    //                             if (mapOfDistrictToDPSM.containsKey(acc.SalesDistrict__c)) {
+    //                                 acc.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(acc.SalesDistrict__c);
+    //                             }*/
+    //                             if (mapOfDistrictToGMM.containsKey(acc.Market__c)) {
+    //                                 acc.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(acc.Market__c);
+    //                             }
+    //                             listAccToUpdate.add(acc);
 
-                            }
+    //                         }
 
-                            if (listAccToUpdate.size() > 0) {
-                                update listAccToUpdate;
-                            }
-    }
+    //                         if (listAccToUpdate.size() > 0) {
+    //                             update listAccToUpdate;
+    //                         }
+    // }
 
     
     /**
@@ -498,78 +500,79 @@ public without sharing class DistrictTriggerHelper {
      * @param mapOfDistrictToDPSM map of district to DPSM.
      * @param mapOfDistrictToGMM map of district to GMM.
      * @return none.
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
      */
-    @Future
-    public static void updateEvaluations(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
+    // @Future
+    // public static void updateEvaluations(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
 
-        Set<Id> setOfDistrictIds = new Set<Id>();
-        List<Evaluation__c> listEvalToUpdate = new List<Evaluation__c>();
-        List<SObject> listSObj = new List<SObject>();
+    //     Set<Id> setOfDistrictIds = new Set<Id>();
+    //     List<Evaluation__c> listEvalToUpdate = new List<Evaluation__c>();
+    //     List<SObject> listSObj = new List<SObject>();
 
-       /* if (mapOfDistrictToDM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
-        }
+    //    /* if (mapOfDistrictToDM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
+    //     }
 
-        if (mapOfDistrictToDSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
-        }
+    //     if (mapOfDistrictToDSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
+    //     }
 
-        if (mapOfDistrictToDPSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
-        }*/
+    //     if (mapOfDistrictToDPSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
+    //     }*/
 
-        if (mapOfDistrictToGMM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
-        }
+    //     if (mapOfDistrictToGMM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
+    //     }
         
 
-        for (Evaluation__c eval : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c, MarketRef__c 
-                                    FROM Evaluation__c 
-                                    WHERE MarketRef__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
-                                    AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
+    //     for (Evaluation__c eval : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c, MarketRef__c 
+    //                                 FROM Evaluation__c 
+    //                                 WHERE MarketRef__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
+    //                                 AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
 
-                               /* if (mapOfDistrictToDM.containsKey(eval.SalesDistrict__c)) {
-                                    eval.DistrictManagerAlt__c = mapOfDistrictToDM.get(eval.SalesDistrict__c);
-                                    if (mapOfDistrictToDM.get(eval.SalesDistrict__c) != NULL) {
-                                      SObject sh = manualShareEdit(eval.Id, eval.DistrictManagerAlt__c, 'Evaluation__Share');
-                                      listSObj.add(sh);
-                                    }
-                                }
-                                if (mapOfDistrictToDSM.containsKey(eval.SalesDistrict__c)) {
-                                    eval.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(eval.SalesDistrict__c);
-                                    if (mapOfDistrictToDSM.get(eval.SalesDistrict__c) != NULL) {
-                                        SObject sh =  manualShareEdit(eval.Id, eval.DistrictSalesManagerAlt__c, 'Evaluation__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }
-                                if (mapOfDistrictToDPSM.containsKey(eval.SalesDistrict__c)) {
-                                    eval.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(eval.SalesDistrict__c);
-                                    if (mapOfDistrictToDPSM.get(eval.SalesDistrict__c) != NULL) {
-                                        SObject sh =  manualShareEdit(eval.Id, eval.DistrictPartsServiceManagerAlt__c, 'Evaluation__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }*/
-                                if (mapOfDistrictToGMM.containsKey(eval.MarketRef__c)) {
-                                    eval.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(eval.MarketRef__c);
-                                    if (mapOfDistrictToGMM.get(eval.MarketRef__c) != NULL) {
-                                        SObject sh =  manualShareEdit(eval.Id, eval.GenesisMarketManagerAlt__c, 'Evaluation__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }
-                                listEvalToUpdate.add(eval);
+    //                            /* if (mapOfDistrictToDM.containsKey(eval.SalesDistrict__c)) {
+    //                                 eval.DistrictManagerAlt__c = mapOfDistrictToDM.get(eval.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDM.get(eval.SalesDistrict__c) != NULL) {
+    //                                   SObject sh = manualShareEdit(eval.Id, eval.DistrictManagerAlt__c, 'Evaluation__Share');
+    //                                   listSObj.add(sh);
+    //                                 }
+    //                             }
+    //                             if (mapOfDistrictToDSM.containsKey(eval.SalesDistrict__c)) {
+    //                                 eval.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(eval.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDSM.get(eval.SalesDistrict__c) != NULL) {
+    //                                     SObject sh =  manualShareEdit(eval.Id, eval.DistrictSalesManagerAlt__c, 'Evaluation__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }
+    //                             if (mapOfDistrictToDPSM.containsKey(eval.SalesDistrict__c)) {
+    //                                 eval.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(eval.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDPSM.get(eval.SalesDistrict__c) != NULL) {
+    //                                     SObject sh =  manualShareEdit(eval.Id, eval.DistrictPartsServiceManagerAlt__c, 'Evaluation__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }*/
+    //                             if (mapOfDistrictToGMM.containsKey(eval.MarketRef__c)) {
+    //                                 eval.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(eval.MarketRef__c);
+    //                                 if (mapOfDistrictToGMM.get(eval.MarketRef__c) != NULL) {
+    //                                     SObject sh =  manualShareEdit(eval.Id, eval.GenesisMarketManagerAlt__c, 'Evaluation__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }
+    //                             listEvalToUpdate.add(eval);
 
-                            }
+    //                         }
 
-                            if (listEvalToUpdate.size() > 0) {
-                                update listEvalToUpdate;
+    //                         if (listEvalToUpdate.size() > 0) {
+    //                             update listEvalToUpdate;
 
-                                if (listSObj.size() > 0) {
-                                    Database.insert(listSObj,false);
-                                }
+    //                             if (listSObj.size() > 0) {
+    //                                 Database.insert(listSObj,false);
+    //                             }
 
                                
-                            }
-    }
+    //                         }
+    // }
 
     
     /**
@@ -579,76 +582,77 @@ public without sharing class DistrictTriggerHelper {
      * @param mapOfDistrictToDPSM map of district to DPSM.
      * @param mapOfDistrictToGMM map of district to GMM.
      * @return none.
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
      */
-    @Future
-    public static void updateActionPlans(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
+    // @Future
+    // public static void updateActionPlans(Map<Id,Id> mapOfDistrictToDM, Map<Id,Id> mapOfDistrictToDSM, Map<Id,Id> mapOfDistrictToDPSM, Map<Id,Id> mapOfDistrictToGMM){
 
-        Set<Id> setOfDistrictIds = new Set<Id>();
-        List<Action_Plan__c> listAPToUpdate = new List<Action_Plan__c>();
-        List<SObject> listSObj = new List<SObject>();
+    //     Set<Id> setOfDistrictIds = new Set<Id>();
+    //     List<Action_Plan__c> listAPToUpdate = new List<Action_Plan__c>();
+    //     List<SObject> listSObj = new List<SObject>();
 
-       /* if (mapOfDistrictToDM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
-        }
+    //    /* if (mapOfDistrictToDM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDM.keySet());
+    //     }
 
-        if (mapOfDistrictToDSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
-        }
+    //     if (mapOfDistrictToDSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDSM.keySet());
+    //     }
 
-        if (mapOfDistrictToDPSM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
-        }*/
+    //     if (mapOfDistrictToDPSM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToDPSM.keySet());
+    //     }*/
 
-        if (mapOfDistrictToGMM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
-        }
+    //     if (mapOfDistrictToGMM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToGMM.keySet());
+    //     }
         
 
-        for (Action_Plan__c ap : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c,MarketRef__c 
-                                    FROM Action_Plan__c 
-                                    WHERE MarketRef__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
-                                    AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
+    //     for (Action_Plan__c ap : [SELECT Id, DistrictManagerAlt__c, DistrictSalesManagerAlt__c, DistrictPartsServiceManagerAlt__c, GenesisMarketManagerAlt__c, SalesDistrict__c, ServiceDistrict__c,MarketRef__c 
+    //                                 FROM Action_Plan__c 
+    //                                 WHERE MarketRef__c IN:setOfDistrictIds /*OR (SalesDistrict__c IN:setOfDistrictIds 
+    //                                 AND ServiceDistrict__c IN:setOfDistrictIds)*/]) {
 
-                               /* if (mapOfDistrictToDM.containsKey(ap.SalesDistrict__c)) {
-                                    ap.DistrictManagerAlt__c = mapOfDistrictToDM.get(ap.SalesDistrict__c);
-                                    if (mapOfDistrictToDM.get(ap.SalesDistrict__c) != NULL) {
-                                        SObject sh = manualShareEdit(ap.Id, ap.DistrictManagerAlt__c, 'Action_Plan__Share');
-                                        listSObj.add(sh);
-                                    }
+    //                            /* if (mapOfDistrictToDM.containsKey(ap.SalesDistrict__c)) {
+    //                                 ap.DistrictManagerAlt__c = mapOfDistrictToDM.get(ap.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDM.get(ap.SalesDistrict__c) != NULL) {
+    //                                     SObject sh = manualShareEdit(ap.Id, ap.DistrictManagerAlt__c, 'Action_Plan__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
                                     
-                                }
-                                if (mapOfDistrictToDSM.containsKey(ap.SalesDistrict__c)) {
-                                    ap.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(ap.SalesDistrict__c);
-                                    if (mapOfDistrictToDSM.get(ap.SalesDistrict__c) != NULL) {
-                                        SObject sh =manualShareEdit(ap.Id, ap.DistrictSalesManagerAlt__c, 'Action_Plan__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }
-                                if (mapOfDistrictToDPSM.containsKey(ap.SalesDistrict__c)) {
-                                    ap.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(ap.SalesDistrict__c);
-                                    if (mapOfDistrictToDPSM.get(ap.SalesDistrict__c) != NULL) {
-                                        SObject sh =manualShareEdit(ap.Id, ap.DistrictPartsServiceManagerAlt__c, 'Action_Plan__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }*/
-                                if (mapOfDistrictToGMM.containsKey(ap.MarketRef__c)) {
-                                    ap.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(ap.MarketRef__c);
-                                    if (mapOfDistrictToGMM.get(ap.MarketRef__c) != NULL) {
-                                        SObject sh =manualShareEdit(ap.Id,ap.GenesisMarketManagerAlt__c, 'Action_Plan__Share');
-                                        listSObj.add(sh);
-                                    }
-                                }
-                                listAPToUpdate.add(ap);
+    //                             }
+    //                             if (mapOfDistrictToDSM.containsKey(ap.SalesDistrict__c)) {
+    //                                 ap.DistrictSalesManagerAlt__c = mapOfDistrictToDSM.get(ap.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDSM.get(ap.SalesDistrict__c) != NULL) {
+    //                                     SObject sh =manualShareEdit(ap.Id, ap.DistrictSalesManagerAlt__c, 'Action_Plan__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }
+    //                             if (mapOfDistrictToDPSM.containsKey(ap.SalesDistrict__c)) {
+    //                                 ap.DistrictPartsServiceManagerAlt__c = mapOfDistrictToDPSM.get(ap.SalesDistrict__c);
+    //                                 if (mapOfDistrictToDPSM.get(ap.SalesDistrict__c) != NULL) {
+    //                                     SObject sh =manualShareEdit(ap.Id, ap.DistrictPartsServiceManagerAlt__c, 'Action_Plan__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }*/
+    //                             if (mapOfDistrictToGMM.containsKey(ap.MarketRef__c)) {
+    //                                 ap.GenesisMarketManagerAlt__c = mapOfDistrictToGMM.get(ap.MarketRef__c);
+    //                                 if (mapOfDistrictToGMM.get(ap.MarketRef__c) != NULL) {
+    //                                     SObject sh =manualShareEdit(ap.Id,ap.GenesisMarketManagerAlt__c, 'Action_Plan__Share');
+    //                                     listSObj.add(sh);
+    //                                 }
+    //                             }
+    //                             listAPToUpdate.add(ap);
 
-                            }
+    //                         }
 
-                            if (listAPToUpdate.size() > 0) {
-                                update listAPToUpdate;
-                                if (listSObj.size() > 0) {
-                                    Database.insert(listSObj,false);
-                                }
-                            }
-    }
+    //                         if (listAPToUpdate.size() > 0) {
+    //                             update listAPToUpdate;
+    //                             if (listSObj.size() > 0) {
+    //                                 Database.insert(listSObj,false);
+    //                             }
+    //                         }
+    // }
 
     /**
      * This update Alt Districts values.
@@ -677,118 +681,223 @@ public without sharing class DistrictTriggerHelper {
             }
         }
     }
-    
-    public static void updateAftersalesMarketmanager(List<District__c> newList, Map<Id, District__c> oldMap){
+
+    // DPM-133
+    public static void searchUserManagerUpdate(List<District__c> newList, Map<Id, District__c> oldMap) {
         
-        Map<Id,Id> mapOfDistrictToAMM = new Map<Id,Id>();
-        Set<Id> setOfDistrictIds = new Set<Id>();
-        
-		
-        
-        for(District__c district : newlist){
-            if (district.Aftersales_Market_Manager__c != NULL) {
-                mapOfDistrictToAMM.put(district.Id,district.Aftersales_Market_Manager__c);
-                //district.GenesisMarketManagerAlt__c = district.Aftersales_Market_Manager__c;
-            } else if (district.Aftersales_Market_Manager__c == NULL && oldMap != NULL &&
-            oldMap.get(district.Id).Aftersales_Market_Manager__c != district.Aftersales_Market_Manager__c) {
-                mapOfDistrictToAMM.put(district.Id,NULL);
+        Set<String> empNumSet = new Set<String>();
+        for (District__c district : newList) {
+            if (district.DPSMEmpNum__c  != oldMap.get(district.Id).DPSMEmpNum__c  && district.DPSMEmpNum__c  != null) {
+                empNumSet.add(district.DPSMEmpNum__c );
+            }
+
+            if (district.DSMEmpNum__c  != oldMap.get(district.Id).DSMEmpNum__c  && district.DSMEmpNum__c  != null) {
+                empNumSet.add(district.DSMEmpNum__c );
+            }
+            if (district.GAMMEmpNum__c  != oldMap.get(district.Id).GAMMEmpNum__c  && district.GAMMEmpNum__c  != null) {
+                empNumSet.add(district.GAMMEmpNum__c );
+            }
+            if (district.GMMEmpNum__c  != oldMap.get(district.Id).GMMEmpNum__c  && district.GMMEmpNum__c  != null) {
+                empNumSet.add(district.GMMEmpNum__c );
+            }
+        }
+
+        Map<String, User> empNumToUserMap = new Map<String, User>();
+        if (!empNumSet.isEmpty()) {
+            for (User user : [SELECT Id, EmployeeNumber FROM User WHERE EmployeeNumber IN :empNumSet AND IsActive = true]) {
+                empNumToUserMap.put(user.EmployeeNumber, user);
             }
         }
         
-        if (mapOfDistrictToAMM.size() > 0) {
-            setOfDistrictIds.addAll(mapOfDistrictToAMM.keySet());
+        System.debug('DistrictTriggerHelper empNumToUserMap ==>' + empNumToUserMap);
+
+        for (District__c district : newList) {
+            System.debug('DistrictTriggerHelper district ==>' + district);
+            if(district.DPSMEmpNum__c  != oldMap.get(district.Id).DPSMEmpNum__c ) {
+                if (district.DPSMEmpNum__c  != null) {
+                    User user = empNumToUserMap.get(district.DPSMEmpNum__c );
+                    if(user != null) {
+                        district.DistrictPartsServiceManager__c = user.Id;
+                    }
+                } 
+                // else {
+                //     district.DistrictPartsServiceManager__c = null;
+                // }
+            }
+
+            if(district.DSMEmpNum__c  != oldMap.get(district.Id).DSMEmpNum__c ) {
+                if (district.DSMEmpNum__c  != null) {
+                    User user = empNumToUserMap.get(district.DSMEmpNum__c );
+                    if(user != null) {
+                        district.SalesManager__c = user.Id;
+                    }
+                    // district.SalesManager__c = (user != null) ? user.Id : null;
+                } 
+            }
+
+            if(district.GAMMEmpNum__c  != oldMap.get(district.Id).GAMMEmpNum__c ) {
+                if (district.GAMMEmpNum__c  != null) {
+                    User user = empNumToUserMap.get(district.GAMMEmpNum__c );
+                    if(user != null) {
+                        district.Aftersales_Market_Manager__c = user.Id;
+                    }
+                    // district.Aftersales_Market_Manager__c = (user != null) ? user.Id : null;
+                } 
+            }
+            
+
+            if(district.GMMEmpNum__c != oldMap.get(district.Id).GMMEmpNum__c) {
+                if (district.GMMEmpNum__c != null) {
+                    User user = empNumToUserMap.get(district.GMMEmpNum__c);
+                    if(user != null) {
+                        district.MarketManager__c = user.Id;
+                    }
+                    //district.MarketManager__c = (user != null) ? user.Id : null;
+                } 
+                // else {
+                //     district.MarketManager__c = null;
+                // }
+            }
+            
         }
+    }
+    
+
+    /**
+     * Description: [Method Description] 
+     * updateAftersalesMarketmanager
+     * Created by [Author] on [MM-DD-YYYY] for [Ticket #]
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
+    */
+    // public static void updateAftersalesMarketmanager(List<District__c> newList, Map<Id, District__c> oldMap){
         
-        updateAMMInAccounts(setOfDistrictIds,mapOfDistrictToAMM);
-        updateAMMInActionPlans(setOfDistrictIds,mapOfDistrictToAMM);
-        updateAMMInEvaluations(setOfDistrictIds,mapOfDistrictToAMM);
+    //     Map<Id,Id> mapOfDistrictToAMM = new Map<Id,Id>();
+    //     Set<Id> setOfDistrictIds = new Set<Id>();
+        
+		
+        
+    //     for(District__c district : newlist){
+    //         if (district.Aftersales_Market_Manager__c != NULL) {
+    //             mapOfDistrictToAMM.put(district.Id,district.Aftersales_Market_Manager__c);
+    //             //district.GenesisMarketManagerAlt__c = district.Aftersales_Market_Manager__c;
+    //         } else if (district.Aftersales_Market_Manager__c == NULL && oldMap != NULL &&
+    //             oldMap.get(district.Id).Aftersales_Market_Manager__c != district.Aftersales_Market_Manager__c) {
+    //             mapOfDistrictToAMM.put(district.Id,NULL);
+    //         }
+    //     }
+        
+    //     if (mapOfDistrictToAMM.size() > 0) {
+    //         setOfDistrictIds.addAll(mapOfDistrictToAMM.keySet());
+    //     }
+        
+    //     updateAMMInAccounts(setOfDistrictIds,mapOfDistrictToAMM);
+    //     updateAMMInActionPlans(setOfDistrictIds,mapOfDistrictToAMM);
+    //     updateAMMInEvaluations(setOfDistrictIds,mapOfDistrictToAMM);
     				
         
-    }
+    // }
 
-    @Future
-    public static void updateAMMInAccounts(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
+    /**
+     * Description: [Method Description] 
+     * updateAMMInAccounts
+     * Created by [Author] on [MM-DD-YYYY] for [Ticket #]
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
+    */
+    // @Future
+    // public static void updateAMMInAccounts(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
 
-        List<Account> listAccToUpdate = new List<Account>();
-        for (Account acc : [SELECT Id, Market__c
-                            FROM Account 
-                            WHERE Market__c IN:setOfDistrictIds]) {
+    //     List<Account> listAccToUpdate = new List<Account>();
+    //     for (Account acc : [SELECT Id, Market__c
+    //                         FROM Account 
+    //                         WHERE Market__c IN:setOfDistrictIds]) {
                                 
-							if (mapOfDistrictToAMM.containsKey(acc.Market__c)) {
-                        		acc.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(acc.Market__c);
-                            	}
-								listAccToUpdate.add(acc);
-            				}
+	// 						if (mapOfDistrictToAMM.containsKey(acc.Market__c)) {
+    //                     		acc.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(acc.Market__c);
+    //                         	}
+	// 							listAccToUpdate.add(acc);
+    //         				}
         
-                        	if (listAccToUpdate.size() > 0) {
-                                update listAccToUpdate;
-                        	}
-    }
+    //                     	if (listAccToUpdate.size() > 0) {
+    //                             update listAccToUpdate;
+    //                     	}
+    // }
 
-    @Future
-    public static void updateAMMInActionPlans(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
+    /**
+     * Description: [Method Description] 
+     * updateAMMInActionPlans
+     * Created by [Author] on [MM-DD-YYYY] for [Ticket #]
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
+    */
+    // @Future
+    // public static void updateAMMInActionPlans(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
 
             
-        List<Action_Plan__c> listAPToUpdate = new List<Action_Plan__c>();
+    //     List<Action_Plan__c> listAPToUpdate = new List<Action_Plan__c>();
        
-        List<SObject> listSObjAP = new List<SObject>();
-        for (Action_Plan__c ap : [SELECT Id, MarketRef__c
-                                    FROM Action_Plan__c 
-                                    WHERE MarketRef__c IN:setOfDistrictIds]) {
+    //     List<SObject> listSObjAP = new List<SObject>();
+    //     for (Action_Plan__c ap : [SELECT Id, MarketRef__c
+    //                                 FROM Action_Plan__c 
+    //                                 WHERE MarketRef__c IN:setOfDistrictIds]) {
 
-                                if (mapOfDistrictToAMM.containsKey(ap.MarketRef__c)) {
-                                    ap.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(ap.MarketRef__c);
-                                    if (mapOfDistrictToAMM.get(ap.MarketRef__c) != NULL) {
-                                        SObject sh = manualShareEdit(ap.Id,ap.Aftersales_Market_Manager__c, 'Action_Plan__Share');
-                                        listSObjAP.add(sh);
-                                    }
-                                }
-                                listAPToUpdate.add(ap);
+    //                             if (mapOfDistrictToAMM.containsKey(ap.MarketRef__c)) {
+    //                                 ap.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(ap.MarketRef__c);
+    //                                 if (mapOfDistrictToAMM.get(ap.MarketRef__c) != NULL) {
+    //                                     SObject sh = manualShareEdit(ap.Id,ap.Aftersales_Market_Manager__c, 'Action_Plan__Share');
+    //                                     listSObjAP.add(sh);
+    //                                 }
+    //                             }
+    //                             listAPToUpdate.add(ap);
 
-                            }
+    //                         }
 
-                            if (listAPToUpdate.size() > 0) {
-                                update listAPToUpdate;
+    //                         if (listAPToUpdate.size() > 0) {
+    //                             update listAPToUpdate;
                                 
-    System.debug('listSObjAP '+listSObjAP);
-                                if (listSObjAP.size() > 0) {
-                                    Database.insert(listSObjAP,false);
-                                    System.debug('listSObjAP after '+listSObjAP);
-                                }
-                            }
-    }
+    // System.debug('listSObjAP '+listSObjAP);
+    //                             if (listSObjAP.size() > 0) {
+    //                                 Database.insert(listSObjAP,false);
+    //                                 System.debug('listSObjAP after '+listSObjAP);
+    //                             }
+    //                         }
+    // }
 
-    @Future
-    public static void updateAMMInEvaluations(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
-        List<Evaluation__c> listEvalToUpdate = new List<Evaluation__c>();  
-        List<SObject> listSObj = new List<SObject>();
-        for (Evaluation__c eval : [SELECT Id, MarketRef__c
-                                   FROM Evaluation__c 
-                                   WHERE MarketRef__c IN:setOfDistrictIds]) {
+    /**
+     * Description: [Method Description] 
+     * updateAMMInAccounts
+     * Created by [Author] on [MM-DD-YYYY] for [Ticket #]
+     * Edited by [MinheeKim] on [11-25-2024] for [DPM-133] Changed to comments
+    */
+    // @Future
+    // public static void updateAMMInEvaluations(Set<Id> setOfDistrictIds,Map<Id,Id> mapOfDistrictToAMM){
+    //     List<Evaluation__c> listEvalToUpdate = new List<Evaluation__c>();  
+    //     List<SObject> listSObj = new List<SObject>();
+    //     for (Evaluation__c eval : [SELECT Id, MarketRef__c
+    //                                FROM Evaluation__c 
+    //                                WHERE MarketRef__c IN:setOfDistrictIds]) {
                                 
-							if (mapOfDistrictToAMM.containsKey(eval.MarketRef__c)) {
-                        		eval.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(eval.MarketRef__c);
-                            	}
-								listEvalToUpdate.add(eval);
+	// 						if (mapOfDistrictToAMM.containsKey(eval.MarketRef__c)) {
+    //                     		eval.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(eval.MarketRef__c);
+    //                         	}
+	// 							listEvalToUpdate.add(eval);
             				
         
-                          	if (mapOfDistrictToAMM.containsKey(eval.MarketRef__c)) {
-                                eval.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(eval.MarketRef__c);
-                                if (mapOfDistrictToAMM.get(eval.MarketRef__c) != NULL) {
-                                    SObject sh =  manualShareEdit(eval.Id, eval.Aftersales_Market_Manager__c, 'Evaluation__Share');
-                                    listSObj.add(sh);
-                                   }
-                            	}
-							}
+    //                       	if (mapOfDistrictToAMM.containsKey(eval.MarketRef__c)) {
+    //                             eval.Aftersales_Market_Manager__c = mapOfDistrictToAMM.get(eval.MarketRef__c);
+    //                             if (mapOfDistrictToAMM.get(eval.MarketRef__c) != NULL) {
+    //                                 SObject sh =  manualShareEdit(eval.Id, eval.Aftersales_Market_Manager__c, 'Evaluation__Share');
+    //                                 listSObj.add(sh);
+    //                                }
+    //                         	}
+	// 						}
 
-                            if (listEvalToUpdate.size() > 0) {
-                                update listEvalToUpdate;
+    //                         if (listEvalToUpdate.size() > 0) {
+    //                             update listEvalToUpdate;
 
-                                if (listSObj.size() > 0) {
-                                    Database.insert(listSObj,false);
-                                }  
-                            }
-    }
+    //                             if (listSObj.size() > 0) {
+    //                                 Database.insert(listSObj,false);
+    //                             }  
+    //                         }
+    // }
         
 
     

@@ -1,3 +1,13 @@
+/**
+************************************************************************************************
+* @classname         : DistrictTriggerHandler
+* @description       : DPM-133 // Automate Change of District Manager On District and Account,Action Plan,Evaluation
+* @author            : JongHoon Kim
+* History
+* Version      Date                Author               Ticket         Modification
+* 1.0       2024-09-25           JongHoon Kim           DPM-133       Add searchUserManagerUpdate Method, Add UpdateRelatedDMOnDistrictChangeQueueable
+************************************************************************************************
+**/
 public class DistrictTriggerHandler extends Trigger_Framework.baseHandler {
 
     public static Boolean run = true; 
@@ -25,6 +35,7 @@ public class DistrictTriggerHandler extends Trigger_Framework.baseHandler {
         }
 
         DistrictTriggerHelper.updateAltDistricts(newMap.values(),oldMap);
+        DistrictTriggerHelper.searchUserManagerUpdate(newMap.values(),oldMap); // DPM-133
 
         /*BEFORE UPDATE METHODS END*/
     }
@@ -46,8 +57,8 @@ public class DistrictTriggerHandler extends Trigger_Framework.baseHandler {
         Map<Id, District__c> newMap = (Map<Id, District__c>) newMapGeneric;
         /*AFTER INSERT METHODS START*/
         DistrictTriggerHelper.secondaryDistrictApproverAccess(newMap.values(),null);
-        DistrictTriggerHelper.updateAftersalesMarketmanager(newMap.values(),null);
-
+        // DistrictTriggerHelper.updateAftersalesMarketmanager(newMap.values(),null); // DPM-133
+        
         /*AFTER INSERT METHODS END*/
     }
 
@@ -72,11 +83,14 @@ public class DistrictTriggerHandler extends Trigger_Framework.baseHandler {
         System.debug(LoggingLevel.ERROR, newMap);
         /*AFTER UPDATE METHODS START*/
         
+
+        
+
         DistrictTriggerHelper.secondaryDistrictApproverAccess(newMap.values(),oldMap);
         DistrictTriggerHelper.removeSecondaryDistrictApproverAccess(newMap.values(),oldMap);
-        DistrictTriggerHelper.updateRelatedEvalAPAccount(newMap.values(),oldMap);
-        DistrictTriggerHelper.updateAftersalesMarketmanager(newMap.values(),oldMap);
-        
+        //DistrictTriggerHelper.updateRelatedEvalAPAccount(newMap.values(),oldMap); // DPM-133
+        //DistrictTriggerHelper.updateAftersalesMarketmanager(newMap.values(),oldMap); // DPM-133
+        System.enqueueJob(new UpdateRelatedDMOnDistrictChangeQueueable(newMap.values(), oldMap)); // DPM-133
 
         /*AFTER UPDATE METHODS END*/
     }

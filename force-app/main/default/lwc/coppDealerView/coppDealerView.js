@@ -170,7 +170,7 @@ export default class CoppDealerView extends LightningElement {
                             reportMonth : item[11] ? this.setReportingMonth(item[11]) : '',
                             brandScore: item[2]==800 ? this.brandingCurrent(item[0],item[11]) : null,
 
-                            vsTgtClass: item[10] ? this.getVsTgtClass(item[10]) : '',
+                            vsTgtClass: item[10] && item[2] ? this.getVsTgtClass(item[10], item[2]) : '',
                             show: true,
                             branding: item[2]==800 ? true : false,
                             brandingChecked : item[2]==800 ? this.getBranding(this.brandingCurrent(item[0],item[11])) : ''
@@ -303,11 +303,12 @@ export default class CoppDealerView extends LightningElement {
     /**
      * [Method Description] COPP Project - check the target data is positive or not
      * Created by [MinheeKim] on [2024-09-11] for [DPM-5707]
+     * Edited by [MinheeKim] on [2025-01-22] for [DPM-6035]]
     */
-    getVsTgtClass(vsTgt) {
-        if (vsTgt && vsTgt.includes('+')) {
+    getVsTgtClass(vsTgt, seq) {
+        if ((seq==325 && vsTgt && vsTgt.includes('-')) || (seq!=325 && vsTgt && vsTgt.includes('+'))) {
             return 'positive';
-        } else if (vsTgt && vsTgt.includes('-')) {
+        } else if ((seq==325 && vsTgt && vsTgt.includes('+')) ||  (seq!=325 && vsTgt && vsTgt.includes('-')) ) {
             return 'negative';
         }else if(vsTgt=='-'){
             return 'black';

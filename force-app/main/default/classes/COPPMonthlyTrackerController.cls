@@ -66,6 +66,7 @@
             public Boolean isRank{get;set;}
             public Boolean isPositiveInitialDiff {get;set;} //DPM-5910 added to check if the currentInitialDiff is positive
             public Boolean isPositiveTargetDiff {get;set;} //DPM-5910 added to check if the currentTargetDiff is positive
+            public Boolean oppositeColor{get;set;} //DPM-6035 added to change the opposite color by Minhee Kim - 01.22.2025
             public Decimal currentInitialDiff {get;set;}
             public Decimal currentTargetDiff {get;set;}
             public COPPKPIDetail__c kpiDetail{get;set;}
@@ -81,6 +82,7 @@
                 this.category = kpiDetail.COPP_KPI__r.Section__c;
                 this.isPercent = (kpiDetail.COPP_KPI__r.isPercent__c) ? true : false;
                 this.isRank = kpiDetail.COPP_KPI__r.Key__c == 'H515' ? true : false;
+                this.oppositeColor = kpiDetail.COPP_KPI__r.Key__c.contains('325') ? true : false; //DPM-6035 added to change the opposite color by Minhee Kim - 01.22.2025
                 this.kpiDetail = kpiDetail;
     
                 if(isRank){

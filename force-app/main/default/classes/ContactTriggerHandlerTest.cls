@@ -12,9 +12,10 @@ public with sharing class ContactTriggerHandlerTest {
     private static final String CONTACT_FN_1 = 'Ioniq';
     private static final String CONTACT_LN_1 = 'Palisade';
     private static final String CONTACT_EMAIL_1 = 'ionisade@hyundaidealerusa.com.test.ignore';
- 
+    
     @TestSetup
     static void makeData() {
+        ContentDocumentLinkTriggerHandler.run = false;
         Account acct = new Account(
                 Name='GA999'
         );
@@ -170,7 +171,7 @@ public with sharing class ContactTriggerHandlerTest {
  
 
     static testMethod void testMethodContactTriggerHelper() {
-
+        ContentDocumentLinkTriggerHandler.run = false;
         Account testAccount = new Account(Name = 'Test Account',
                 DealerCode__c='AK003');
         insert testAccount;
@@ -231,6 +232,7 @@ public with sharing class ContactTriggerHandlerTest {
         
         Action_Plan__c updatedActionPlan = [SELECT Original_Partner_User_ID__c FROM Action_Plan__c WHERE Id = :testActionPlan.Id];
         //System.assertEquals(testUser.Id, updatedActionPlan.Original_Partner_User_ID__c, 'Original_Partner_User_ID__c should be updated to the new user.');
+        ContentDocumentLinkTriggerHandler.run = true;
     }
  
 }

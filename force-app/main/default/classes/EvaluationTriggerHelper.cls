@@ -1,39 +1,66 @@
 /**
- * Description: [EvaluationTriggerHelper]
- * ----- Change Log -----
- * Author : [JonghoonKim] / [10-07-2024] / [Ticket 5663] / [Created evaluationDPMRTopicChange Method] 
- * Author : [JonghoonKim] / [11-08-2024] / [Ticket 5924] / [Created preventDuplicateEvaluation Method]
- * Author : [JonghoonKim] / [12-03-2024] / [Ticket 5946] / [Update evaluationDPMRTopicChange Method]
- * ---------------------------
- */
+************************************************************************************************
+* @classname         : EvaluationTriggerHelper
+* @description       : 
+* @author            : JongHoon Kim
+* History
+* Version      Date                Author               Ticket         Modification
+* 1.0       10-07-2024           JongHoon Kim           DPM-5663      Created evaluationDPMRTopicChange Method
+* 1.1       11-08-2024           JongHoon Kim           DPM-5924      Created preventDuplicateEvaluation Method
+* 1.2       12-03-2024           JongHoon Kim           DPM-5946      Update evaluationDPMRTopicChange Method
+* 1.3       01-22-2025           JongHoon Kim           DPM-133       Change DSM, DPSM, GMM, GAMM Update logic
+* 1.4       02-03-2025           JongHoon Kim           DPM-6033      If the due date has not passed, update the Manager and Owner
+************************************************************************************************
+**/
+
 public without sharing class EvaluationTriggerHelper {
-
      /**Start - [TBD] To fix error occuring while many files at COPP Comfidential button */
-    private static String cachedUserProfileName;
-    private static RecordType cachedSalesRecType;
-    private static RecordType cachedServiceRecType;
+     private static String cachedUserProfileName;
+     private static RecordType cachedSalesRecType;
+     private static RecordType cachedServiceRecType;
+     private static RecordType  cachedCOPPRecType;
+     private static Set<RecordType> cachedDpmrRecodTypes = new Set<RecordType>();
+     private static Date today = Date.today(); // DPM-6033
 
-    public static String getUserProfileName() {
-        if (cachedUserProfileName == null) {
-            cachedUserProfileName = [SELECT Profile.Name FROM User WHERE Id = :UserInfo.getUserId()].Profile.Name;
+     public static String getUserProfileName() {
+         if (cachedUserProfileName == null) {
+             cachedUserProfileName = [SELECT Profile.Name FROM User WHERE Id = :UserInfo.getUserId()].Profile.Name;
+         }
+         return cachedUserProfileName;
+     }
+ 
+     public static RecordType getSalesRecType() {
+         if (cachedSalesRecType == null) {
+             cachedSalesRecType = [SELECT Id FROM RecordType WHERE  SObjectType = 'Evaluation__c' AND DeveloperName = 'Genesis_Retailer_Eval_Sales' LIMIT 1];
+         }
+         return cachedSalesRecType;
+     }
+ 
+     public static RecordType getServiceRecType() {
+         if (cachedServiceRecType == null) {
+             cachedServiceRecType = [SELECT Id FROM RecordType WHERE  SObjectType = 'Evaluation__c' AND DeveloperName = 'Genesis_Retailer_Eval_Service' LIMIT 1];
+         }
+         return cachedServiceRecType;
+     }
+     public static RecordType getCOPPRecType(){
+        if (cachedCOPPRecType == null) {
+            cachedCOPPRecType = [SELECT Id FROM RecordType WHERE  SObjectType = 'Evaluation__c' AND DeveloperName = 'COPP_Confidential' LIMIT 1];
         }
-        return cachedUserProfileName;
-    }
+        return cachedCOPPRecType;
+     }
+     public static Set<RecordType> getDPMRRecordType(){
+        if (cachedDpmrRecodTypes==null || cachedDpmrRecodTypes.size()==0) {
+            List<RecordType> tempRecords = [SELECT Id, DeveloperName FROM RecordType WHERE SObjectType = 'Evaluation__c' AND DeveloperName LIKE '%DPMR%'];
+            if(tempRecords.size()>0){
+                for(RecordType rt: tempRecords){
+                    cachedDpmrRecodTypes.add(rt);
+                }
+            }    
+        }
+        return cachedDpmrRecodTypes;
+     }
+      /**End - [TBD] To fix error occuring while many files at COPP Comfidential button */
 
-    public static RecordType getSalesRecType() {
-        if (cachedSalesRecType == null) {
-            cachedSalesRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Sales' LIMIT 1];
-        }
-        return cachedSalesRecType;
-    }
-
-    public static RecordType getServiceRecType() {
-        if (cachedServiceRecType == null) {
-            cachedServiceRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' LIMIT 1];
-        }
-        return cachedServiceRecType;
-    }
-     /**End - [TBD] To fix error occuring while many files at COPP Comfidential button */
     /**
      * Description: [Prevent Duplicate Reocrd] 
      * Created by [JonghoonKim] on [11-08-2024] for [Ticket 5924]
@@ -47,10 +74,18 @@ public without sharing class EvaluationTriggerHelper {
             setRecordTypeId.add(eval.RecordTypeId);  
         }
 
-        List<RecordType> rtList = [SELECT DeveloperName FROM RecordType WHERE Id IN :setRecordTypeId LIMIT 1];
-        
-        for (RecordType rt : rtList) {
-            recordTypeMap.put(rt.Id, rt.DeveloperName.contains('DPMR'));
+        //List<RecordType> rtList = [SELECT DeveloperName FROM RecordType WHERE Id IN :setRecordTypeId LIMIT 1];
+        Set<RecordType> dpmrRecTypes = getDPMRRecordType();
+        Set<String> dpmrRecTypeIds = new Set<String>();
+        for(RecordType rt: dpmrRecTypes){
+            dpmrRecTypeIds.add(rt.Id);
+        }
+        for (String rectypeId : setRecordTypeId) {
+            if(dpmrRecTypeIds!=null && dpmrRecTypeIds.contains(rectypeId)){
+                recordTypeMap.put(rectypeId, true);
+            }else{
+                recordTypeMap.put(rectypeId, false);
+            }
         }
 
 
@@ -244,14 +279,14 @@ public without sharing class EvaluationTriggerHelper {
                 Account evalAccount = accountMap.get(evaluation.Account__c);
 
                 //Changes by Dhiraj starts here
-                if(evaluation.RecordTypeId=='0123I0000009qFwQAI'){
-                 //   evaluation.Organization__c = 'Hyundai Confidential';
-                 //evaluation.OrganizationRef__c = '';
+                // if(evaluation.RecordTypeId=='0123I0000009qFwQAI'){
+                //  //   evaluation.Organization__c = 'Hyundai Confidential';
+                //  //evaluation.OrganizationRef__c = '';
                  		
-                }else{
-                	//evaluation.Organization__c = evalAccount.Organization__r.Name;
-                	//evaluation.OrganizationRef__c = evalAccount.Organization__c;
-                }
+                // }else{
+                // 	//evaluation.Organization__c = evalAccount.Organization__r.Name;
+                // 	//evaluation.OrganizationRef__c = evalAccount.Organization__c;
+                // }
                 
                 //Changes by Dhiraj ends here
                 evaluation.OrganizationRef__c = evalAccount.Organization__c;
@@ -274,7 +309,7 @@ public without sharing class EvaluationTriggerHelper {
                 else {
                     evaluation.DealerName__c = evalAccount.Name;
                 }
-
+                
                 evaluation.DistrictManager__c = evalAccount.DistrictManager__c;
                //evaluation.DistrictManagerAlt__c = evalAccount.DistrictManagerAlt__c;
                 if(evalAccount.RecordType.DeveloperName == 'HyundaiDealer' || evalAccount.RecordType.DeveloperName == 'GenesisRetailer'){
@@ -293,7 +328,21 @@ public without sharing class EvaluationTriggerHelper {
                         evaluation.ServiceDistrict__c = evalAccount.ServiceDistrict__c;    
                         evaluation.ServiceDistrictName__c = evalAccount.ServiceDistrict__r.DistrictCode__c + ' - ' + evalAccount.ServiceDistrict__r.Name;
                         evaluation.ServiceDistrictCode__c = evalAccount.ServiceDistrict__r.DistrictCode__c;
-                        evaluation.DistrictPartsServiceManager__c = evalAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                        //DPM-6033
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c) && evalAccount.SalesDistrict__r.SalesManager__r.isactive == true) {
+                            evaluation.DistrictPartsServiceManager__c = evalAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                        }
+                        
+                        //DPM-133
+                        //DPM-6033
+                        // if(evaluation.Status__c != null &&  evaluation.ApprovalStatus__c != 'Region Approved' && evaluation.Status__c != 'Completed' && evaluation.Status__c !='Closed' && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {   
+                            if(evaluation.Type__c == 'Service' && evalAccount.ServiceDistrict__r.DistrictPartsServiceManager__r.isactive == true) {
+                                evaluation.OwnerId = evalAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                            }
+                            
+                        }
+                        //
                         // evaluation.DistrictPartsServiceManagerAlt__c = evalAccount.ServiceDistrict__r.DistrictPartsServiceManagerAlt__c;
                     }
                     
@@ -301,16 +350,48 @@ public without sharing class EvaluationTriggerHelper {
                         evaluation.SalesDistrict__c = evalAccount.SalesDistrict__c;
                         evaluation.SalesDistrictName__c = evalAccount.SalesDistrict__r.DistrictCode__c + ' - ' + evalAccount.SalesDistrict__r.Name;
                         evaluation.SalesDistrictCode__c = evalAccount.SalesDistrict__r.DistrictCode__c;
-                        evaluation.DistrictSalesManager__c = evalAccount.SalesDistrict__r.SalesManager__c;
+                        //DPM-6033
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c) && evalAccount.SalesDistrict__r.SalesManager__r.isactive == true) {
+                            evaluation.DistrictSalesManager__c = evalAccount.SalesDistrict__r.SalesManager__c;
+                        }
+                        
+                        //DPM-133
+                        //DPM-6033
+                        // if(evaluation.Status__c != null && evaluation.ApprovalStatus__c != 'Region Approved' && evaluation.Status__c != 'Completed' && evaluation.Status__c !='Closed' && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {    
+                            if(evaluation.Type__c == 'Sales' && evalAccount.SalesDistrict__r.SalesManager__r.isactive == true) {
+                                evaluation.OwnerId = evalAccount.SalesDistrict__r.SalesManager__c;
+                            }
+                        }
+                        //
                        // evaluation.DistrictSalesManagerAlt__c = evalAccount.SalesDistrict__r.DistrictSalesManagerAlt__c;
 
                     }
                     if(evalAccount.Market__c != null && evalAccount.RecordType.DeveloperName == 'GenesisRetailer') {
                         evaluation.MarketRef__c = evalAccount.Market__c;
                         evaluation.MarketCode__c = evalAccount.Market__r.DistrictCode__c;
-                        evaluation.MarketManager__c = evalAccount.Market__r.MarketManager__c;
-                        evaluation.Aftersales_Market_Manager__c = evalAccount.Market__r.Aftersales_Market_Manager__c;
+                        //DPM-6033
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c)) {
+                            if(evalAccount.Market__r.MarketManager__r.isactive == true) {
+                                evaluation.MarketManager__c = evalAccount.Market__r.MarketManager__c;
+                            }
+                            
+                            if(evalAccount.Market__r.Aftersales_Market_Manager__r.isactive == true) {
+                                evaluation.Aftersales_Market_Manager__c = evalAccount.Market__r.Aftersales_Market_Manager__c;
+                            } 
+                        }
                         evaluation.GenesisMarketManagerAlt__c = evalAccount.Market__r.GenesisMarketManagerAlt__c;
+                        //DPM-133
+                        //DPM-6033
+                        // if(evaluation.Status__c != null && evaluation.ApprovalStatus__c != 'Region Approved' && evaluation.Status__c != 'Completed' && evaluation.Status__c !='Closed' && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {
+                        if(evaluation.EndDate__c >= today && !String.isBlank(evaluation.ScheduledTopic__c) && !String.isBlank(evaluation.Type__c) ) {
+                            if(evaluation.Type__c == 'Sales' && evalAccount.Market__r.MarketManager__r.isactive == true) {
+                                evaluation.OwnerId = evalAccount.Market__r.MarketManager__c;
+                            } else if(evaluation.Type__c == 'Service' && evalAccount.Market__r.Aftersales_Market_Manager__r.isactive == true){
+                                evaluation.OwnerId = evalAccount.Market__r.Aftersales_Market_Manager__c;
+                            }
+                        }
+                        //
                     }
                 }
                 else {
@@ -807,10 +888,12 @@ public static void evaluationDPMRTopicChange(List<Evaluation__c> newEvaluations,
         String SUFFIX_FIN = ' (FIN)';
         String SUFFIX_SI = ' (SI)';
         Map<Id, String> recordTypeMap = new Map<Id, String>();
-
-        for (RecordType rt : [SELECT Id, DeveloperName FROM RecordType WHERE SObjectType = 'Evaluation__c' AND DeveloperName LIKE 'DPMR%']) {
-            recordTypeMap.put(rt.Id, rt.DeveloperName);
-        }
+        Set<RecordType> dpmrRecodType = getDPMRRecordType(); /**[TBD] To fix error occuring while many files at COPP Comfidential button */
+        if(dpmrRecodType!=null){
+            for (RecordType rt : dpmrRecodType) {
+                recordTypeMap.put(rt.Id, rt.DeveloperName);
+            }
+        }    
 
         for (Evaluation__c evaluation : newEvaluations) {
             Evaluation__c oldEval = oldEvaluationsMap.get(evaluation.Id);
@@ -915,9 +998,7 @@ public static void evaluationDPMRTopicChange(List<Evaluation__c> newEvaluations,
 
 
 
-
-
-    /*
+      /*
    * @method updateGenesisEvaluation() 
    * @desc DPM-5633
    * Prevent the record to be edited when the status is Completed
@@ -953,7 +1034,7 @@ public static void evaluationDPMRTopicChange(List<Evaluation__c> newEvaluations,
     */
     public static void attachTrackerOnEval(List<Evaluation__c> newEvaluations){
         
-       RecordType coppRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'COPP_Confidential' LIMIT 1];
+       RecordType coppRecType = getCOPPRecType();  //[SELECT Id FROM RecordType WHERE DeveloperName = 'COPP_Confidential' LIMIT 1]; //[TBD] To fix error occuring while many files at COPP Comfidential button */
        List<Evaluation__c> coppEvaluations = new List<Evaluation__c>();
 
        Map<Id, COPPInfo__c> mapOfAccountCOPPInfo = new Map<Id, COPPInfo__c>();

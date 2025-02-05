@@ -47,6 +47,27 @@
          }
      }*/
      
+     @TestSetup
+     static void makeData(){
+        List<Evaluation__c> evalList = new List<Evaluation__c>();
+        for (Integer i = 0; i < 2; i++) {
+            evalList.add(new Evaluation__c(Name = 'Test Evaluation ' + i, Attachment__c = 'No'));
+        }
+        insert evalList;
+
+
+        ContentVersion version = new ContentVersion(
+            Title = 'Test File Version',
+            VersionData = Blob.valueOf('Test Data'),
+            PathOnClient = 'TestFile.pdf',
+            IsMajorVersion = true
+        );
+        insert version;
+
+
+     }
+
+             
      @IsTest
      static void test_TriggerBypass() {
          User runAsUser = ContentDocumentTestFactory.makeUser();
@@ -852,6 +873,31 @@
              Test.stopTest();
          }
      }
+     
+     /**
+     * [Method Description] Test code for updateEvaluationFiles method
+     * Created by [MinheeKim] on [2024-12-09] for [DPM-5879]
+    */
+     @IsTest
+     static void testUpdateEvaluationFiles() {
+         List<Evaluation__c> evalList = [SELECT Id FROM Evaluation__c];
+         ContentVersion version = [SELECT Id, ContentDocumentId FROM ContentVersion Limit 1];
+         
+         List<ContentDocumentLink> links = new List<ContentDocumentLink>();
+        for (Evaluation__c eval : evalList) {
+            links.add(new ContentDocumentLink(
+                LinkedEntityId = eval.Id,
+                ContentDocumentId = version.ContentDocumentId,
+                ShareType = 'V'
+            ));
+        }
+        
+        Test.startTest();
+        	insert links;
+        Test.stopTest(); 
+         
+     }
+
  /*
      @IsTest
      static void testPreventPkgFileUploadWrongStage() {
@@ -885,4 +931,6 @@
  
          Test.stopTest();
      }*/
+     
+     
  }
