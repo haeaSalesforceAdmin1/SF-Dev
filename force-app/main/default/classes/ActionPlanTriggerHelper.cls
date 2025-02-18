@@ -1,7 +1,29 @@
+/**
+************************************************************************************************
+* @classname         : ActionPlanTriggerHelper
+* @description       : 
+* @author            : JongHoon Kim
+* History
+* Version      Date                Author               Ticket         Modification
+* 1.0       01-22-2025           JongHoon Kim           DPM-133       Add Action Plan District Manager Update Logic
+* 1.1       02-03-2025           JongHoon Kim           DPM-6033      If the due date has not passed, update the Manager and Owner
+************************************************************************************************
+**/
+
 public without sharing class ActionPlanTriggerHelper {
     
     public static Map<String, Map<String, List<ObjectAccess__mdt>>> objectAccessMap =  new Map<String, Map<String, List<ObjectAccess__mdt>>>();
-     
+    
+    private static String cachedEnvironment;
+    private static Date today = Date.today(); // DPM-6033
+
+     public static String getEnvironment() {
+         if (cachedEnvironment == null) {
+             cachedEnvironment = [SELECT Environment__c FROM CurrentEnvironment__c].Environment__c;
+         }
+         return cachedEnvironment;
+     }
+    
     public static void populateAccountForActionsPlansCreatedFromEinsteinKPI(List<Action_Plan__c> actionPlans) {
         
         List<Id> einsteinKPIDetailIds = new List<Id>();
@@ -67,6 +89,12 @@ public without sharing class ActionPlanTriggerHelper {
         System.debug(LoggingLevel.ERROR, accountMap);
         List<Id> genesisAreas = new List<Id>();
         List<Action_Plan__c> genesisActionPlans = new List<Action_Plan__c>();
+        //Add DPM-133
+        Set<String> validApprovalStatuses = new Set<String>{
+            'Submitted for District Approval',
+            'District Approved',
+            'Sent Back'
+        };
         
         for(Action_Plan__c actionPlan:actionPlans) {
             System.debug(LoggingLevel.ERROR, actionPlan);
@@ -113,14 +141,30 @@ public without sharing class ActionPlanTriggerHelper {
                         actionPlan.ServiceDistrictName__c = actionPlanAccount.ServiceDistrict__r.DistrictCode__c + ' - ' + actionPlanAccount.ServiceDistrict__r.Name;
                         actionPlan.ServiceDistrictCode__c = actionPlanAccount.ServiceDistrict__r.DistrictCode__c;
                     }
-                    actionPlan.DistrictPartsServiceManager__c = actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                    // DPM-6033 Add EndDate__c logic start
+                    if(actionPlan.EndDate__c >= today && actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManager__r.isactive  == true) {
+                        actionPlan.DistrictPartsServiceManager__c = actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                    }
+                    
+                    if(actionPlan.EndDate__c >= today && actionPlan.Division__c == 'Service' && validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManager__r.isactive  == true) {
+                        actionPlan.OwnerId = actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManager__c;
+                    }
+                    // end
                     //actionPlan.DistrictPartsServiceManagerAlt__c = actionPlanAccount.ServiceDistrict__r.DistrictPartsServiceManagerAlt__c;
                     actionPlan.SalesDistrict__c = actionPlanAccount.SalesDistrict__c;
                     if(actionPlan.SalesDistrict__c != null) {
                         actionPlan.SalesDistrictName__c = actionPlanAccount.SalesDistrict__r.DistrictCode__c + ' - ' + actionPlanAccount.SalesDistrict__r.Name;
                         actionPlan.SalesDistrictCode__c = actionPlanAccount.SalesDistrict__r.DistrictCode__c;
                     }
-                    actionPlan.DistrictSalesManager__c = actionPlanAccount.SalesDistrict__r.SalesManager__c;
+                    // DPM-6033 Add EndDate__c logic start
+                    if(actionPlan.EndDate__c >= today && actionPlanAccount.SalesDistrict__r.SalesManager__r.isactive  == true) {
+                        actionPlan.DistrictSalesManager__c = actionPlanAccount.SalesDistrict__r.SalesManager__c;
+                    }
+                    
+                    if(actionPlan.EndDate__c >= today && actionPlan.Division__c == 'Sales' && validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlanAccount.SalesDistrict__r.SalesManager__r.isactive  == true) {
+                        actionPlan.OwnerId = actionPlanAccount.SalesDistrict__r.SalesManager__c;
+                    }
+                    // end
                     //actionPlan.DistrictSalesManagerAlt__c = actionPlanAccount.SalesDistrict__r.DistrictSalesManagerAlt__c;
 
                     //actionPlan.OwnerId = actionPlanAccount.SalesDistrict__r.SalesManager__c;
@@ -597,13 +641,11 @@ update listToUPDAP;
         
         DPMConfigurationSettings__c var = DPMConfigurationSettings__c.getOrgDefaults();
         
-        CurrentEnvironment__c instanceName = [SELECT name,Environment__c FROM CurrentEnvironment__c LIMIT 1];
-        
-       
+        String instanceName = getEnvironment();
         
         for(Action_Plan__c ap :newActionPlans ){
           
-            if(instanceName.Environment__c=='STAGE'|| Test.isRunningTest()){
+            if(instanceName == 'STAGE'|| Test.isRunningTest()){
                   Imagelink =ap.Dealer_Indicator_Stage__c;
                 if(ap.Phase__c=='Open'){
                     Imagelink=Url.getOrgDomainUrl().toExternalForm()+'/'+var.FileURLHelper__c+''+var.STAGEDealerIndicatorCompletSumaryFileId__c;
@@ -628,7 +670,7 @@ update listToUPDAP;
                 ap.Dealer_Indicator_Stage__c=Imagelink;
                 
             }
-            if(instanceName.Environment__c=='PROD'|| Test.isRunningTest()){
+            if(instanceName == 'PROD'|| Test.isRunningTest()){
                  Imagelink =ap.Dealer_Indicator_Prod__c;
                 if(ap.Phase__c=='Open'){
                     Imagelink=Url.getOrgDomainUrl().toExternalForm()+'/'+var.FileURLHelper__c+''+var.PROD_DealerIndicatorCompletSumaryFileId__c;

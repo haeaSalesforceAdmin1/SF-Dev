@@ -63,6 +63,7 @@ public without sharing class UserTriggerHelper {
     * @return none     
     * @author Vinit [10 Nov 2021] [IBM] Ticket DPM-177
     * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] edit condition to run the method when the accesstype is not changed
+    * Edited by MinheeKim on 02-12-2025 for DPM-6083 - Edit not to run the updateDNAMSRole logic
     */
     public static void updateAccessTypeOnContact(List<User> newUsersList, Map<Id,User> oldUsersMap){
         ContactTriggerHandler.runByUserTrigger=true;
@@ -86,6 +87,11 @@ public without sharing class UserTriggerHelper {
         
     }
 
+    /** 
+    * [Method Description]
+    * Created by [Author] on [Date] for [#ticket]
+    * Edited by [MinheeKim] on [02-12-2025] for [DPM-6083] - Edit not to run the updateDNAMSRole logic
+    */
     @Future
     public static void updateAccessType(List<Id> listUserId){
         System.debug('updateAccessType started');
@@ -113,8 +119,8 @@ public without sharing class UserTriggerHelper {
             }
 
             for (User usr : users) {
-                Contact con = new Contact();
-                con.Id = usr.ContactId;
+                    Contact con = new Contact();
+                    con.Id = usr.ContactId;
                 
                 if (String.isNotBlank(usr.AccessTypes__c)) {
                     con.Access_Types__c = prepareAccessTypes(usr.AccessTypes__c);
@@ -134,15 +140,16 @@ public without sharing class UserTriggerHelper {
                         con.Active_CUV_User__c = false; 
                     }
                     // CUV Program Changes - End
- 
+                    
                     // DNAMS
                     if(usr.AccessTypes__c.contains('DNA')){ // Added by Areum on 11-01-2024 for DNAMS PIR
                         con.DNAMS_Active_User__c = true;
                     } else if(!usr.AccessTypes__c.contains('DNA')){
                         con.DNAMS_Active_User__c = false;
-                        con.DNAMS_Role__c = null;
+                        if(!contactDNAMSMap.containsKey(usr.ContactId)){ //DPM-6083 added to fix updateDNAMSRole error on 02-13-2025 by MinheeKim
+                            con.DNAMS_Role__c = null;
+                        }
                     }
-                    
                     
                     if(usr.IsActive){
                         con.Salesforce_Active_User__c = TRUE;
@@ -154,29 +161,36 @@ public without sharing class UserTriggerHelper {
                     con.Active_DPM_User__c = FALSE;
                     con.Active_CUV_User__c = false;
                     con.DNAMS_Active_User__c = false;
-                    con.DNAMS_Role__c = null; // Added by Areum on 11-01-2024 for DNAMS PIR
-
-                
+                    if(!contactDNAMSMap.containsKey(usr.ContactId)){ //DPM-6083 added to fix updateDNAMSRole error on 02-13-2025 by MinheeKim
+                        con.DNAMS_Role__c = null; // Added by Areum on 11-01-2024 for DNAMS PIR
+                    }
                 }
-
-
-                //DPM-6005 Skip the temp account
+                
+                //DPM-6005 Skip the temp account: If DNAMS_Active_User__c is true, retain the value as true
                 if(contactDNAMSMap.containsKey(usr.ContactId)) {
                     con.DNAMS_Active_User__c = true;
-                    
+
                 }
                 System.debug('### update Contact DNAMS access and role:'+con);
+                
                 listConToUpd.add(con);
+                
             }
         
             if (listConToUpd != NULL && listConToUpd.size() >0) {
                 // Added by Areum on 11-01-2024 for DNAMS PIR
-                updateDNAMSRoles(listConToUpd);
-                
+                //updateDNAMSRoles(listConToUpd); //DPM-6083 changed to comment by MinheeKim on 02-12-2025 
                 try {
                     update listConToUpd;
                 } catch(Exception e) {
                     System.debug(LoggingLevel.ERROR, 'Error updateOwner: ' + e.getMessage());
+
+                    String errorDetail ='Error Message: ' + e.getMessage() + '\n' +
+                        'Line Number: ' + e.getLineNumber() + '\n' +
+                       'Stacktrace: ' + e.getStackTraceString();
+
+                    Async_Apex_Error__c error = new Async_Apex_Error__c(SystemTimestamp__c=System.now(), Error_Detail__c = errorDetail);
+                    insert error;
                     throw(e);
                 }
             }
@@ -189,8 +203,9 @@ public without sharing class UserTriggerHelper {
      * Edited by Areum on 12-22-2024 for DPM-5979 - Add the logic to compare the dealer code information of DNAMS access type with ACR
      * Edited by MinheeKim on 01-13-2025 for DPM-6016 - Remove ACR which is for non-existing dealercode in access type from ACR list
      * Edited by Areum on 01-13-2025 for DPM-6005 - Check for DNAMS access in temporary dealer accounts and Skip
+     * Edited by MinheeKim on 02-12-2025 for DPM-6083 - Change to comments to move the logic into ContactTrigger to run after changing the ACRs according to the current user's accesstype
      */
-    private static void updateDNAMSRoles(List<Contact> contacts) {
+    /**private static void updateDNAMSRoles(List<Contact> contacts) {
         if(ContactTriggerHandler.runByUserTrigger == false) return;
     
         Set<Id> allContactIds = new Set<Id>();
@@ -203,7 +218,6 @@ public without sharing class UserTriggerHelper {
                 dnamsContactMap.put(con.Id, con);
             }
         }
-
         System.debug('### allContactIds: ' + allContactIds);
         System.debug('### dnamsContactMap: ' + dnamsContactMap);
         
@@ -218,7 +232,7 @@ public without sharing class UserTriggerHelper {
                         WHERE ContactId IN :allContactIds 
                         AND IsActive = true]) {
             contactAccessTypes.put(usr.ContactId, usr.AccessTypes__c);
-            /**DPM-6016 start : add Map of Contact and Access type */
+            //DPM-6016 start : add Map of Contact and Access type 
             Set<String> dealerCodes = new Set<String>();
             if(String.isNotBlank(usr.AccessTypes__c)){
                 for(String accessType : usr.AccessTypes__c.split(',')) {
@@ -231,11 +245,11 @@ public without sharing class UserTriggerHelper {
 
             userIds.add(usr.Id);
             contactDealercode.put(usr.ContactId,dealerCodes);
-            /**DPM-6016 end */
+            //DPM-6016 end 
         }
         System.debug('### contactAccessTypes: ' + contactAccessTypes);
        
-        List<AccountContactRelation> existingACRs = [SELECT Id, Roles, ContactId, Account.DealerCode__c, Account.Name, DNAMSUser__c, DNAMSAccountUser__c, Account.Temporary_Dealer__c, Contact.DNAMS_Role__c  
+        List<AccountContactRelation> existingACRs = [SELECT Id, Roles, ContactId, Account.DealerCode__c, Account.Name, DNAMSUser__c, DNAMSAccountUser__c, Account.Temporary_Dealer__c, Contact.DNAMS_Role__c 
                                                     FROM AccountContactRelation 
                                                     WHERE IsActive = true
                                                     AND ContactId IN :allContactIds];
@@ -253,9 +267,8 @@ public without sharing class UserTriggerHelper {
             if(dnamsContactMap.containsKey(acr.ContactId)) {
                 //DPM-6005 Skip the temp account
                 if(isTempAccount && acr.DNAMSAccountUser__c) {
-                    System.debug('### Maintaining DNAMS access for TEMP account: ' + acr.Account.Name + '/' + acr.DNAMSAccountUser__c);
                     acrsToUpdate.add(acr);
-
+                    
                     if(String.isNotBlank(acr.Roles)) {
                         Set<String> contactRoles = new Set<String>(acr.Roles.split(';'));
                         String dnamsRole = getDNAMSRoleByPriority(contactRoles);
@@ -291,15 +304,15 @@ public without sharing class UserTriggerHelper {
                     acr.DNAMSAccountUser__c = false;
                 }
                 
-                /*if(String.isNotBlank(acr.Roles)) {
-                    Set<String> contactRoles = new Set<String>(acr.Roles.split(';'));
-                    System.debug('### contactRoles: ' + contactRoles);
-                    String dnamsRole = getDNAMSRoleByPriority(contactRoles);
-                    System.debug('### dnamsRole: ' + dnamsRole);
-                    if(dnamsRole != null) {
-                        contactToRoleMap.put(acr.ContactId, dnamsRole);
-                    }
-                }*/
+                // if(String.isNotBlank(acr.Roles)) {
+                //     Set<String> contactRoles = new Set<String>(acr.Roles.split(';'));
+                //     System.debug('### contactRoles: ' + contactRoles);
+                //     String dnamsRole = getDNAMSRoleByPriority(contactRoles);
+                //     System.debug('### dnamsRole: ' + dnamsRole);
+                //     if(dnamsRole != null) {
+                //         contactToRoleMap.put(acr.ContactId, dnamsRole);
+                //     }
+                // }
                 //DPM-5979 issue #6 - Updated DNAMS Role for all contacts by Areum on 01-03-2024
                 if(String.isNotBlank(acr.Roles)) {
                   
@@ -317,11 +330,11 @@ public without sharing class UserTriggerHelper {
             
             String accessTypes = contactAccessTypes.get(acr.ContactId);
 
-            /**DPM-6016 added condition */
+            //DPM-6016 added condition 
             if((String.isNotBlank(accessTypes) && contactDealercode.get(acr.ContactId).contains(acr.Account.DealerCode__c)) || Test.isRunningTest()) {
                 acrsToUpdate.add(acr);
                 System.debug('### acrsToUpdate: ' + acr.Account.DealerCode__c);
-            }/**DPM-6016 end */
+            }//DPM-6016 end 
         }
         
         for(Id contactId : contactAllRoles.keySet()) {
@@ -396,18 +409,17 @@ public without sharing class UserTriggerHelper {
                 con.DNAMS_Role__c = null;
             }
         }
-
-        System.debug('### updateDNAMSRoles:'+contacts);
     }
 
-    public class ACRDMLException extends Exception {}
+    public class ACRDMLException extends Exception {}*/
     
 
     /**
      * Update DNAMS roles and flags for contacts based on their active status and roles in AccountContactRelation.
      * Created by Areum on 11-01-2024 for DNAMS PIR
+     * Edited by [MinheeKim] on [02-13-2025] for [DPM-6083] Changed to comment 
      */
-    private static String getDNAMSRoleByPriority(Set<String> contactRoles) {
+    /**private static String getDNAMSRoleByPriority(Set<String> contactRoles) {
         List<String> rolePriority = new List<String>{
             'Dealer Principal',
             'General Manager',
@@ -421,7 +433,7 @@ public without sharing class UserTriggerHelper {
             }
         }
         return null;
-    }
+    }*/
 
     /**
      * [Method Description] Update action plan's owner when dealer lose the permission about action plan
@@ -866,6 +878,7 @@ public without sharing class UserTriggerHelper {
      * @return none     
      * @author Vinit [27 May 2022] [IBM] Ticket DPM-177
      * Edited by Areum on 01-13-2025 for DPM-6005 - Check for DNAMS access in temporary dealer accounts and Skip
+     * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
      */
     @future
     public static void updateChanges(List < Id > listUserId) {
@@ -888,19 +901,19 @@ public without sharing class UserTriggerHelper {
 
             for (User usr: [SELECT Id, AccessTypes__c, UserRoleId, UserRole.Name, Safety_User__c, DPM_User__c, DNAMS_User_Flag__c, ProfileId, Profile.Name, ContactId 
                               FROM User
-                             WHERE Id IN: listUserId]) { //Removed DNAMS_Internal_User__c, DNAMS_User__c from query [DM-6020] by MinheeKim 01.21.2025
+                             WHERE Id IN: listUserId]) { //removed DNAMS_User__c , DNAMS_Internal_User__c from the query DPM-6020 by MinheeKim 02.10.2025
                                     
                 usr.Safety_User__c = FALSE;
                 usr.DPM_User__c = FALSE;
                 usr.CUV_User__c = false;
-                // usr.DNAMS_Internal_User__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR //Changed to comments [DPM-6020] by MinheeKim 01.21.2025
-                 usr.DNAMS_User_Flag__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR
+                //usr.DNAMS_Internal_User__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR // Changed to comment by Minhee on 02-10-2025 for DPM-6020
+                usr.DNAMS_User_Flag__c = false; //Added by Areum on 11-01-2024 for DNAMS PIR
 
                 //DPM-6005 Update DNAMS_User_Flag__c = true
                 if(usr.ContactId != null && contactDNAMSMap.containsKey(usr.ContactId)) {
                     usr.DNAMS_User_Flag__c = true;
                 } 
-                
+                                 
                 if (usr.AccessTypes__c != NULL) {
                     List < String > listOfAT = (usr.AccessTypes__c).split(',');
     
@@ -919,11 +932,11 @@ public without sharing class UserTriggerHelper {
                             }
                             // CUV Program Changes - End
                             if (at.containsIgnoreCase('DNA')) { //Added by Areum on 11-01-2024 for DNAMS PIR
-                               
+                                
                                 if(at.containsIgnoreCase('DNA_HyundaiExt') || at.containsIgnoreCase('DNA_GenesisExt')) {
                                     usr.DNAMS_User_Flag__c = true;
                                 } else {
-                                   // usr.DNAMS_Internal_User__c = true; //Changed to comments [DPM-6020] by MinheeKim 01.21.2025
+                                    //usr.DNAMS_Internal_User__c = true;  // Changed to comment by Minhee on 02-10-2025 for DPM-6020
                                     usr.DNAMS_User_Flag__c = true;
                                 }
                             }
@@ -967,7 +980,7 @@ public without sharing class UserTriggerHelper {
         }
     }
     
-        /**
+   /**
     * Update Account Contact relationship
     * @param  newUsersList  list of new User
     * @param  oldUsersMap map of old User
@@ -1045,8 +1058,9 @@ public without sharing class UserTriggerHelper {
      * @param  listUserId  list of User
      * @return none     
      * @author Rajendra [20 Dec 2022] 
+     * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Changed to comment not to run DNAMSUserProvisioningServiceQueueable
      */
-    public static void updateDNAMSUserCheck(Map<Id, User> mapUsers) {
+    /**public static void updateDNAMSUserCheck(Map<Id, User> mapUsers) {
         
         Map<Id, Id> mapUserContactIds = new Map<Id, Id>();
         Set<Id> setDNAMSDealerUserIds = new Set<Id>();
@@ -1076,15 +1090,15 @@ public without sharing class UserTriggerHelper {
 
         if(!setDNAMSDealerUserIds.isEmpty()) {
             System.enqueueJob(new DNAMSUserProvisioningServiceQueueable(setDNAMSDealerUserIds));
-        }
-    }
+        } 
+    }*/
 
 
     /**
      * [Method Description] 
      * Prevent isActive from being false when DNAMS_Internal_User__c is true.
      * Created by [Jonghoon Kim] on [24-08-27] for [Ticket DPM-5754]
-     * Edited by [Minhee Kim] on [01.21.2025] for [DPM-6020]
+     * Edited by [Author] on [Date] for [Ticket #]
     */
     public static void DNAMsIUActive(Map<Id, User> oldMap, Map<Id, User> newMap) {  
         try {
@@ -1092,7 +1106,7 @@ public without sharing class UserTriggerHelper {
                 User newUser = newMap.get(userId);
                 User oldUser = oldMap.get(userId);
                 
-                if (newUser.DNAMS_User_flag__c == true) { //Changed from DNAMS_Internal_User__c to DNAMS_User_flag__c [DPM-6020] by MinheeKim 01.21.2025
+                if (newUser.DNAMS_User_flag__c == true) { // Changed DNAMS_Internal_User__c from to DNAMS_User_flag__c by Minhee on 02-10-2025 for DPM-6020
                     if (newUser.IsActive == false) {
                         newUser.IsActive = true;
                     }
@@ -1161,7 +1175,7 @@ public without sharing class UserTriggerHelper {
                 newUser.Safety_User__c = FALSE;
                 newUser.DPM_User__c = FALSE;
                 newUser.CUV_User__c = false;
-                //newUser.DNAMS_Internal_User__c = false; //Changed to comments by MinheeKim [DPM-6020] 01.21.2025
+                //newUser.DNAMS_Internal_User__c = false; // Changed to comment by Minhee on 02-10-2025 for DPM-6020
                 newUser.DNAMS_User_Flag__c = false;
 
                 newUser.RegionCodes__c= null;

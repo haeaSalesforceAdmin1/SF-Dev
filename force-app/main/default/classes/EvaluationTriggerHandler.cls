@@ -10,6 +10,10 @@ public class EvaluationTriggerHandler extends Trigger_Framework.baseHandler {
     public static Boolean run = AccountTriggerHandler.run ? true : false; //DPM-4456 changed from "true" to "AccountTriggerHandler.run ? true : false"  to prevent runiing when AccountTriggerHdler is false by Minhee - 24.04.03
     public static Boolean isInserting = false;
 
+    /**
+     * [Method Description] Before insert handler
+     * Edited by [MinheeKim] on [02-04-2025] for [DPM-6017] add the method to input the business last modified date, by
+    */
     public override void beforeInsert(List<SObject> newListGeneric){
         List<Evaluation__c> newList = (List<Evaluation__c>) newListGeneric;
         /*BEFORE INSERT METHODS START*/
@@ -22,10 +26,15 @@ public class EvaluationTriggerHandler extends Trigger_Framework.baseHandler {
         EvaluationTriggerHelper.populateEvaluationFromAccount(newList,null);
         EvaluationTriggerHelper.populateAssignedDealOnPartnerOwner(newList, null);
         EvaluationTriggerHelper.UpdateDealerIndicator(newList, null);
+        EvaluationTriggerHelper.updateBusinessLastmodified(newList, null); //DPM-6017 method to input the business last modified date, by MinheeKim - 02.04.2025
         
         /*BEFORE INSERT METHODS END*/
     }
 
+    /**
+     * [Method Description] Before update handler
+     * Edited by [MinheeKim] on [02-04-2025] for [DPM-6017] add the method to input the business last modified date, by
+    */
     public override void beforeUpdate(Map<Id, SObject> oldMapGeneric, Map<Id, SObject> newMapGeneric){
 
         Map<Id, Evaluation__c> oldMap = (Map<Id, Evaluation__c>) oldMapGeneric;
@@ -46,6 +55,7 @@ public class EvaluationTriggerHandler extends Trigger_Framework.baseHandler {
         EvaluationTriggerHelper.UpdateDealerIndicator(newMap.values(), null);
 
         EvaluationTriggerHelper.updateGenesisEvaluation(newMap.values(), oldMap); //DPM-5633 Added for Genesis Evaluation
+        EvaluationTriggerHelper.updateBusinessLastmodified(newMap.values(), oldMap); //DPM-6017 method to input the business last modified date, by MinheeKim - 02.04.2025
         /*BEFORE UPDATE METHODS END*/
     }
 

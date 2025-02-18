@@ -12,10 +12,9 @@ public with sharing class ContactTriggerHandlerTest {
     private static final String CONTACT_FN_1 = 'Ioniq';
     private static final String CONTACT_LN_1 = 'Palisade';
     private static final String CONTACT_EMAIL_1 = 'ionisade@hyundaidealerusa.com.test.ignore';
-    
+ 
     @TestSetup
     static void makeData() {
-        ContentDocumentLinkTriggerHandler.run = false;
         Account acct = new Account(
                 Name='GA999'
         );
@@ -46,6 +45,20 @@ public with sharing class ContactTriggerHandlerTest {
         Contact contact2 = new Contact(LastName='Test6', FirstName = 'Frent6', AccountId = acct2.Id, Email='test6@email.com', Access_Types__c='1) DPM_BasicExt/CA349 - DPM basic access permission for dealer user');
         insert contact2;
  
+        Contact contact3 = new Contact(LastName='DNAMS', FirstName = 'Test1', AccountId = acct2.Id, JobCode__c='DP', Active_DPM_User__c = true,
+        DNAMS_Active_User__c = true, DNAMS_Role__c = 'General Manager',
+        Email='test7@email.com', Access_Types__c='1) DPM_BasicExt/CA349 - DPM basic access permission for dealer user 2) DNA_HyundaiExt/CA349 - DPM basic access permission for dealer user');
+        insert contact3;
+
+        List<AccountContactRelation> acrForCon3 = [SELECT Id, JobCode__c, Roles FROM AccountContactRelation WHERE ContactId=:contact3.Id];
+
+        for(AccountContactRelation acr : acrForCon3){
+            acr.Roles = 'Dealer Principal';
+            acr.JobCode__c='DP';
+        }
+
+        update acrForCon3;
+
         User user1 = new User(
             FirstName = 'TestF1',
             LastName = 'Test1L1',
@@ -109,6 +122,7 @@ public with sharing class ContactTriggerHandlerTest {
     }
  
     public static testMethod void testInsertContact() {
+        ContentDocumentLinkTriggerHandler.run = false;
         Contact objContact = [SELECT Id, AccountId, LastName, FirstName, Email, Active_DPM_User__c, JobCode__c FROM Contact LIMIT 1];
         Contact objContact2 = objContact.clone(false);
         objContact2.LastName = 'testdata2';
@@ -117,9 +131,11 @@ public with sharing class ContactTriggerHandlerTest {
         Test.startTest();
         insert objContact2;
         Test.stopTest();
+        ContentDocumentLinkTriggerHandler.run = true;
     }
  
     public static testMethod void testUpdateContact() {
+        ContentDocumentLinkTriggerHandler.run =false;
         TestUtility.createOrganizations();
         TestUtility.createRegionsForOrganizations(HYUNDAI_ORG);
         TestUtility.createDistrictsForRegions();
@@ -137,21 +153,26 @@ public with sharing class ContactTriggerHandlerTest {
         //DPM-4454 end
         update activeDNAContact;
         Test.stopTest();
+        ContentDocumentLinkTriggerHandler.run =true;
     }
 
     public static testMethod void testDeleteContact() {
         Contact objContact = [SELECT Id FROM Contact LIMIT 1];
         Test.startTest();
+        ContentDocumentLinkTriggerHandler.run =false;
         delete objContact;
+        ContentDocumentLinkTriggerHandler.run =true;
         Test.stopTest();
     }
  
     public static testMethod void testUnDeleteContact() {
         Contact objContact = [SELECT Id FROM Contact LIMIT 1];
+        ContentDocumentLinkTriggerHandler.run =false;
         delete objContact;
         Test.startTest();
         undelete objContact;
         Test.stopTest();
+        ContentDocumentLinkTriggerHandler.run =true;
     }
  
     // static testMethod void testChangePrimaryContact() {
@@ -171,7 +192,7 @@ public with sharing class ContactTriggerHandlerTest {
  
 
     static testMethod void testMethodContactTriggerHelper() {
-        ContentDocumentLinkTriggerHandler.run = false;
+        ContentDocumentLinkTriggerHandler.run =false;
         Account testAccount = new Account(Name = 'Test Account',
                 DealerCode__c='AK003');
         insert testAccount;
@@ -235,4 +256,17 @@ public with sharing class ContactTriggerHandlerTest {
         ContentDocumentLinkTriggerHandler.run = true;
     }
  
+    /**
+     * [Method Description] test method for updateDNAMSRole
+     * Created by [MinheeKim] on [02-12-2025] for [DPM-6083]
+    */
+    static testMethod void testUpdateDNAMSRole() {
+        ContentDocumentLinkTriggerHandler.run =false;
+        Contact dnamsCon = [SELECT Id, Name, AccountId, Access_Types__c FROM Contact WHERE Name like '%DNAMS%' LIMIT 1];
+        Test.startTest();
+        dnamsCon.Access_Types__c = '<p>1) DNA_HyundaiExt/CA349  - null</p><p>2) DPM_HyundaiExt/TX095  - Hyundai Dealer user</p><p>2) DNA_HyundaiExt/TX095  - Hyundai Dealer user</p>';
+        update dnamsCon;
+        Test.stopTest();
+        ContentDocumentLinkTriggerHandler.run =true;
+    }
 }

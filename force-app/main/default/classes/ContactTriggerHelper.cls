@@ -4,20 +4,21 @@ public without sharing class ContactTriggerHelper {
     public static final String ACTIVE = 'Active';
     public static final String INACTIVE = 'Inactive';
     public static final String GeneralManager = 'GM'; //DPM-5400 added by Minhee Kim - 24.04.26
+    public static final String DealerPrincipal = 'DP'; //DPM-5620 added by Minhee Kim - 02.12.2025
+    public static final String DealerAdminSupport = 'DA'; //DPM-5620 added by Minhee Kim - 02.12.2025
+    public static final String OfficeManager = 'OM'; //DPM-5620 added by Minhee Kim - 02.12.2025
 
     /**DPM-5620 add to get current ACR */
     private static List<AccountContactRelation> cachedACRs = new List<AccountContactRelation>();
     private static Boolean nonACR = false;
 
     /**
-    * Description: get AccountContactRelation
-    * ----- Change Log -----
-    * Author : [Minhee Kim] / [01-31-2025] / [DPM-5620] / Created
-    * ---------------------------
+    * [Method Description]  get AccountContactRelation
+    * Created by [MinheeKim] on [01-31-2025] for [DPM-5620]
     */
     public static List<AccountContactRelation> getACRs(Contact newCon) {
         if (cachedACRs.size()==0 && !nonACR) {
-            cachedACRs = [SELECT AccountId, isActive, Account.DealerCode__c, DPMAccountUser__c, DNAMSUser__c, DPM_User_Active__c, DNAMSAccountUser__c, Active_CUV_User__c FROM AccountContactRelation WHERE ContactId=:newCon.Id];
+            cachedACRs = [SELECT AccountId, Account.Name, Roles, DNAMS_Role__c, JobCode__c, IsActive, Account.DealerCode__c, Account.Temporary_Dealer__c, DPMAccountUser__c, DNAMSUser__c, DPM_User_Active__c, DNAMSAccountUser__c, Active_CUV_User__c FROM AccountContactRelation WHERE ContactId=:newCon.Id];
             if(cachedACRs.size()==0) nonACR = true;
         }
         return cachedACRs;
@@ -50,8 +51,9 @@ public without sharing class ContactTriggerHelper {
      * @description:    When DNAMS_Active_User__c flag on the Contact gets updated, find the associated partner user
      *                  and invoke DNAMSUserProvisioningServiceQueueable to assign necessary permission sets/public groups
      * @params:         newMap - Trigger.newMap, oldMap - Trigger.oldMap
+     * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Changed to comment not to run DNAMSUserProvisioningServiceQueueable
      */
-    public static void updateDNAMSActiveUser( Map<Id, Contact> newMap, Map<Id, Contact> oldMap) {
+    /**public static void updateDNAMSActiveUser( Map<Id, Contact> newMap, Map<Id, Contact> oldMap) {
         
         Map<Id, Boolean> mapContactDNAActiveUserFlag = new Map<Id, Boolean>();
         Map<Id, Boolean> mapUserDNAMSFlag = new Map<Id, Boolean>();
@@ -72,7 +74,8 @@ public without sharing class ContactTriggerHelper {
                 System.enqueueJob(new DNAMSUserProvisioningServiceQueueable(mapUserDNAMSFlag));
             }
         }
-    }
+    }*/
+
 
 
     /**
@@ -184,6 +187,7 @@ public without sharing class ContactTriggerHelper {
      * Created by [MinheeKim] on [2023-12-12] for [DPM-4454]
      * Edited by [MinheeKim] on [2024-07-10] for [DPM-5613] add logic to check the app type for each accesstype
      * Edited by [MinheeKim] on [01-30-2025] for [DPM-5620] change the logic to compare with existing ACR and new accesstype
+     * Edited by [MinheeKim] on [02-12-2025] for [DPM-6083] add logic to update DNAMS Role
     */
     public static Map<String,List<AccountContactRelation>> compareAccesstype(Contact newCon){//DPM-5620 changed the paramaneter from newCon, oldCon to newCon
         Map<String,Set<String>> newAccesstype = new Map<String,Set<String>>();
@@ -202,37 +206,48 @@ public without sharing class ContactTriggerHelper {
         //List<Account> activeAcc = new List<Account>();
         List<AccountContactRelation> acrToUpsert = new List<AccountContactRelation>();
         List<AccountContactRelation> acrToDelete = new List<AccountContactRelation>();
-        
+        List<AccountContactRelation> existingACRs = new List<AccountContactRelation>(); //DPM-5620 Add to use in updateDNAMSRole method
+        Boolean runUpdateDNAMSRole = false;
+        Boolean hasTempAccount = false;
+
         /**DPM-5620 start: added to compare the ACRs with accesstype */
         if(ACRList.size()>0){
             for(AccountContactRelation acr : ACRList){
                 if(newCon.Access_Types__c!='' && newCon.Access_Types__c!=null && newAccesstype.containsKey(acr.Account.DealerCode__c)){
                     //If the dealer code of existing ACR is in new Accesstype, remain the ACR and check the flags
-                    if(acr.DPMAccountUser__c==false && newAccesstype.get(acr.Account.DealerCode__c).contains('DPM')){
+                    if(newAccesstype.get(acr.Account.DealerCode__c).contains('DPM')){
                         acr.DPMAccountUser__c = true;
-                    }else if(acr.DPMAccountUser__c==true && !(newAccesstype.get(acr.Account.DealerCode__c).contains('DPM'))){
+                    }else if(!(newAccesstype.get(acr.Account.DealerCode__c).contains('DPM'))){
                         acr.DPMAccountUser__c = false;
                     }
                         
-                    if(acr.DNAMSAccountUser__c==false && newAccesstype.get(acr.Account.DealerCode__c).contains('DNA')){
+                    if(newAccesstype.get(acr.Account.DealerCode__c).contains('DNA')){
                         acr.DNAMSAccountUser__c = true;
-                    }else if(acr.DNAMSAccountUser__c==true && !(newAccesstype.get(acr.Account.DealerCode__c).contains('DNA'))){
+                    }else if(!(newAccesstype.get(acr.Account.DealerCode__c).contains('DNA'))){
                         acr.DNAMSAccountUser__c = false;
                     }
 
-                    if(!acr.isActive){
-                        acr.isActive = true;
+                    if(!acr.IsActive){
+                        acr.IsActive = true;
                     }
                     acrToUpsert.add(acr);
                         
-                }else{
-                    //If the dealer code of existing ACR isn't in new Accesstype, put the acr in list to inactive
-                    acr.isActive = false;
+                }else if(acr.Account.Temporary_Dealer__c){
+                    acrToUpsert.add(acr);
+                    hasTempAccount = true;
+                }else if(!acr.Account.Temporary_Dealer__c){
+                    //If the dealer code of existing ACR isn't in new Accesstype and the account of ACR is not temporary dealer, put the acr in list to inactive
+                    acr.IsActive = false;
                     acr.DNAMSAccountUser__c = false;
                     acr.DPMAccountUser__c = false;
-                    acrToDelete.add(acr);
+                    acrToDelete.add(acr); 
                 }
                 existingAcc.add(acr.Account.DealerCode__c);
+
+                if(acr.DNAMSAccountUser__c) {
+                    runUpdateDNAMSRole = true;
+                }
+                existingACRs.add(acr); //DPM-6083 Add to use in updateDNAMSRole method
             }
         }
         //If there's no existing ACR and new access type isn't blank, create new ACR
@@ -240,7 +255,7 @@ public without sharing class ContactTriggerHelper {
             Map<Account,Set<String>> accountAppMap =getAccountApptypeMap(newAccesstype);
             for(Account acc : accountAppMap.keySet()){ 
                 if(!existingAcc.contains(acc.DealerCode__c)){
-                    AccountContactRelation newACR = new AccountContactRelation(AccountId = acc.Id, ContactId = newCon.Id, isActive = true);
+                    AccountContactRelation newACR = new AccountContactRelation(AccountId = acc.Id, ContactId = newCon.Id, IsActive = true);
                     Set<String> appType = accountAppMap.get(acc);
                     if(appType.contains('DPM')){
                         newACR.DPMAccountUser__c = true;
@@ -250,15 +265,24 @@ public without sharing class ContactTriggerHelper {
 
                     if(appType.contains('DNA')){ //Added by Areum on 11-01-2024 for DNAMS PIR
                         newACR.DNAMSAccountUser__c = true;
+                        runUpdateDNAMSRole = true;
                     }else{
                         newACR.DNAMSAccountUser__c = false;
                     }
                     acrToUpsert.add(newACR);
+                    
+                    if(newACR.DNAMSAccountUser__c){
+                        runUpdateDNAMSRole = true;
+                    } 
+                    existingACRs.add(newACR); //DPM-6083 Add to use in updateDNAMSRole method
                 }
             }
         }
             
-        
+        if(existingACRs.size()>0 && runUpdateDNAMSRole && !hasTempAccount){
+            String dnamsRole = updateDNAMSRole(existingACRs);
+            if(dnamsRole!=null) newCon.DNAMS_Role__c = dnamsRole;
+        }
         
         /**DPM-5620 end: added to compare the ACRs with accesstype */
         /** DPM-5620 Changed to comments
@@ -314,20 +338,82 @@ public without sharing class ContactTriggerHelper {
         //activeAcc=activeAccountContactRelation(newCon, activeACR);
         //inactiveAcc=inactiveAccountContactRelation(oldCon, inactiveACR);
 
-        try {
-            System.debug('acrToUpsert: '+acrToUpsert);
-            System.debug('acrToDelete: '+acrToDelete);
-            if(acrToUpsert.size()>0) upsert acrToUpsert;
-            if(acrToDelete.size()>0) upsert acrToDelete;
-        } catch(Exception e) {
-            System.debug(e.getMessage());
+        Database.UpsertResult[] results = new List<Database.UpsertResult>();
+        List<Async_Apex_Error__c> errorLogs = new List<Async_Apex_Error__c>();
+        if(!existingACRs.isEmpty()) {
+            try {
+                Boolean hasError = false;
+                
+                System.debug('### Before update - ACRs to update: ');
+                for(AccountContactRelation acrToUpdate : existingACRs) {
+                    System.debug('### Account: ' + acrToUpdate.Account.Name + 
+                                ', DNAMSAccountUser__c: ' + acrToUpdate.DNAMSAccountUser__c);
+                }
+                AccountContactRelationTriggerHandler.isRunning = false;
+                results = Database.upsert(existingACRs, false);
+
+                System.debug(LoggingLevel.ERROR, 'results.size(): ' + results.size());
+                for (Integer i = 0; i < results.size(); i++) {
+                    if (!results[i].isSuccess()) {
+                        Database.Error error = results[i].getErrors()[0];
+                        AccountContactRelation failedAcr = existingACRs[i];
+        
+                        Contact relatedContact = [SELECT Access_Types__c FROM Contact WHERE Id = :failedAcr.ContactId];
+
+                        String errorDetail ='Error Message: ' + error.getMessage() + '\n' +
+                                        //     'Line Number: ' + error.getLineNumber() + '\n' +
+                                        //    'Stacktrace: ' + error.getStackTraceString() + '\n' +
+                                            'Failed to update AccountContactRelation for Contact ID: ' + failedAcr.ContactId + '\n' +
+                                            'Account ID: ' + failedAcr.AccountId + '\n' +
+                                            'AccessType: ' + relatedContact.Access_Types__c;
+
+
+                            Async_Apex_Error__c errorLog = new Async_Apex_Error__c(
+                            SystemTimestamp__c = System.now(),
+                            Error_Detail__c = errorDetail
+                            );
+                        errorLogs.add(errorLog);
+                        
+                        hasError = true;
+                    }
+                }
+                AccountContactRelationTriggerHandler.isRunning = true;
+                if (hasError) {
+                    throw new ACRDMLException('Update for AccountContactRelation failed.');
+                }
+
+            } catch(Exception e) {
+                System.debug(LoggingLevel.ERROR, 'Failed to update AccountContactRelations: ' + e.getMessage());
+                for (Async_Apex_Error__c log : errorLogs) {
+                    log.Error_Detail__c += '\nLine Number: ' + e.getLineNumber() + '\n' +
+                                        'Stacktrace: ' + e.getStackTraceString();
+                }
+
+                if (!errorLogs.isEmpty()) {
+                    insert errorLogs;
+                }
+            }
         }
+    
+        
+        // try {
+        //     System.debug('acrToUpsert: '+acrToUpsert);
+        //     System.debug('acrToDelete: '+acrToDelete);
+        //     if(acrToUpsert.size()>0) upsert acrToUpsert;
+        //     if(acrToDelete.size()>0) update acrToDelete; 
+
+            
+        // } catch(Exception e) {
+        //     System.debug(e.getMessage());
+        // }
         acrMap.put(ACTIVE,acrToUpsert);
         acrMap.put(INACTIVE,acrToDelete);
         return acrMap;
 
     }
     
+    public class ACRDMLException extends Exception {}
+
     /**
      * [Method Description] get Account Apptype map
      * Created by [MinheeKim] on [01-30-2025] for [DPM-5620]
@@ -456,7 +542,8 @@ public without sharing class ContactTriggerHelper {
         WHERE ContactId IN :newMap.keySet() AND IsDirect = false AND IsActive=false AND DNAMSAccountUser__c = false];*/ 
         
         List<AccountContactRelation> acrList = [SELECT AccountId, Account.DealerCode__c, IsActive, IsDirect, DNAMSAccountUser__c FROM AccountContactRelation 
-        WHERE ContactId IN :newMap.keySet() AND IsDirect = false AND IsActive=false]; //Added by Areum on 11-01-2024 for DNAMS PIR
+        WHERE ContactId IN :newMap.keySet() AND IsDirect = false AND IsActive=false //Added by Areum on 11-01-2024 for DNAMS PIR 
+        AND Account.Temporary_Dealer__c =false]; //not delete the ACR of temporary account as DPM-6005 -02.04.2025
 
         for(AccountContactRelation acr : acrList){
             System.debug('Delete ACR: '+acr.Account.DealerCode__c);
@@ -613,6 +700,49 @@ public without sharing class ContactTriggerHelper {
 
         return conUserMap;
     }
+
+    /**
+     * [Method Description] update ACR's DNAMSRole field
+     * Created by [MinheeKim] on [02-12-2025] for [DPM-6083]
+    */
+    public static String updateDNAMSRole(List<AccountContactRelation> existingACRs){
+
+        String finalDNAMSRole = '';
+        String finalJobCode = '';
+        Map<String, Integer> dnamsRolePriority = new Map<String, Integer>();
+        dnamsRolePriority.put(DealerPrincipal, 0);
+        dnamsRolePriority.put(GeneralManager, 1);
+        dnamsRolePriority.put(DealerAdminSupport, 2);
+        dnamsRolePriority.put(OfficeManager, 3);
+
+        Map<String, String> jobcodeToRole = new Map<String, String>();
+        jobcodeToRole.put(DealerPrincipal, 'Dealer Principal');
+        jobcodeToRole.put(GeneralManager, 'General Manager');
+        jobcodeToRole.put(DealerAdminSupport, 'Dealer Admin Support');
+        jobcodeToRole.put(OfficeManager, 'Office Manager');
+
+        for(AccountContactRelation acr : existingACRs) {
+            if(acr.isActive && acr.DNAMSAccountUser__c){
+                if(acr.JobCode__c != null) {
+                    Set<String> jobCodes = new Set<String>(acr.JobCode__c.split(';'));
+                    for(String jobCode : jobCodes) {
+                        if(dnamsRolePriority.containsKey(jobCode)){
+                            if(finalJobCode!='' && dnamsRolePriority.containsKey(finalJobCode)){
+                                if(dnamsRolePriority.get(finalJobCode) > dnamsRolePriority.get(jobCode)) {
+                                    finalJobCode=jobCode;
+
+                                }
+                            }else if(finalJobCode==''){finalJobCode=jobCode;}
+                        }
+                    }
+                }
+            }
+        }
+
+        if(finalJobCode!='') finalDNAMSRole = jobcodeToRole.get(finalJobCode);
+        return finalDNAMSRole;
+    }
+
 
     
 }

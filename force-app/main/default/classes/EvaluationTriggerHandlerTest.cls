@@ -9,7 +9,7 @@ public with sharing class EvaluationTriggerHandlerTest {
         insert CE;
         User user1 = TestUtility.createInternalUser('TestOwnerUser', 'TestOwnerUser', 'System Administrator');
         User user2 = TestUtility.createInternalUser('TestOwnerUser2', 'TestOwnerUser2', 'System Administrator');
-        // User user3 = TestUtility.createInternalUser('TestOwnerUser3', 'TestOwnerUser3', 'System Administrator');
+        User user3 = TestUtility.createInternalUser('TestOwnerUser3', 'TestOwnerUser3', 'Genesis User Internal');
 
         TestUtility.createOrganizations();
         List<Region__c> regions = TestUtility.createRegionsForOrganizations(TestUtility.HYUNDIA_ORG);
@@ -63,6 +63,51 @@ public with sharing class EvaluationTriggerHandlerTest {
         cdl.LinkedEntityId = account.Id;
 
         insert cdl;
+
+        //Created by [MinheeKim] on [02-04-2025] for increasing the test coverage
+        RecordType genesisRecType = [
+            SELECT Id FROM RecordType 
+            WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' 
+            AND SObjectType = 'Evaluation__c' 
+            LIMIT 1
+        ];
+
+        User testActiveUser = new User(
+            FirstName = 'testActiveUser',
+            LastName = 'testActiveUser',
+            Username = 'testActiveUser' + 'testActiveUser' + '@' + 'testActiveUser' + '.com',
+            ProfileId = [Select Id from Profile WHERE NAME = 'Genesis User Internal' LIMIT 1].Id,
+            Email = 'testActiveUser' + 'invalid@acumensolutions.com',
+            Alias = 'usr123',
+            TimeZoneSidKey = 'America/New_York',
+            LocaleSidKey = 'en_US',
+            EmailEncodingKey = 'ISO-8859-1',
+            LanguageLocaleKey = 'en_US',
+            RegionCodes__c = '',
+            DistrictCodes__c = '',
+            IsActive = true
+        );
+
+        insert testActiveUser;
+
+        User testActiveAdmin = new User(
+            FirstName = 'testActiveAdmin',
+            LastName = 'testActiveAdmin',
+            Username = 'testActiveAdmin' + 'testActiveAdmin' + '@' + 'testActiveAdmin' + '.com',
+            ProfileId = [Select Id from Profile WHERE NAME = 'System Administrator'  LIMIT 1].Id,
+            Email = 'testActiveAdmin' + 'invalid@acumensolutions.com',
+            Alias = 'usr1234',
+            TimeZoneSidKey = 'America/New_York',
+            LocaleSidKey = 'en_US',
+            EmailEncodingKey = 'ISO-8859-1',
+            LanguageLocaleKey = 'en_US',
+            RegionCodes__c = '',
+            DistrictCodes__c = '',
+            IsActive = true
+        );
+
+        insert testActiveAdmin;
+
     }
 
     static testMethod void testEvaluationHandler() {
@@ -294,6 +339,7 @@ public with sharing class EvaluationTriggerHandlerTest {
        
 
         // Step 2: Create a list of old evaluations
+        List<Evaluation__c> oldEvalList = new List<Evaluation__c>();
         Evaluation__c oldEvaluation = new Evaluation__c(
             Name = 'AL701 - Sales DPMR - Oct 2, 2024 - 2',
             RecordTypeId = dpmrRecType.Id,
@@ -303,7 +349,7 @@ public with sharing class EvaluationTriggerHandlerTest {
             Topics_HmaService__c = 'Commodities',
             PrimaryContactDate__c = Date.today()
         );
-        insert oldEvaluation;
+        oldEvalList.add(oldEvaluation);
 
         Evaluation__c oldEvaluation2 = new Evaluation__c(
             Name = 'AL701 - Sales DPMR (FIN, SI) - Oct 2, 2024 - 5',
@@ -314,7 +360,7 @@ public with sharing class EvaluationTriggerHandlerTest {
             Topics_HmaService__c = null,
             PrimaryContactDate__c = Date.today().addDays(-1)
         );
-        insert oldEvaluation2;
+        oldEvalList.add(oldEvaluation2);
 
         Evaluation__c oldEvaluation3 = new Evaluation__c(
             Name = 'AL701 - Sales DPMR - Oct 2, 2024 - 3',
@@ -325,7 +371,7 @@ public with sharing class EvaluationTriggerHandlerTest {
             Topics_HmaService__c = null,
             PrimaryContactDate__c = Date.today().addDays(-2)
         );
-        insert oldEvaluation3;
+        oldEvalList.add(oldEvaluation3);
 
         Evaluation__c oldEvaluation4 = new Evaluation__c(
             Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 4',
@@ -336,7 +382,63 @@ public with sharing class EvaluationTriggerHandlerTest {
             Topics_HmaService__c = null,
             PrimaryContactDate__c = Date.today().addDays(-3)
         );
-        insert oldEvaluation4;
+        oldEvalList.add(oldEvaluation4);
+
+        Evaluation__c oldEvaluation5 = new Evaluation__c(
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 5',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_GmaSales__c = null,
+            Topics_GmaService__c = null,
+            Topics_HmaSales__c =null,
+            Topics_HmaService__c = null,
+            PrimaryContactDate__c = Date.today().addDays(-3)
+        );
+        oldEvalList.add(oldEvaluation5);
+
+        Evaluation__c oldEvaluation6 = new Evaluation__c(
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 6',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_GmaSales__c = null,
+            Topics_GmaService__c = null,
+            Topics_HmaSales__c =null,
+            Topics_HmaService__c = null,
+            PrimaryContactDate__c = Date.today().addDays(-3)
+        );
+        oldEvalList.add(oldEvaluation6);
+
+        Evaluation__c oldEvaluation7 = new Evaluation__c(
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 7',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_GmaSales__c = null,
+            Topics_GmaService__c = null,
+            Topics_HmaSales__c =null,
+            Topics_HmaService__c = null,
+            PrimaryContactDate__c = Date.today().addDays(-3)
+        );
+        oldEvalList.add(oldEvaluation7);
+
+        Evaluation__c oldEvaluation8 = new Evaluation__c(
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 8',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_GmaSales__c = null,
+            Topics_GmaService__c = null,
+            Topics_HmaSales__c =null,
+            Topics_HmaService__c = null,
+            PrimaryContactDate__c = Date.today().addDays(-3)
+        );
+        oldEvalList.add(oldEvaluation8);
+
+        Evaluation__c oldEvaluation9 = new Evaluation__c(
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 9',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_GmaSales__c = null,
+            Topics_GmaService__c = null,
+            Topics_HmaSales__c =null,
+            Topics_HmaService__c = null,
+            PrimaryContactDate__c = Date.today().addDays(-3)
+        );
+        oldEvalList.add(oldEvaluation9);
+        insert oldEvalList;
 
         // Step 3: Create a new evaluation with changed topics
         Evaluation__c newEvaluation = new Evaluation__c(
@@ -369,7 +471,7 @@ public with sharing class EvaluationTriggerHandlerTest {
 
         Evaluation__c newEvaluation4 = new Evaluation__c(
             Id = oldEvaluation4.Id, // Use the same Id for the update
-            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 3',
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 4',
             RecordTypeId = dpmrRecType.Id,
             Topics_HmaSales__c = null,
             Topics_HmaService__c = null,
@@ -377,16 +479,67 @@ public with sharing class EvaluationTriggerHandlerTest {
             Topics_GmaService__c = null
         );
 
+        Evaluation__c newEvaluation5 = new Evaluation__c(
+            Id = oldEvaluation5.Id, // Use the same Id for the update
+            Name = 'AL701 - Sales DPMR (FIN) - Oct 2, 2024 - 5',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_HmaSales__c = null,
+            Topics_HmaService__c = 'Financial Performance;Survey Integrity',
+            Topics_GmaSales__c = '',
+            Topics_GmaService__c = null
+        );
+
+        Evaluation__c newEvaluation6 = new Evaluation__c(
+            Id = oldEvaluation5.Id, // Use the same Id for the update
+            Name = 'AL701 - Sales DPMR (SI) - Oct 2, 2024 - 6',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_HmaSales__c = null,
+            Topics_HmaService__c = 'Financial Performance;Survey Integrity',
+            Topics_GmaSales__c = '',
+            Topics_GmaService__c = null
+        );
+
+        Evaluation__c newEvaluation7 = new Evaluation__c(
+            Id = oldEvaluation5.Id, // Use the same Id for the update
+            Name = 'AL701 - Sales DPMR (FIN, SI) - Oct 2, 2024 - 7',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_HmaSales__c = null,
+            Topics_HmaService__c = 'Financial Performance;Survey Integrity',
+            Topics_GmaSales__c = '',
+            Topics_GmaService__c = null
+        );
+
+        Evaluation__c newEvaluation8 = new Evaluation__c(
+            Id = oldEvaluation5.Id, // Use the same Id for the update
+            Name = 'AL701 - Sales DPMR (FIN, SI) - Oct 2, 2024 - 8',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_HmaSales__c = null,
+            Topics_HmaService__c = null,
+            Topics_GmaSales__c ='Financial Performance;Survey Integrity',
+            Topics_GmaService__c = null
+        );
+
+        Evaluation__c newEvaluation9 = new Evaluation__c(
+            Id = oldEvaluation5.Id, // Use the same Id for the update
+            Name = 'AL701 - Sales DPMR (SI) - Oct 2, 2024 - 8',
+            RecordTypeId = dpmrRecType.Id,
+            Topics_HmaSales__c = null,
+            Topics_HmaService__c = null,
+            Topics_GmaSales__c ='Financial Performance;Survey Integrity',
+            Topics_GmaService__c = null
+        );
+
+
         // Step 4: Create a map of old evaluations
         Map<Id, Evaluation__c> oldEvaluationsMap = new Map<Id, Evaluation__c>();
-        oldEvaluationsMap.put(oldEvaluation.Id, oldEvaluation);
-        oldEvaluationsMap.put(oldEvaluation2.Id, oldEvaluation2);
-        oldEvaluationsMap.put(oldEvaluation3.Id, oldEvaluation3);
-        oldEvaluationsMap.put(oldEvaluation4.Id, oldEvaluation4);
+        for(Integer i=0;i<oldEvalList.size();i++){
+            oldEvaluationsMap.put(oldEvalList[i].Id, oldEvalList[i]);
+        }
 
         // Step 5: Call the evaluationDPMRTopicChange method
         Test.startTest();
-        List<Evaluation__c> newEvaluations = new List<Evaluation__c> { newEvaluation, newEvaluation2, newEvaluation3, newEvaluation4 };
+        List<Evaluation__c> newEvaluations = 
+        new List<Evaluation__c> { newEvaluation, newEvaluation2, newEvaluation3, newEvaluation4, newEvaluation5, newEvaluation6, newEvaluation7, newEvaluation8, newEvaluation9 };
         EvaluationTriggerHelper.evaluationDPMRTopicChange(newEvaluations, oldEvaluationsMap); // Call your method
         EvaluationTriggerHelper.preventDuplicateEvaluation(newEvaluations);
         Test.stopTest();
@@ -417,4 +570,50 @@ public with sharing class EvaluationTriggerHandlerTest {
         insert evaluationContact;
     }*/
 
+    /**
+     * [Method Description] Test method for updateBusinessLastmodified
+     * Created by [MinheeKim] on [02-04-2025] for [DPM-6017] 
+    */
+    static testMethod void testUpdateBusinessLastmodified(){
+
+        User testUser = [SELECT Id, ProfileId, Profile.Name FROM User WHERE Profile.Name !='System Administrator' AND IsActive =true Limit 1];
+        User sysAdmin =  [SELECT Id, ProfileId, Profile.Name FROM User WHERE Profile.Name ='System Administrator' AND IsActive =true  Limit 1];
+        
+        Evaluation__c testEval = new Evaluation__c(Name='testEval',Organization__c = 'Genesis', Type__c='Service');
+
+        Test.startTest();
+        System.runAs(testUser){
+            insert testEval;
+        }
+
+        System.runAs(sysAdmin){
+            testEval.Name = 'testSysAdmin';
+            update testEval;
+        }
+        Test.stopTest();
+     }
+
+      /**
+     * [Method Description] test method for the updateGenesisEvaluation method
+     * Created by [MinheeKim] on [02-04-2025] for increasing the test coverage
+    */
+    static testMethod void testUpdateGenesisEvaluation(){
+
+        Account account = [SELECT Id FROM Account LIMIT 1];
+        
+        RecordType genesisRecType = [SELECT Id FROM RecordType WHERE DeveloperName = 'Genesis_Retailer_Eval_Service' AND SObjectType = 'Evaluation__c' LIMIT 1];
+        Evaluation__c genesisEval = new Evaluation__c(Name='testEval', RecordTypeId=genesisRecType.Id);
+
+        User testUser = [SELECT Id, ProfileId, Profile.Name, isActive FROM User WHERE Profile.Name ='System Administrator'  AND IsActive =true  Limit 1];
+
+        Test.startTest();
+        System.runAs(testUser){
+            insert genesisEval;
+            genesisEval.Name = 'genesisEval';
+            update genesisEval;
+        }
+        Test.stopTest();
+       
+        
+     }
 }

@@ -51,6 +51,10 @@ public class ContactTriggerHandler extends Trigger_Framework.baseHandler {
         /*AFTER INSERT METHODS END*/
     }
 
+    /**
+     * [Method Description] ContactTriggerHandler after update
+     * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Changed to comment not to run DNAMSUserProvisioningServiceQueueable
+    */
     public override void afterUpdate(Map<Id, SObject> oldMapGeneric, Map<Id, SObject> newMapGeneric){
         if(!run) {
             return;
@@ -74,7 +78,7 @@ public class ContactTriggerHandler extends Trigger_Framework.baseHandler {
 
 
         ContactTriggerHelper.handleExternalSharingForContacts(contactsToProcessSharing);
-        ContactTriggerHelper.updateDNAMSActiveUser(newMap, oldMap);
+        //ContactTriggerHelper.updateDNAMSActiveUser(newMap, oldMap); //Changed to comment not to run DNAMSUserProvisioningServiceQueueable
         ContactTriggerHelper.deleteInactiveACR(newMap, oldMap); //DPM-5613 Added by MinheeKim - 2024.06.28
        
         /*AFTER UPDATE METHODS END*/

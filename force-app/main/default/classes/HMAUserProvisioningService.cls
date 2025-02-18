@@ -343,9 +343,11 @@ public without sharing class HMAUserProvisioningService {
     /**
      * [Method Description] provide profile and role to user
      * Created by [Author] on [Date] for [Ticket #]
-     * Edited by [MinheeKim] on [2023-12-06] for [DPM-5194]: Added condition to check DPM_JDP_Evaluat to go to not internal logic for role
-     * Edited by [Minhee Kim] on [2024-04-11] for [DPM-5015] prevent to change the profile as 'minimum access' when DNAMS internal user has no access type
-     * Edited by [Minhee Kim] on [2024-12-02] for [DPM-5934] Insert Role by Access type to use in CRMA Log
+     * Edited by [MinheeKim] on [12-06-2023] for [DPM-5194]: Added condition to check DPM_JDP_Evaluat to go to not internal logic for role
+     * Edited by [Minhee Kim] on [04-11-2024] for [DPM-5015] prevent to change the profile as 'minimum access' when DNAMS internal user has no access type
+     * Edited by [Minhee Kim] on [12-02-2024] for [DPM-5934] Insert Role by Access type to use in CRMA Log
+     * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
+     * Edited by [Minhee Kim] on [02-17-2025] for [DPM-6086] added condition not to provide role if there's only DNAMS access(maintain the previous role) 
     */
     public static void provisionRoleAndProfileOnUsers(List<HMAUserProvisioning__c> listOfHMAUserProvisionings, Map<Id, List<String>> mapUserProvisionAccessTypes, Set<String> accessTypes) {
         System.debug('provisionRoleAndProfileOnUsers started');
@@ -463,7 +465,8 @@ public without sharing class HMAUserProvisioningService {
                         }
                     
                         //DPM-4973 check whether the user is intenal or not - by MH - 2023.10.24
-                        if(profileName.contains('Internal')){
+                        //DPM-6086 added condition not to provide role if there's only DNAMS access(maintain the previous role) by MinheeKim on 02.17.2025
+                        if(profileName.contains('Internal') && !(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true) ){
                             Integer currentRoleIndex = rolePriorityList.indexOf(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                             System.debug(LoggingLevel.ERROR, currentRoleIndex);    
                                 if(FIELDMANAGER.contains(accessTypeToRoleDeveloperNameMap.get(userAccessType)) && (currentRoleIndex <= priorityIndexRole|| priorityIndexRole==-1 || priorityIndexRole==null)){ 
@@ -497,13 +500,16 @@ public without sharing class HMAUserProvisioningService {
                             /**DPM-5934 end*/
 
                         // profileName not contains 'Intennal' 
-                        }else if(accessTypeToRoleDeveloperNameMap.containsKey(userAccessType)) {
+                        }else if(accessTypeToRoleDeveloperNameMap.containsKey(userAccessType) 
+                        && !(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true)) { //DPM-6086 added condition not to provide role if there's only DNAMS access(maintain the previous role) by MinheeKim on 02.17.2025
                             Integer currentRoleIndex = rolePriorityList.indexOf(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                             System.debug(LoggingLevel.ERROR, currentRoleIndex);
                             if((priorityIndexRole == null || (priorityIndexRole != null && currentRoleIndex != -1 && currentRoleIndex <= priorityIndexRole))) {
                                 user.UserRoleId = roleDeveloperNameToRoleIdMap.get(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                                 priorityIndexRole = currentRoleIndex;
                             }
+                        }else if(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true){  //DPM-6086 added condition to maintain the previous role when user has only DNAMS access by MinheeKim on 02.17.2025
+                            user.UserRoleId = currentUserRoleId;
                         }
 
                         // CCSOM-67, retain System_Admin Role, use currentUserProfileName,currentUserRoleId which was declared before
@@ -513,9 +519,10 @@ public without sharing class HMAUserProvisioningService {
 
                         //Added by Areum on 11-01-2024 for DNAMS PIR
                         //Changed the condition from (user.DNAMS_User__c == true || user.DNAMS_Internal_User__c == true) to  user.DNAMS_User_Flag__c == true [DPM-6020] by Minhee Kim 01.21.2025
-                        if(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true && userAccessTypes.size() == 1) {
+                        /**DPM-6086 change to comment by Minhee on 02-12-2025 */
+                        /*if(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true && userAccessTypes.size() == 1) {
                             user.UserRoleId = null;
-                        }
+                        }*/
 
                         System.debug(LoggingLevel.ERROR, 'RoleId: '+user.UserRoleId);
                         System.debug(LoggingLevel.ERROR, 'NEW RoleId: '+currentUserRoleId);
@@ -541,7 +548,7 @@ public without sharing class HMAUserProvisioningService {
                         // Soyeon Kim changes finish
 
                         if(!minimumUser.DNAMS_User_Flag__c){ //DPM-5015 added '!minimumUser.DNAMS_Internal_User__c' condition by MinheeKim - 24.04.11
-                        //Changed the condition from !minimumUser.DNAMS_Internal_User__c && !minimumUser.DNAMS_User__c to !minimumUser.DNAMS_User_Flag__c [DPM-6020] by Minhee Kim - 01.21.2025
+                        //Changed the condition from !minimumUser.DNAMS_Internal_User__c && !minimumUser.DNAMS_User__c to !minimumUser.DNAMS_User_Flag__c [DPM-DNAMSUserProvisioningServiceQueueable] by Minhee Kim - 01.21.2025
                             user.ProfileId = minimumProfileLicenseTypeToProfileIdMap.get(currentUserProfileLicenseType); 
                         }
                         //DPM-5015 added else if condition to provide hyundai user internal profile to DNAMS internal user with no access type by  MinheeKim - 24.04.11

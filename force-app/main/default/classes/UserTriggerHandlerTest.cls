@@ -1221,6 +1221,7 @@ public with sharing class UserTriggerHandlerTest {
     /**
      * [Method Description] Test method to test DNAMsIUActive
      * Created by [Jonghoon Kim] on [24.08.28] for [DPM-5754] 
+	 * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
     */
     @IsTest
     static void DNAMsIUActiveTest() {
@@ -1247,8 +1248,9 @@ public with sharing class UserTriggerHandlerTest {
     /**
      * Test method to test updateAccessType
      * Created by Areum on 12-22-2024 for DPM-5979
+     * Edited by MinheeKim on 02-13-2025 for DPM-6083 change to comment
     */
-    @IsTest
+    /**@IsTest
     static void testUpdateAccessTypeWithDNAMS() {
         UserRole userRole = [Select Id, DeveloperName From UserRole Where Name = 'System Admin' Limit 1];
         User adminUser = [Select Id, UserRoleId From User Where Profile.Name='System Administrator' and IsActive = true Limit 1];
@@ -1267,7 +1269,9 @@ public with sharing class UserTriggerHandlerTest {
                 LastName = 'TestContact',
                 AccountId = acc.Id,
                 Email = 'test@test.com',
-                JobCode__c = 'DP'
+                JobCode__c = 'DP',
+                DNAMS_Active_User__c = true,
+                DNAMS_Role__c = 'Dealer Principal'
             );
             insert con;
 
@@ -1302,7 +1306,7 @@ public with sharing class UserTriggerHandlerTest {
                                             WHERE ContactId = :con.Id];
             System.assertEquals(true, updatedACR.DNAMSAccountUser__c);
         }
-    }
+    }*/
 
     /**
      * Test method to test updateAccessType
@@ -1333,8 +1337,8 @@ public with sharing class UserTriggerHandlerTest {
 
             User testUser = TestUtility.createExternalUser(
                 con.Id, 
-                'Test', 
-                'User2', 
+                'AccessTypeTest', 
+                'User123', 
                 'DPM Partner Community (Hyundai)',
                 'DPM_BasicExt/CA01B'
             );
@@ -1382,6 +1386,5 @@ public with sharing class UserTriggerHandlerTest {
         Test.stopTest();
 
     }
-
 
 }

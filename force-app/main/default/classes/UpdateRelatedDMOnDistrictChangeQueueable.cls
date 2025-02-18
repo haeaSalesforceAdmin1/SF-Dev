@@ -5,7 +5,8 @@
 * @author            : JongHoon Kim
 * History
 * Version      Date                Author               Ticket         Modification
-* 1.0       2025-01-22           JongHoon Kim           DPM-133       Initial Version
+* 1.0       01-22-2025           JongHoon Kim           DPM-133       Initial Version
+* 1.1       02-03-2025           JongHoon Kim           DPM-6033      If the due date has not passed, update the Manager and Owner.
 ************************************************************************************************
 **/
 
@@ -231,7 +232,7 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                 FROM Action_Plan__c 
                 WHERE BrandCode__c = 'H' 
                 // AND ApprovalStatus__c != 'Region Approved' // DPM-6033
-                AND EndDate__c >= :today
+                AND EndDate__c >= :today // DPM-6033
                 AND SalesDistrictCode__c IN :districtApSalesCodes 
                 ORDER BY Createddate desc
             ];
@@ -240,18 +241,16 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                 District__c district = codeToDistrictMap.get(actionPlan.SalesDistrictCode__c);
                 
                 if (district != null  && actionPlan.DistrictSalesManager__c != district.SalesManager__c) {
-                        if(!actionPlansIdsToUpdate.contains(actionPlan.Id)) {
-                            actionPlan.DistrictSalesManager__c = district.SalesManager__c;
-                            actionPlansToUpdate.add(actionPlan);
-                            actionPlansIdsToUpdate.add(actionPlan.Id);
-                        } else {
-                            actionPlan.DistrictSalesManager__c = district.SalesManager__c;
-                            actionPlansToUpdate.add(actionPlan);
-                        }
-                        if (validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlan.Division__c == 'Sales') {
-                            actionPlan.OwnerId = district.SalesManager__c;
-                        }
-                    
+                    if(!actionPlansIdsToUpdate.contains(actionPlan.Id)) {
+                        actionPlan.DistrictSalesManager__c = district.SalesManager__c;
+                        actionPlansToUpdate.add(actionPlan);
+                        actionPlansIdsToUpdate.add(actionPlan.Id);
+                    } else {
+                        actionPlan.DistrictSalesManager__c = district.SalesManager__c;
+                    }
+                    if (validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlan.Division__c == 'Sales') {
+                        actionPlan.OwnerId = district.SalesManager__c;
+                    }
                 }
             }
         }
@@ -270,19 +269,18 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
             for (Action_Plan__c actionPlan : actionPlans) {
                 District__c district = codeToDistrictMap.get(actionPlan.ServiceDistrictCode__c);
                 
-                if (district != null && actionPlan.DistrictPartsServiceManager__c != district.DistrictPartsServiceManager__c) {
-                        if(!actionPlansIdsToUpdate.contains(actionPlan.Id)) {
-                            actionPlan.DistrictPartsServiceManager__c = district.DistrictPartsServiceManager__c;
-                            actionPlansToUpdate.add(actionPlan);
-                            actionPlansIdsToUpdate.add(actionPlan.Id);
-                        } else {
-                            actionPlan.DistrictPartsServiceManager__c = district.DistrictPartsServiceManager__c;
-                            actionPlansToUpdate.add(actionPlan);
-                        }
+                if (district != null && actionPlan.DistrictPartsServiceManager__c != district.DistrictPartsServiceManager__c) {    
+                    if(!actionPlansIdsToUpdate.contains(actionPlan.Id)) {
+                        actionPlan.DistrictPartsServiceManager__c = district.DistrictPartsServiceManager__c;
+                        actionPlansToUpdate.add(actionPlan);
+                        actionPlansIdsToUpdate.add(actionPlan.Id);
+                    } else {
+                        actionPlan.DistrictPartsServiceManager__c = district.DistrictPartsServiceManager__c;
+                    }
 
-                        if (validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlan.Division__c == 'Service') {
-                            actionPlan.OwnerId = district.DistrictPartsServiceManager__c;
-                        }
+                    if (validApprovalStatuses.contains(actionPlan.ApprovalStatus__c) && actionPlan.Division__c == 'Service') {
+                        actionPlan.OwnerId = district.DistrictPartsServiceManager__c;
+                    }
                 }
             }
         }
@@ -332,16 +330,16 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                 SELECT Id, MarketCode__c, BrandCode__c, Type__c, MarketManager__c, Aftersales_Market_Manager__c , GenesisMarketManagerAlt__c, ApprovalStatus__c, RecordType.DeveloperName, Indicator__c, ScheduledTopic__r.TopicOwner__c 
                 FROM Evaluation__c 
                 WHERE BrandCode__c = 'G' 
+                AND EndDate__c >= :today // DPM-6033
+                AND JDP_Evaluation__c = true
+                AND MarketCode__c IN :districtEvalMarketCodes 
+                ORDER BY Createddate desc
                 // DPM-6033 start
                 // AND Status__c NOT IN ('Closed','Completed')
                 // AND Status__c != null
                 // AND ApprovalStatus__c != 'Region Approved'
-                AND EndDate__c >= :today
+                // AND Indicator__c !='Retailer Refusal'  // DPM-6033
                  // DPM-6033 end
-                AND JDP_Evaluation__c = true
-                AND Indicator__c !='Retailer Refusal'
-                AND MarketCode__c IN :districtEvalMarketCodes 
-                ORDER BY Createddate desc
             ];
 
 
@@ -370,15 +368,7 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                             eval.GenesisMarketManagerAlt__c = district.Aftersales_Market_Manager__c;
                         }
                         evaluationsToUpdate.add(eval);
-                    }
-
-                    // if(validApprovalStatuses.contains(eval.ApprovalStatus__c) || eval.RecordType.DeveloperName.contains('Genesis_Retailer')) {
-                    //     if(eval.Type__c == 'Sales') {
-                    //         eval.OwnerId = district.MarketManager__c;
-                    //     } else if(eval.Type__c == 'Service') {
-                    //         eval.OwnerId = district.Aftersales_Market_Manager__c;
-                    //     }
-                    // }         
+                    }     
                 }
             }
         }
@@ -388,14 +378,15 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                 SELECT Id, SalesDistrictCode__c, BrandCode__c, Type__c, JDP_Evaluation__c, DistrictSalesManager__c, ApprovalStatus__c, ScheduledTopic__r.TopicOwner__c, RecordType.DeveloperName
                 FROM Evaluation__c 
                 WHERE BrandCode__c = 'H' 
+                AND EndDate__c >= :today // DPM-6033
+                AND SalesDistrictCode__c IN :districtEvalSalesCodes 
+                ORDER BY Createddate desc
                 // DPM-6033 start
                 // AND Status__c NOT IN ('Closed','Completed')
                 // AND Status__c != null
                 // AND ApprovalStatus__c != 'Region Approved'
-                AND EndDate__c >= :today
                 // DPM-6033 end
-                AND SalesDistrictCode__c IN :districtEvalSalesCodes 
-                ORDER BY Createddate desc
+                
             ];
 
 
@@ -415,15 +406,7 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                             eval.DistrictSalesManager__c = district.SalesManager__c;
                             eval.OwnerId = district.SalesManager__c;
                         }
-                        evaluationsToUpdate.add(eval);
-                    }
-
-                    // if(validApprovalStatuses.contains(eval.ApprovalStatus__c) || eval.RecordType.DeveloperName.contains('Warranty')) {
-                    //     if(eval.Type__c == 'Sales' || eval.ScheduledTopic__r.TopicOwner__c == 'District Sales Manager') {
-                    //         eval.OwnerId = district.SalesManager__c;
-                    //     }
-                    // }
-                         
+                    }           
                 }
             }
         }
@@ -433,12 +416,12 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                 SELECT Id, ServiceDistrictCode__c, BrandCode__c, Type__c, JDP_Evaluation__c, DistrictPartsServiceManager__c, ApprovalStatus__c, ScheduledTopic__r.TopicOwner__c, RecordType.DeveloperName
                 FROM Evaluation__c 
                 WHERE BrandCode__c = 'H'
-                // AND Status__c NOT IN ('Closed','Completed') //DPM-6033
-                // AND Status__c != null //DPM-6033
-                // AND ApprovalStatus__c != 'Region Approved'  //DPM-6033
                 AND EndDate__c >= :today
                 AND ServiceDistrictCode__c IN :districtApServiceCodes 
                 ORDER BY Createddate desc
+                // AND Status__c NOT IN ('Closed','Completed') //DPM-6033
+                // AND Status__c != null //DPM-6033
+                // AND ApprovalStatus__c != 'Region Approved'  //DPM-6033
             ];
 
             for (Evaluation__c eval : evaluationList) {
@@ -456,9 +439,7 @@ public with sharing class UpdateRelatedDMOnDistrictChangeQueueable implements Qu
                         if(eval.Type__c == 'Service' || eval.ScheduledTopic__r.TopicOwner__c == 'District Parts Service Manager') {
                             eval.DistrictPartsServiceManager__c = district.DistrictPartsServiceManager__c;
                             eval.OwnerId = district.DistrictPartsServiceManager__c;
-                        }
-                        evaluationsToUpdate.add(eval);
-                        
+                        }            
                     } 
 
                     // if(validApprovalStatuses.contains(eval.ApprovalStatus__c) || eval.RecordType.DeveloperName.contains('Warranty')) {

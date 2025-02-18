@@ -55,6 +55,12 @@ public class UserTriggerHandler extends Trigger_Framework.baseHandler {
         /*BEFORE DELETE METHODS END*/
     }
 
+     /**
+         * [Method Description] UserTriggerHandler  after insert
+         * Created by 
+         * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Changed to comment not to run DNAMSUserProvisioningServiceQueueable
+         * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
+        */
     public override void afterInsert(Map<Id, SObject> newMapGeneric){
 
         Map<Id, User> newMap = (Map<Id, User>) newMapGeneric;
@@ -67,7 +73,7 @@ public class UserTriggerHandler extends Trigger_Framework.baseHandler {
         //Soyeon Kim Changes for DPM-4702
         UserTriggerHelper.updatePublicGroup(newMap.values());
         
-        UserTriggerHelper.updateDNAMSUserCheck(newMap);
+        //UserTriggerHelper.updateDNAMSUserCheck(newMap); // Changed to comment not to run DNAMSUserProvisioningServiceQueueable by MinheeKim for DPM-6020 on 02-10-2025
         /*AFTER INSERT METHODS END*/
 
         // Edited by Areum on 11-01-2024 for DNAMS PIR

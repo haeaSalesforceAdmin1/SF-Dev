@@ -51,7 +51,10 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
     showSpinner = false;
     showProgress = false;
 
-
+    // Added by Jonghoon Kim 02.14.2025
+    @track dateErrorMessage = '';
+    @track isFifteenOver = false;
+    @track isFifteenUnder = false;
 
     acceptedFormats = ['.pdf', '.png', '.jpg', '.jpeg'];
 
@@ -229,16 +232,27 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
     handleContactDateChange(event) {
         this.contactDate = event.target.value;
         console.log('selectedTopics', this.selectedTopics.join(';'));
-        createEvalName({ recordId: this.recordId, contactDate: this.contactDate, division: 'Sales' , topic: this.selectedTopics.join(';')})
-            .then(result => {
-                console.log('handleContactDateChange');
-                this.evaluationName = result;
-                console.log('this.evaluationName', this.evaluationName);
-            })
-            .catch(error => {
-                console.error('Error getAccountName', error);
-                // this.showToast('Error', 'Error loading contacts', 'error');
-            });
+        if (this.isValidDate(this.contactDate)) {
+            this.dateErrorMessage = '';
+            createEvalName({ recordId: this.recordId, contactDate: this.contactDate, division: 'Sales' , topic: this.selectedTopics.join(';')})
+                .then(result => {
+                    console.log('handleContactDateChange');
+                    this.evaluationName = result;
+                    console.log('this.evaluationName', this.evaluationName);
+                })
+                .catch(error => {
+                    console.error('Error getAccountName', error);
+                    // this.showToast('Error', 'Error loading contacts', 'error');
+                });
+        } else {
+            return;
+            // if(this.isFifteenOver) {
+            //     this.dateErrorMessage = 'test Over';
+            // } else {
+            //     this.dateErrorMessage = 'test Under';
+            // }
+            
+        }
 
     }
 
@@ -486,21 +500,40 @@ handleUploadFinished(event) {
 
         const fifteenthDay = new Date(year, month, 15);
         const previousMonthEnd = new Date(year, month, 0); // Last day of the previous month
-        const previousMonthStart = new Date(year, month - 1, 0);
+        const previousMonthStart = new Date(year, month - 1, 1);
+
+         // 메시지에 표시할 날짜 범위 계산
+        const rangeStart = new Date(year, month, 1); // 첫 번째 날짜
+        const rangeEnd = new Date(year, month + 1, 0); // 이전 달 마지막 날짜
+        const formattedStart = `${rangeStart.getMonth() + 1}/${rangeStart.getDate()}/${rangeStart.getFullYear()}`;
+        const formattedEnd = `${rangeEnd.getMonth() + 1}/${rangeEnd.getDate()}/${rangeEnd.getFullYear()}`;
 
         if (currentDate > fifteenthDay) {
             // If today is after the 15th, last month's dates should not be allowed
             if (selectedDate < previousMonthEnd) {
+                this.isFifteenOver = true; 
+                 this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedStart} ~ ${formattedEnd})`;
                 return false;
+            } else {
+                this.isFifteenOver = false; 
             }
         } else {
             // If today is on or before the 15th
             if (selectedDate < previousMonthStart || selectedDate > currentDate) {
+                this.isFifteenUnder = true; 
+                this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedStart} ~ ${formattedEnd})`;
                 return false;
+            } else {
+                 this.isFifteenUnder = false; 
             }
         }
+        if(this.isFifteenOver || this.isFifteenUnder) {
+            return false;
+        } else {
+            return true;
+        }
 
-        return true;
+        
     }
 
     navigateToRecordPage() {

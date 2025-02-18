@@ -10,10 +10,16 @@
 * 1.2       12-03-2024           JongHoon Kim           DPM-5946      Update evaluationDPMRTopicChange Method
 * 1.3       01-22-2025           JongHoon Kim           DPM-133       Change DSM, DPSM, GMM, GAMM Update logic
 * 1.4       02-03-2025           JongHoon Kim           DPM-6033      If the due date has not passed, update the Manager and Owner
+* 1.5       02-04-2025           Minhee Kim             DPM-6017      add the method to input the business last modified date, by
 ************************************************************************************************
 **/
 
 public without sharing class EvaluationTriggerHelper {
+
+    /**DPM-6017 added static variable */
+    private static String INTEGRATIONUSER = 'Integration User';
+    private static String SYSTEMADMIN = 'System Administrator';/**DPM-6017 end */
+    
      /**Start - [TBD] To fix error occuring while many files at COPP Comfidential button */
      private static String cachedUserProfileName;
      private static RecordType cachedSalesRecType;
@@ -1070,6 +1076,23 @@ public static void evaluationDPMRTopicChange(List<Evaluation__c> newEvaluations,
     }
 
     public class evalNameDuplException extends Exception {
+    }
+
+     /**
+     * [Method Description] method to input the business last modified date, by
+     * Created by [MinheeKim] on [02-04-2025] for [DPM-6017]
+    */
+    public static void updateBusinessLastmodified(List<Evaluation__c> newEvaluations,Map<Id, Evaluation__c> oldEvaluationsMap){
+        String userProfileName = getUserProfileName();
+        if(userProfileName==INTEGRATIONUSER || userProfileName==SYSTEMADMIN ){
+            return;
+        }
+
+        for (Evaluation__c evaluation : newEvaluations) {
+            evaluation.BusinessLastModifiedBy__c = UserInfo.getUserId();
+            evaluation.BusinessLastModifiedDate__c = System.now();
+        }
+        
     }
      
 }
