@@ -51,7 +51,7 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
     showSpinner = false;
     showProgress = false;
 
-    // Added by Jonghoon Kim 02.14.2025
+    // Added by Jonghoon Kim 02.14.2025 DPM-6050
     @track dateErrorMessage = '';
     @track isFifteenOver = false;
     @track isFifteenUnder = false;
@@ -232,8 +232,8 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
     handleContactDateChange(event) {
         this.contactDate = event.target.value;
         console.log('selectedTopics', this.selectedTopics.join(';'));
-        if (this.isValidDate(this.contactDate)) {
-            this.dateErrorMessage = '';
+        if (this.isValidDate(this.contactDate)) { // DPM-6050
+            this.dateErrorMessage = ''; // DPM-6050
             createEvalName({ recordId: this.recordId, contactDate: this.contactDate, division: 'Sales' , topic: this.selectedTopics.join(';')})
                 .then(result => {
                     console.log('handleContactDateChange');
@@ -245,12 +245,8 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
                     // this.showToast('Error', 'Error loading contacts', 'error');
                 });
         } else {
+            this.contactDate = ''; // DPM-6050
             return;
-            // if(this.isFifteenOver) {
-            //     this.dateErrorMessage = 'test Over';
-            // } else {
-            //     this.dateErrorMessage = 'test Under';
-            // }
             
         }
 
@@ -369,7 +365,7 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
                         this.isLoading = false;
                     });
                 } else {
-                    this.showToast('Error', 'Selected date is not valid. Please select a valid date.', 'error');
+                    // this.showToast('Error', 'Selected date is not valid. Please select a valid date.', 'error'); // DPM-6050
                     this.isLoading = false;
                 }
         } else {
@@ -407,7 +403,7 @@ uploadFilesSequentially(recordId, files) {
         });
     });
 
-    return uploadPromise; // 모든 파일 업로드가 완료되거나 실패하면 결과 반환
+    return uploadPromise;
 }
 
 handleUploadFinished(event) {
@@ -500,35 +496,41 @@ handleUploadFinished(event) {
 
         const fifteenthDay = new Date(year, month, 15);
         const previousMonthEnd = new Date(year, month, 0); // Last day of the previous month
-        const previousMonthStart = new Date(year, month - 1, 1);
+        const previousMonthStart = new Date(year, month - 1, 0);
 
-         // 메시지에 표시할 날짜 범위 계산
-        const rangeStart = new Date(year, month, 1); // 첫 번째 날짜
-        const rangeEnd = new Date(year, month + 1, 0); // 이전 달 마지막 날짜
+         // DPM-6050
+        const rangeStart = new Date(year, month, 1); 
+        const rangeEnd = new Date(year, month, day)
         const formattedStart = `${rangeStart.getMonth() + 1}/${rangeStart.getDate()}/${rangeStart.getFullYear()}`;
         const formattedEnd = `${rangeEnd.getMonth() + 1}/${rangeEnd.getDate()}/${rangeEnd.getFullYear()}`;
 
+        const beforeRangeStart = new Date(year, month - 1, 1);
+        const beforeRangeEnd = new Date(year, month, day);
+        const formattedBeforeStart = `${beforeRangeStart.getMonth() + 1}/${beforeRangeStart.getDate()}/${beforeRangeStart.getFullYear()}`;
+        const formattedBeforeEnd = `${beforeRangeEnd.getMonth() + 1}/${beforeRangeEnd.getDate()}/${beforeRangeEnd.getFullYear()}`;
+        // 
         if (currentDate > fifteenthDay) {
             // If today is after the 15th, last month's dates should not be allowed
-            if (selectedDate < previousMonthEnd) {
-                this.isFifteenOver = true; 
-                 this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedStart} ~ ${formattedEnd})`;
+            if (selectedDate < previousMonthEnd || selectedDate > currentDate) {
+                this.isFifteenOver = true; // DPM-6050
+                this.dateErrorMessage = `Due to auto-closing, you cannot select dates from the previous month. Please use a date between (${formattedStart} ~ ${formattedEnd})`; // DPM-6050
                 return false;
             } else {
-                this.isFifteenOver = false; 
+                this.isFifteenOver = false;  // DPM-6050
             }
         } else {
             // If today is on or before the 15th
             if (selectedDate < previousMonthStart || selectedDate > currentDate) {
-                this.isFifteenUnder = true; 
-                this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedStart} ~ ${formattedEnd})`;
+                this.isFifteenUnder = true; // DPM-6050
+                this.dateErrorMessage = `You can select dates from the previous month and dates of the current month up to today. Please use a date between (${formattedBeforeStart} ~ ${formattedBeforeEnd})`; // DPM-6050
                 return false;
             } else {
-                 this.isFifteenUnder = false; 
+                 this.isFifteenUnder = false; // DPM-6050
             }
         }
-        if(this.isFifteenOver || this.isFifteenUnder) {
-            return false;
+        
+        if(this.isFifteenOver || this.isFifteenUnder) { // DPM-6050
+            return false; // DPM-6050
         } else {
             return true;
         }

@@ -353,6 +353,7 @@ public without sharing class HMAUserProvisioningService {
         System.debug('provisionRoleAndProfileOnUsers started');
         //DPM-4973 Change to provision profile by federation Id - by MH - 2023.10.24
         Map<String, AccessType__mdt> profileAccessTypes = populateAccessTypes(accessTypes, HMAConstants.METADATA_PROFILE_FIELD);
+        Map<Id, Set<String>> mapUserAppTypes = populateApptypes(mapUserProvisionAccessTypes); //DPM-6086 method to get apptypes in the accesstype on 02-18-2025 by MinheeKim
 		Map<String, String> profileMap = populateFederationId();
         System.debug(LoggingLevel.ERROR, profileMap);
         
@@ -466,7 +467,7 @@ public without sharing class HMAUserProvisioningService {
                     
                         //DPM-4973 check whether the user is intenal or not - by MH - 2023.10.24
                         //DPM-6086 added condition not to provide role if there's only DNAMS access(maintain the previous role) by MinheeKim on 02.17.2025
-                        if(profileName.contains('Internal') && !(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true) ){
+                        if(profileName.contains('Internal') && !(!mapUserAppTypes.get(user.Id).contains('DPM') && !mapUserAppTypes.get(user.Id).contains('CUV') && mapUserAppTypes.get(user.Id).contains('DNA')) ){
                             Integer currentRoleIndex = rolePriorityList.indexOf(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                             System.debug(LoggingLevel.ERROR, currentRoleIndex);    
                                 if(FIELDMANAGER.contains(accessTypeToRoleDeveloperNameMap.get(userAccessType)) && (currentRoleIndex <= priorityIndexRole|| priorityIndexRole==-1 || priorityIndexRole==null)){ 
@@ -501,14 +502,14 @@ public without sharing class HMAUserProvisioningService {
 
                         // profileName not contains 'Intennal' 
                         }else if(accessTypeToRoleDeveloperNameMap.containsKey(userAccessType) 
-                        && !(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true)) { //DPM-6086 added condition not to provide role if there's only DNAMS access(maintain the previous role) by MinheeKim on 02.17.2025
+                        && !(!mapUserAppTypes.get(user.Id).contains('DPM') && !mapUserAppTypes.get(user.Id).contains('CUV') && mapUserAppTypes.get(user.Id).contains('DNA'))) { //DPM-6086 added condition not to provide role if there's only DNAMS access(maintain the previous role) by MinheeKim on 02.17.2025
                             Integer currentRoleIndex = rolePriorityList.indexOf(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                             System.debug(LoggingLevel.ERROR, currentRoleIndex);
                             if((priorityIndexRole == null || (priorityIndexRole != null && currentRoleIndex != -1 && currentRoleIndex <= priorityIndexRole))) {
                                 user.UserRoleId = roleDeveloperNameToRoleIdMap.get(accessTypeToRoleDeveloperNameMap.get(userAccessType));
                                 priorityIndexRole = currentRoleIndex;
                             }
-                        }else if(user.DPM_User__c == false && user.CUV_User__c == false && user.DNAMS_User_Flag__c == true){  //DPM-6086 added condition to maintain the previous role when user has only DNAMS access by MinheeKim on 02.17.2025
+                        }else if(!mapUserAppTypes.get(user.Id).contains('DPM') && !mapUserAppTypes.get(user.Id).contains('CUV') && mapUserAppTypes.get(user.Id).contains('DNA')){  //DPM-6086 added condition to maintain the previous role when user has only DNAMS access by MinheeKim on 02.17.2025
                             user.UserRoleId = currentUserRoleId;
                         }
 
@@ -1877,6 +1878,35 @@ public without sharing class HMAUserProvisioningService {
         System.debug('6005 userTempAccesstype : '+userTempAccesstype);
         return userTempAccesstype;
         
+    }
+
+    /**
+     * [Method Description] Get apptypes of the accesstype user has
+     * Created by [MinheeKim] on [02-18-2025] for [DPM-6086]
+    */
+    private static Map<Id, Set<String>> populateApptypes(Map<Id, List<String>> mapUserProvisionAccessTypes){
+        Map<Id, Set<String>> mapUserAppTypes = new Map<Id, Set<String>>();
+        
+        if(mapUserProvisionAccessTypes==null || mapUserProvisionAccessTypes.size()<=0){
+            return mapUserAppTypes;
+        }
+
+        for(Id user : mapUserProvisionAccessTypes.keySet()){
+            Set<String> appTypes = new Set<String>();
+            for(String accesstype : mapUserProvisionAccessTypes.get(user)){
+                if(accesstype.contains('DPM')){
+                    appTypes.add('DPM');
+                }else if(accesstype.contains('DNA')){
+                    appTypes.add('DNA');
+                }else if(accesstype.contains('CUV')){
+                    appTypes.add('CUV');
+                }
+            }
+
+            mapUserAppTypes.put(user, appTypes);
+        }
+
+        return mapUserAppTypes;
     }
 
 }

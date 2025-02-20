@@ -95,3 +95,7 @@
 .delete-icon:hover {
     color: darkred;
 }
+
+.error-text {
+    color: red;
+}

@@ -1387,4 +1387,28 @@ public with sharing class UserTriggerHandlerTest {
 
     }
 
+    /**
+     * [Method Description] Test method for populateApptypes
+     * Created by [MinheeKim] on [02.18.2025] for [DPM-6086] 
+     */
+    @IsTest
+    static void testCheckingApptypes() {
+        User testUser = [SELECT Id,AccessTypes__c FROM User WHERE Name like '%UserBeforeUpdate%'];
+        List<Id> userIds = new List<Id>{testUser.Id};
+
+        Test.startTest();
+        
+        try {
+            testUser.AccessTypes__c ='DNA_RMRM_MS';
+            testUser.Autoprovision__c = true;
+            update testUser;
+            //UserTriggerHelper.updateAccessType(userIds);
+        } catch (Exception e) {
+            System.debug('Caught expected exception: ' + e.getMessage());
+        }
+        
+        Test.stopTest();
+
+    }
+
 }

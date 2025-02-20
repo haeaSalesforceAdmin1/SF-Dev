@@ -763,25 +763,25 @@ export default class CoppRecordDetail extends LightningElement {
                     console.log('ExpectedSalesScore: '+this.ExpectedSalesScore);
                     
                 }else if(wrapper.kpiDetail.index !=0 && wrapper.kpiDetail.index !=1 && wrapper.kpiDetail.index !=2 && wrapper.kpiDetail.Visiblity__c === true && 
-                    ( (wrapper.kpiDetail.Initial_Score_Date__c==null || wrapper.kpiDetail.Initial_Score_Date__c=='') 
-                    || (wrapper.kpiDetail.Target_Score_Date__c==null || wrapper.kpiDetail.Target_Score_Date__c=='')
-                    || ((wrapper.kpiDetail.Initial_Score__c==null || wrapper.kpiDetail.Initial_Score__c=='') 
-                    && (wrapper.kpiDetail.Initial_Score_Text__c==null || wrapper.kpiDetail.Initial_Score_Text__c==''))
-                    || ((wrapper.kpiDetail.Target_Score__c==null || wrapper.kpiDetail.Target_Score__c=='')
-                    && (wrapper.kpiDetail.Target_Score_Text__c==null || wrapper.kpiDetail.Target_Score_Text__c==''))
+                    ( (wrapper.kpiDetail.Initial_Score_Date__c==null || wrapper.kpiDetail.Initial_Score_Date__c==='') 
+                    || (wrapper.kpiDetail.Target_Score_Date__c==null || wrapper.kpiDetail.Target_Score_Date__c==='')
+                    || ((wrapper.kpiDetail.Initial_Score__c==null || wrapper.kpiDetail.Initial_Score__c==='') 
+                    && (wrapper.kpiDetail.Initial_Score_Text__c==null || wrapper.kpiDetail.Initial_Score_Text__c===''))
+                    || ((wrapper.kpiDetail.Target_Score__c==null || wrapper.kpiDetail.Target_Score__c==='')
+                    && (wrapper.kpiDetail.Target_Score_Text__c==null || wrapper.kpiDetail.Target_Score_Text__c===''))
                 )){
                     this.missingRequired = true;
                     wrapper.kpiDetail.errorRequired ='Fill in the required field.';
                     console.log(wrapper.kpiDetail.Name+': '+this.missingRequired);
                 }else if(wrapper.kpiDetail.index ==0 && wrapper.kpiDetail.Visiblity__c === true && 
-                    ( (wrapper.kpiDetail.Initial_Score_Date__c==null || wrapper.kpiDetail.Initial_Score_Date__c=='') 
-                    || (wrapper.kpiDetail.Target_Score_Date__c==null || wrapper.kpiDetail.Target_Score_Date__c=='')
-                    || ((wrapper.kpiDetail.Initial_Score__c==null || wrapper.kpiDetail.Initial_Score__c=='') 
-                    && (wrapper.kpiDetail.Initial_Score_Text__c==null || wrapper.kpiDetail.Initial_Score_Text__c==''))
-                    || ((wrapper.kpiDetail.Target_Score__c==null || wrapper.kpiDetail.Target_Score__c=='')
-                    && (wrapper.kpiDetail.Target_Score_Text__c==null || wrapper.kpiDetail.Target_Score_Text__c==''))
-                    || (this.DealerSalesScore==null  || this.DealerSalesScore=='' ) 
-                    || (this.ExpectedSalesScore==null || this.ExpectedSalesScore=='')
+                    ( (wrapper.kpiDetail.Initial_Score_Date__c==null || wrapper.kpiDetail.Initial_Score_Date__c==='') 
+                    || (wrapper.kpiDetail.Target_Score_Date__c==null || wrapper.kpiDetail.Target_Score_Date__c==='')
+                    || ((wrapper.kpiDetail.Initial_Score__c==null || wrapper.kpiDetail.Initial_Score__c==='') 
+                    && (wrapper.kpiDetail.Initial_Score_Text__c==null || wrapper.kpiDetail.Initial_Score_Text__c===''))
+                    || ((wrapper.kpiDetail.Target_Score__c==null || wrapper.kpiDetail.Target_Score__c==='')
+                    && (wrapper.kpiDetail.Target_Score_Text__c==null || wrapper.kpiDetail.Target_Score_Text__c===''))
+                    || (this.DealerSalesScore==null  || this.DealerSalesScore==='' ) 
+                    || (this.ExpectedSalesScore==null || this.ExpectedSalesScore==='')
                 )){
                     this.missingRequired = true;
                     wrapper.kpiDetail.errorRequired ='Fill in the required field.';

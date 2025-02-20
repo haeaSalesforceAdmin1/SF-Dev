@@ -5,6 +5,7 @@
  * Created by [Jonghoon Kim] on [24-08-03] for [Ticket DPM-5663]
  * Edited by [Jonghoon Kim] on [25-01-07] for [Ticket DPM-5986]
  * Edited by [Jonghoon Kim] on [25-01-21] for [Ticket DPM-6029] # Add Topic Option 'CX Process Improvement'
+* Edited by [Jonghoon Kim] on [25-02-17] for [Ticket DPM-6050] # Change Date Error Message
 */
 -->
 <template>
@@ -28,10 +29,15 @@
                 <div class="slds-col slds-size_2-of-3 slds-p-around_small">
                     <lightning-input label="Account Name" type="text" value={accountName} readonly></lightning-input>
                     <lightning-input label="Contact Date" type="date" value={contactDate}
-                        onchange={handleContactDateChange} required></lightning-input>
-                        <lightning-input  label="Evaluation Name" type="text" value={evaluationName}
-                        onchange={handleEvalNameChange} disabled></lightning-input>
-
+                        onchange={handleContactDateChange} required message-when-invalid={dateErrorMessage}></lightning-input>
+                    <div> <!--DPM-6050 Add Error Message-->
+                        <template if:true={dateErrorMessage}>
+                            <p class="error-text">{dateErrorMessage}</p>
+                        </template>
+                    </div>
+                    <lightning-input  label="Evaluation Name" type="text" value={evaluationName}
+                    onchange={handleEvalNameChange} disabled></lightning-input>
+                    
                     <lightning-combobox label="Primary Retailer Contact" options={contactOptions} value={primaryContactId}
                         onchange={handlePrimaryContactChange} placeholder="Select Primary Contact"
                         required></lightning-combobox> <!-- Changed the label from 'Dealer Contact' to 'Primary Retailer Contact' by MinheeKim -DPM-5904 12.03.2024-->

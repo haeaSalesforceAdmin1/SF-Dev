@@ -1,0 +1,28 @@
+<!-- <apex:page standardController="Evaluation__c" recordSetVar="Evaluations">
+ <iframe src="https://hmausa--dpmdev.sandbox.lightning.force.com/lightning/page/ownerChangeListviewButton" width="100%" height="600px"></iframe> 
+
+    <c-owner-change-listview-button recordIds="{!$CurrentPage.parameters.ids}"></c-owner-change-listview-button>
+
+</apex:page> -->
+
+<apex:page standardStylesheets="true" showHeader="true">
+    <apex:includeLightning />
+    <div id="lwcContainer"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const recordIds = "{!$CurrentPage.parameters.ids}";
+            $Lightning.use("c:lightningOutApp", function() {
+                $Lightning.createComponent(
+                    "c:ownerChangeListviewButton",
+                    {
+                        recordIds: recordIds.split(',')
+                    },
+                    "lwcContainer",
+                    function(cmp) { console.log("LWC is loaded!"); }
+                );
+            });
+        });
+    </script>
+</apex:page>
+<!--DPM-6030-->

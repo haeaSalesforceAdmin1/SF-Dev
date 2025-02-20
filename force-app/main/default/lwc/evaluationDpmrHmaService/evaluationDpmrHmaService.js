@@ -45,6 +45,11 @@ export default class EvaluationDpmrHmaService extends NavigationMixin(LightningE
     // Added by JongHoon Kim 01.07.2025
     @track errorMessage = '';
 
+    // Added by Jonghoon Kim 02.14.2025 DPM-6050
+    @track dateErrorMessage = '';
+    @track isFifteenOver = false;
+    @track isFifteenUnder = false;
+
     acceptedFormats = ['.pdf', '.png', '.jpg', '.jpeg'];
 
     contactTypeOptions = [
@@ -214,18 +219,22 @@ export default class EvaluationDpmrHmaService extends NavigationMixin(LightningE
 
     handleContactDateChange(event) {
         this.contactDate = event.target.value;
-
-        createEvalName({ recordId: this.recordId, contactDate: this.contactDate, division: 'Service' , topic: this.selectedTopics.join(';') })
-            .then(result => {
-                console.log('handleContactDateChange');
-                this.evaluationName = result;
-                console.log('this.evaluationName', this.evaluationName);
-            })
-            .catch(error => {
-                console.error('Error getAccountName', error);
-                // this.showToast('Error', 'Error loading contacts', 'error');
-            });
-
+        if (this.isValidDate(this.contactDate)) { // DPM-6050
+            this.dateErrorMessage = ''; // DPM-6050
+            createEvalName({ recordId: this.recordId, contactDate: this.contactDate, division: 'Service' , topic: this.selectedTopics.join(';') })
+                .then(result => {
+                    console.log('handleContactDateChange');
+                    this.evaluationName = result;
+                    console.log('this.evaluationName', this.evaluationName);
+                })
+                .catch(error => {
+                    console.error('Error getAccountName', error);
+                    // this.showToast('Error', 'Error loading contacts', 'error');
+                });
+        } else {
+            return;
+            
+        }
     }
 
     handleCommentChange(event) {
@@ -340,7 +349,7 @@ export default class EvaluationDpmrHmaService extends NavigationMixin(LightningE
                     this.isLoading = false;
                 });
             } else {
-                this.showToast('Error', 'Selected date is not valid. Please select a valid date.', 'error');
+                // this.showToast('Error', 'Selected date is not valid. Please select a valid date.', 'error'); // DPM-6050
                 this.isLoading = false;
             }
         } else {
@@ -430,14 +439,41 @@ export default class EvaluationDpmrHmaService extends NavigationMixin(LightningE
         const previousMonthEnd = new Date(year, month, 0); 
         const previousMonthStart = new Date(year, month - 1, 0);
 
-        if (currentDate > fifteenthDay) { 
-            if (selectedDate < previousMonthEnd) {
+        // DPM-6050
+        const rangeStart = new Date(year, month, 1); 
+        const rangeEnd = new Date(year, month, day)
+        const formattedStart = `${rangeStart.getMonth() + 1}/${rangeStart.getDate()}/${rangeStart.getFullYear()}`;
+        const formattedEnd = `${rangeEnd.getMonth() + 1}/${rangeEnd.getDate()}/${rangeEnd.getFullYear()}`;
+
+        const beforeRangeStart = new Date(year, month - 1, 1);
+        const beforeRangeEnd = new Date(year, month, day);
+        const formattedBeforeStart = `${beforeRangeStart.getMonth() + 1}/${beforeRangeStart.getDate()}/${beforeRangeStart.getFullYear()}`;
+        const formattedBeforeEnd = `${beforeRangeEnd.getMonth() + 1}/${beforeRangeEnd.getDate()}/${beforeRangeEnd.getFullYear()}`;
+        // 
+        if (currentDate > fifteenthDay) {
+            // If today is after the 15th, last month's dates should not be allowed
+            if (selectedDate < previousMonthEnd || selectedDate > currentDate) {
+                this.isFifteenOver = true; // DPM-6050
+                this.dateErrorMessage = `Due to auto-closing, you cannot select dates from the previous month. Please use a date between (${formattedStart} ~ ${formattedEnd})`; // DPM-6050
                 return false;
+            } else {
+                this.isFifteenOver = false;  // DPM-6050
             }
-        } else { 
+        } else {
+            // If today is on or before the 15th
             if (selectedDate < previousMonthStart || selectedDate > currentDate) {
+                this.isFifteenUnder = true; // DPM-6050
+                this.dateErrorMessage = `You can select dates from the previous month and dates of the current month up to today. Please use a date between (${formattedBeforeStart} ~ ${formattedBeforeEnd})`; // DPM-6050
                 return false;
+            } else {
+                 this.isFifteenUnder = false; // DPM-6050
             }
+        }
+        
+        if(this.isFifteenOver || this.isFifteenUnder) { // DPM-6050
+            return false; // DPM-6050
+        } else {
+            return true;
         }
 
         return true;
