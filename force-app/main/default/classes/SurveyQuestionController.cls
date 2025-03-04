@@ -2,10 +2,14 @@
  * @description       : 
  * @author            : ChangeMeIn@UserSettingsUnder.SFDoc
  * @group             : 
- * @last modified on  : 10-18-2024
- * @last modified by  : JongHoon Kim
- * Author : [Name] / [10-18-2024] / [Ticket DPM-5863] / [Add NumberOfRosWithInsufficientDigtalDoc__c,PerNumberOfRosWithInsufficientDigtalDoc__c] 
- * Edited by [Minhee Kim] on [1-10-2025] for [DPM-5871] To get survey questions not survey
+ * @last modified on  : 01-10-2025
+ * @last modified by  : Minhee Kim
+ * Author : [ChangeMeIn@UserSettingsUnder.SFDoc] /
+ * Edited by [MinheeKim] on [03-08-2023] for [DPM-5399] added Survey__r.Status__c
+ * Edited by [Yaechan Park] on [08-20-2023] for [Ticket] Changing Judgment Criteria : All Question -> Parent Question
+ * Edited by [JongHoon Kim] on [10-18-2024] / [DPM-5863] / [Add NumberOfRosWithInsufficientDigtalDoc__c,PerNumberOfRosWithInsufficientDigtalDoc__c] 
+ * Edited by [Minhee Kim] on [02-10-2024] for [DPM-5279] added to prevent auto-submitted when the survey is not done
+ * Edited by [Minhee Kim] on [01-10-2025] for [DPM-5871] To get survey questions not survey
 **/
 public without sharing class SurveyQuestionController {
     
@@ -29,7 +33,7 @@ public without sharing class SurveyQuestionController {
         sql +=',NumberOfRosWithInsufficientDigtalDoc__c,PerNumberOfRosWithInsufficientDigtalDoc__c';*/
 
         String sql = 'select Id, Name, RecordType.DeveloperName, Survey__c, Action_Plan__c, Evaluation__c, Question_Number__c, Question_Text__c, Remarks__c, Is_Parent__c,';
-        sql += 'Other_Response_Text__c, Question_Number_Text__c, RemarksEnabled__c,Response_Number_2__c';
+        sql += 'Other_Response_Text__c, Question_Number_Text__c, RemarksEnabled__c,Response_Number_2__c, Survey__r.Status__c';
         if(!launchedFromEval) {
             // sql +=' from Survey_Question__c where Survey__c = :recordId order by Section_Number__c NULLS LAST, Question_Number_Text__c NULLS LAST';
             //sql +=' from Survey__c where Id = :recordId order by CreatedDate ASC'; //changed to comment by Minhee Kim - 01.10.2025 [DPM-5871]
@@ -96,8 +100,18 @@ public without sharing class SurveyQuestionController {
      * Created by [Minhee Kim] on [01.21.2025] for [DPM-5871] 
      */
     @AuraEnabled
-        public static void updateWarrantySurveyQuestion(Survey_Question__c questions, String surveyId, String surveyStatus) {
+        public static void updateWarrantySurveyQuestion(List<Survey_Question__c> questions, String surveyId, String surveyStatus) {
+            System.debug('survey Id: '+surveyId);
             Survey__c survey = [SELECT Id, Status__c FROM Survey__c WHERE Id=: surveyId LIMIT 1];
+
+            if(questions.size()>0){
+                for(Survey_Question__c question : questions){
+                    if(question.Response_Number_2__c==null){
+                        question.Response_Number_2__c = 0;
+                        question.Other_Response_Text__c ='0%';           
+                    }        
+                }
+            }
 
             try{
                 if(survey!=null){

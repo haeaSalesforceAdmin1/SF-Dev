@@ -1,3 +1,18 @@
+/**
+ * Description: controller for surveyQuestionComp
+ * ----- Change Log -----
+ * Author : [Name] / [MM-DD-YYYY] / [Ticket #] / [Change Description] 
+ * Version      Date                Author               Ticket         Modification
+ * 1.0                              Dhiraj              DPM-4390        Created
+ * 1.1                              Soyeon Kim          DPM-4602
+ * 1.2          07-24-2023          Minhee Kim                          Add yes/no action to all Survey Questions
+ * 1.3          08-20-2023          Yeachan Park        DPM-4754        Add child Question Radio Button Click Action 
+ * 1.4          08-20-2023          Yeachan Park        DPM-5149        Prevent a survey to be 'auto-completed'
+ * 1.5          02-19-2025          Minhee Kim          DPM-5871        Change from hardcoding to dynamic
+ * ---------------------------
+ */
+
+
 ({
     doInit : function(component, event, helper) {
         var modalBody;
@@ -44,7 +59,6 @@
 
         if(component.get("v.warrantyReview22")){
             var action = component.get("c.getHasEditAccessToRecord");
-            //var recordId = component.get("v.recordId");
             var recordId = evaluation.Survey__c;
              // var recordId ='';
             action.setParams({"recordId": recordId});
@@ -57,6 +71,15 @@
 
             helper.getWarrantySurveyQuestions(component,event,helper);
         }else if(evaluation.Evaluation_Type__c.includes('Warranty RO Review')){ /**Start : DPM-5871 added else if by Minhee Kim 01.21.2025 */
+            var action = component.get("c.getHasEditAccessToRecord");
+            var recordId = evaluation.Survey__c;
+            action.setParams({"recordId": recordId});
+            action.setCallback(this, function(response) {
+                var result = response.getReturnValue();
+                component.set("v.hasEditAccess", result);
+            });
+            $A.enqueueAction(action);
+            
             component.set("v.customError", []);
             helper.getWarrantySurveyQuestions(component,event,helper);
         } /**End : DPM-5871 added else if by Minhee Kim 01.21.2025 */
@@ -619,7 +642,7 @@
 
         component.set("v.showSpinner", true);
         //DPM-5149 Changed parameter to false where is updateSave by MH - 2023.11.20
-        helper.getCompleteAccess(component, event, helper, false, false); //test to DPM-5279 (Original: false, false)
+        helper.getCompleteAccess(component, event, helper, false, false); 
 
 
     },

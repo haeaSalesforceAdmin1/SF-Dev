@@ -1,9 +1,13 @@
 /**
 * @date 09/28/2020
 * @description 
-* UpdatedBy : Inho Kim / [10-07-2024] / [CCSOM-67] / [SF] Permissions for Users with "System Admin" Roles not updated by Auto Provisioning - RITM0643562 / If a user had the "System Admin" role prior to the auto-provisioning run, it should be retained. 
-
+* History
+* 1.1 Inho Kim / [10-07-2024] / [CCSOM-67] / [SF] Permissions for Users with "System Admin" Roles not updated by Auto Provisioning - RITM0643562 / If a user had the "System Admin" role prior to the auto-provisioning run, it should be retained. 
+* 1.2 [Minhee Kim] on [12-02-2024] for [DPM-5934] Insert Role by Access type to use in CRMA Log
+* 1.3 [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
+* 1.4 [Minhee Kim] on [02-17-2025] for [DPM-6086] added condition not to provide role if there's only DNAMS access(maintain the previous role) 
 */
+
 public without sharing class HMAUserProvisioningService {
  
     private static final String CLASSNAME = 'HMAUserProvisioningService'; 

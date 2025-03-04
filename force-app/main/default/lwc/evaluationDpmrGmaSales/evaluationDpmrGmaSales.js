@@ -67,6 +67,7 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
 
     topicOptions = [
         { label: 'Certified Pre-Owned', value: 'Certified Pre-Owned' },
+        { label: 'COPP Eval Completed', value: 'COPP Eval Completed' },
         { label: 'Customer Experience', value: 'Customer Experience' },
         { label: 'CVP', value: 'CVP' },
         { label: 'CX Process Improvement', value: 'CX Process Improvement' }, // DPM-6029
@@ -245,7 +246,6 @@ export default class EvaluationDpmrGmaSales extends NavigationMixin(LightningEle
                     // this.showToast('Error', 'Error loading contacts', 'error');
                 });
         } else {
-            this.contactDate = ''; // DPM-6050
             return;
             
         }
@@ -513,7 +513,7 @@ handleUploadFinished(event) {
             // If today is after the 15th, last month's dates should not be allowed
             if (selectedDate < previousMonthEnd || selectedDate > currentDate) {
                 this.isFifteenOver = true; // DPM-6050
-                this.dateErrorMessage = `Due to auto-closing, you cannot select dates from the previous month. Please use a date between (${formattedStart} ~ ${formattedEnd})`; // DPM-6050
+                this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedStart} ~ ${formattedEnd})`; // DPM-6050
                 return false;
             } else {
                 this.isFifteenOver = false;  // DPM-6050
@@ -522,7 +522,7 @@ handleUploadFinished(event) {
             // If today is on or before the 15th
             if (selectedDate < previousMonthStart || selectedDate > currentDate) {
                 this.isFifteenUnder = true; // DPM-6050
-                this.dateErrorMessage = `You can select dates from the previous month and dates of the current month up to today. Please use a date between (${formattedBeforeStart} ~ ${formattedBeforeEnd})`; // DPM-6050
+                this.dateErrorMessage = `The reporting period is closed for the date selected. Please use a date between (${formattedBeforeStart} ~ ${formattedBeforeEnd})`; // DPM-6050
                 return false;
             } else {
                  this.isFifteenUnder = false; // DPM-6050

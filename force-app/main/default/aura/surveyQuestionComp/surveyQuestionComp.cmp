@@ -104,6 +104,7 @@
     <aura:attribute name="SurveyRecord" type="Survey__c"/>
     <aura:attribute name="isSurveyCompletion" type="boolean" default="false"/>
 
+    <!--DPM-5871 changed to comment
     <aura:attribute name="NUMBEROFROSREVIEWED" type="Integer" default='0' />
     <aura:attribute name="NUMBEROFROSWITHOUTANYDISCREPANCIES" type="Integer" default='0'  />
     <aura:attribute name="NUMBEROFROSWITHINSUFFICIENTTECHNOTES" type="Integer" default='0' />
@@ -118,10 +119,11 @@
     <aura:attribute name="NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA" type="Integer" default='0' />
     <aura:attribute name="NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION" type="Integer" default='0' />
     <aura:attribute name="NUMBEROFROSWHICHARENOTWARRANTY" type="Integer" default='0' /> 
-    <aura:attribute name="NumberOfRosWithInsufficientDigtalDoc" type="Integer" default='0' /> <!--Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
+    <aura:attribute name="NumberOfRosWithInsufficientDigtalDoc" type="Integer" default='0' /> Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
 
 
     <!-- OutPut field warrentyReview -->
+    <!--DPM-5871 changed to comment
     <aura:attribute name="PercentageNUMBEROFROSREVIEWED" type="Integer" />
     <aura:attribute name="PercentageNUMBEROFROSWITHOUTANYDISCREPANCIES" type="Integer" />
     <aura:attribute name="PercentageNUMBEROFROSWITHINSUFFICIENTTECHNOTES" type="Integer" />
@@ -136,15 +138,13 @@
     <aura:attribute name="PercentageNUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA" type="Integer" />
     <aura:attribute name="PercentageNUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION" type="Integer" />
     <aura:attribute name="PercentageNUMBEROFROSWHICHARENOTWARRANTY" type="Integer" />
-    <aura:attribute name="PercentageNumberOfRosWithInsufficientDigtalDoc" type="Integer" /> <!--Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
+    <aura:attribute name="PercentageNumberOfRosWithInsufficientDigtalDoc" type="Integer" />Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]-->
 
     <!-- <aura:attribute name="EvaluationId" type="String" />-->
     <!-- Warrenty question in Metadata format -->
     <aura:attribute name="warQuestions" type="List"/>
     <aura:attribute name="inputWarrentyQuestion" type="List"/>
     <aura:attribute name="surveyWarrantyQuestionList" type="List"/>  <!--Added by Minhee Kim  - DPM-5871 01.21.2025 -->
-    <aura:attribute name="customError" type="List"/>  <!--Added by Minhee Kim  - DPM-5871 01.21.2025 -->
-
 
     <!-- this below code will fetch the Record Id-->
     <force:recordData recordId="{!$SObjectType.CurrentUser.Id}"
@@ -1534,14 +1534,157 @@
                                         <td><strong>Q{!surveyMap.Question_Number__c}.</strong> {!surveyMap.Name}</td>
                                         <td>
                                             <lightning:input type="Number" value="{!surveyMap.Response_Number_2__c}"/>
-                                            <!-- <div style="color: red;">
-                                                <ui:outputText value="" aura:id="customeError1" />
-                                            </div> -->
+                                            <div style="color: red;">
+                                                <aura:if isTrue="{!not(empty(surveyMap.ErrorMessage))}">
+                                                    <ui:outputText value="{!surveyMap.ErrorMessage}" />
+                                                </aura:if>
+                                            </div> 
                                         </td>
                                     </tr>
                                
                                 </aura:iteration>
                                 </tbody>
+                                <!--DPM-5871 changed to comments by MinheeKim on 02-19-2025  -->
+                                <!--                                
+                                <tbody>
+                                <tr>
+                                    <td><strong>Q1.</strong> NUMBER OF RO'S REVIEWED</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSREVIEWED}" aura:id="{!surveyMap.values.NUMBEROFROSREVIEWED}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError1" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q2.</strong> NUMBER OF RO'S WITHOUT ANY DISCREPANCIES</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHOUTANYDISCREPANCIES}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError2" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q3.</strong> NUMBER OF RO'S WITH INSUFFICIENT TECH NOTES</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHINSUFFICIENTTECHNOTES}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError3" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q4.</strong> NUMBER OF RO'S WITH DATE MILEAGE DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHDATEMILEAGEDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError4" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q5.</strong> NUMBER OF RO'S WITH IMPROPER ADDON</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERADDON}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError5" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q6.</strong> NUMBER OF RO'S WITH TIME JUSTIFICATION DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError6" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q7.</strong> NUMBER OF RO'S WITH SUBLET DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHSUBLETDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError7" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q8.</strong> NUMBER OF RO'S WITH IMPROPER REPAIR</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERREPAIR}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError8" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q9.</strong> NUMBER OF RO'S WHERE RO DOES NOT MATCH CLAIM</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWHERERODOESNOTMATCHCLAIM}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError9" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q10.</strong> NUMBER OF RO'S WITH MISSING DOCUMENTS</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHMISSINGDOCUMENTS}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError10" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q11.</strong> NUMBER OF RO'S WITH CUSTOMER SIGNATURE DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError11" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q12.</strong> NUMBER OF RO'S WITH PRIOR APPROVAL DISCREPANCY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError12" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q13.</strong> NUMBER OF RO'S WITH PARTS RETENTION DISCREPANCY (RO DOCUMENTATION)</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError13" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q14.</strong> NUMBER OF RO'S WHICH ARE NOT WARRANTY</td>
+                                    <td>
+                                        <lightning:input type="Number" value="{!surveyMap.values.NUMBEROFROSWHICHARENOTWARRANTY}"/>
+                                        <div style="color: red;">
+                                            <ui:outputText value="" aura:id="customeError14" />
+                                        </div>
+                                    </td>
+                                </tr>
+                                <aura:if isTrue="{!v.showQ15}">
+                                    <tr>
+                                        <td><strong>Q15.</strong> NUMBER OF RO'S WITH INSUFFICIENT DIGITAL DOCUMENTATION</td>
+                                        <td>
+                                            <lightning:input type="Number" value="{!surveyMap.values.NumberOfRosWithInsufficientDigtalDoc}" />
+                                            <div style="color: red;">
+                                                <ui:outputText value="" aura:id="customeError15" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </aura:if>
+                                </tbody>-->
                             </table>
                         </div>
                     </div>
@@ -1583,6 +1726,157 @@
                     </div>
                 </aura:if>
 
+                <!--DPM-5871 changed to comments by MinheeKim on 02-19-2025  -->
+                <!-- <aura:if isTrue="{!or(and(v.showReadonlyPage, v.surveyWarrantySectionQuestionsMapData.length == 1), !v.hasEditAccess)}">
+                    <div class="slds-grid slds-p-top_x-small">
+                        <div class="slds-col slds-size_1-of-1">
+                            <table class="slds-table slds-max-medium-table_stacked-horizontal">
+                                <thead>
+                                <th>Question</th>
+                                <th>Value</th>
+                                <th>Percentage</th>
+                                </thead>
+
+                                <tr>
+                                    <td><strong>Q1.</strong> NUMBER OF RO'S REVIEWED</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSREVIEWED}" aura:id="{!surveyMap.values.NUMBEROFROSREVIEWED}"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q2.</strong> NUMBER OF RO'S WITHOUT ANY DISCREPANCIES</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHOUTANYDISCREPANCIES}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHOUTANYDISCREPANCIES}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q3.</strong> NUMBER OF RO'S WITH INSUFFICIENT TECH NOTES</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHINSUFFICIENTTECHNOTES}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHINSUFFICIENTTECHNOTES}" style="percent-fixed" />
+
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q4.</strong> NUMBER OF RO'S WITH DATE MILEAGE DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHDATEMILEAGEDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHDATEMILEAGEDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q5.</strong> NUMBER OF RO'S WITH IMPROPER ADDON</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERADDON}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHIMPROPERADDON}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q6.</strong> NUMBER OF RO'S WITH TIME JUSTIFICATION DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHTIMEJUSTIFICATIONDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q7.</strong> NUMBER OF RO'S WITH SUBLET DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHSUBLETDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHSUBLETDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q8.</strong> NUMBER OF RO'S WITH IMPROPER REPAIR</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHIMPROPERREPAIR}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHIMPROPERREPAIR}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q9.</strong> NUMBER OF RO'S WHERE RO DOES NOT MATCH CLAIM</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWHERERODOESNOTMATCHCLAIM}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWHERERODOESNOTMATCHCLAIM}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q10.</strong> NUMBER OF RO'S WITH MISSING DOCUMENTS</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHMISSINGDOCUMENTS}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHMISSINGDOCUMENTS}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q11.</strong> NUMBER OF RO'S WITH CUSTOMER SIGNATURE DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHCUSTOMERSIGNATUREDISCREPANCY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q12.</strong> NUMBER OF RO'S WITH PRIOR APPROVAL DISCREPANCY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHPRIORAPPROVALDISCREPANCYinctimeStampbeforePA}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q13.</strong> NUMBER OF RO'S WITH PARTS RETENTION DISCREPANCY (RO DOCUMENTATION)</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWITHPARTSRETENTIONDISCREPANCYRODOCUMENTATION}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Q14.</strong> NUMBER OF RO'S WHICH ARE NOT WARRANTY</td>
+                                    <td>
+                                        <ui:outputText value="{!surveyMap.values.NUMBEROFROSWHICHARENOTWARRANTY}"/>
+                                    </td>
+                                    <td>
+                                        <lightning:formattedNumber value="{!surveyMap.values.PercentageNUMBEROFROSWHICHARENOTWARRANTY}" style="percent-fixed" />
+                                    </td>
+                                </tr>
+                                <aura:if isTrue="{!v.showQ15}">
+                                    <tr>
+                                        <td><strong>Q15.</strong> NUMBER OF RO'S WITH INSUFFICIENT DIGITAL DOCUMENTATION</td> //Edited by [JongHoon Kim] on [10-18-2024] for [DPM-5863]
+                                        <td>
+                                            <ui:outputText value="{!surveyMap.values.NumberOfRosWithInsufficientDigtalDoc}" />
+                                        </td>
+                                        <td>
+                                            <lightning:formattedNumber value="{!surveyMap.values.PercentageNumberOfRosWithInsufficientDigtalDoc}"
+                                                style="percent-fixed" />
+                                        </td>
+                                    </tr>
+                                </aura:if>
+                            </table>
+                        </div>
+                    </div>
+                </aura:if> -->
         </aura:set>
     </aura:if>
 

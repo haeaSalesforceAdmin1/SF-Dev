@@ -4,6 +4,7 @@
  * Author : [JonghoonKim] / [05-08-2024] / [Ticket 5663] / [Created EvaluationDpmrController] 
  * Author : [JonghoonKim] / [12-03-2024] / [Ticket 5946] / [Update createEvalName Method // Modify the logic to add (SI) to the Evaluation Name when the Topic value is 'Survey Integrity'.]
  * Author : [JonghoonKim] / [12-04-2024] / [Ticket 5904] / [Created getSecondaryContactOptions Method And Update saveEvaluation Methoed(Add Secondary Contact)] 
+ * Author : [JonghoonKim] / [02-25-2025] / [Ticket 6087] / [Created createFlowEvalName Method (Only Flow)]
  * ---------------------------
  */
 
@@ -296,6 +297,101 @@ public with sharing class EvaluationDpmrController {
         
         return evalName;
     }
+    
+
+    /**
+     * [Method Description] 
+     * Create Evaluation Name // dealer Code + division + Contact Date + count 
+     * Created by [Jonghoon Kim] on [25-02-25] for [Ticket DPM-6087]
+    */
+    @InvocableMethod(label='Create DPMR Name')
+    public static List<String> createFlowEvalName(List<Request> requests) { // String recordId, Date contactDate, String division, String topic
+        List<String> evalNameList = new List<String>();
+        Request request = requests[0];
+        System.debug('createFlowEvalName request ==>>' + request);
+        // Query the Account record to retrieve the dealerCode.
+        List<Account> accList = [SELECT DealerCode__c, BrandCode__c  FROM Account WHERE Id = :request.recordId];
+        Integer evalCount = 0;
+        
+        // Convert the Date object to a DateTime object and apply the date format
+        DateTime dateTimeForFormatting = DateTime.newInstance(request.contactDate, Time.newInstance(0, 0, 0, 0));
+        String formattedDate = dateTimeForFormatting.format('MMM d, yyyy');
+        
+        String evalName = '';
+        String dealerCode = '';
+        String brandCode = '';
+        
+        if (accList.size() > 0) {
+            dealerCode = accList[0].DealerCode__c;
+        }
+        
+        
+        // DPM - 5946 - Add 'Survey Integrity' logic
+        if(request.division == 'Sales') {
+            if(request.topic.contains('Financial Performance') && request.topic.contains('Survey Integrity')) { 
+                evalName = dealerCode + ' - Sales DPMR (FIN, SI) - ' + formattedDate + ' - ';
+            } else if(request.topic.contains('Survey Integrity') && !request.topic.contains('Financial Performance')) {
+                evalName = dealerCode + ' - Sales DPMR (SI) - ' + formattedDate + ' - ';
+            } else if(request.topic.contains('Financial Performance') && !request.topic.contains('Survey Integrity')) {
+                evalName = dealerCode + ' - Sales DPMR (FIN) - ' + formattedDate + ' - ';
+            } else {
+                evalName = dealerCode + ' - Sales DPMR - ' + formattedDate + ' - ';
+            }
+            
+        } else {
+            if(request.topic.contains('Financial Performance') && request.topic.contains('Survey Integrity')) {
+                evalName = dealerCode + ' - Aftersales DPMR (FIN, SI) - ' + formattedDate + ' - ';
+            } else if(request.topic.contains('Survey Integrity') && !request.topic.contains('Financial Performance')) {
+                evalName = dealerCode + ' - Aftersales DPMR (SI) - ' + formattedDate + ' - ';
+            } else if(request.topic.contains('Financial Performance') && !request.topic.contains('Survey Integrity')) {
+                evalName = dealerCode + ' - Aftersales DPMR (FIN) - ' + formattedDate + ' - ';
+            } else {
+                evalName = dealerCode + ' - Aftersales DPMR - ' + formattedDate + ' - ';
+            }
+        }
+        
+        
+ 
+        // List<Evaluation__c> evaluations = [SELECT Name FROM Evaluation__c WHERE Name LIKE :  + '%'];
+
+
+        List<Evaluation__c> evaluations = [
+                                            SELECT Name 
+                                            FROM Evaluation__c 
+                                            WHERE RecordType.DeveloperName LIKE '%DPMR%'
+                                            AND PrimaryContactDate__c = :request.contactDate 
+                                            AND Account__r.DealerCode__c = :dealerCode
+                                            AND Type__c =:request.division
+                                            ];
+
+        if (evaluations.size() > 0) {
+            Integer maxNumber = 0;
+            for (Evaluation__c eval : evaluations) {
+                String[] parts = eval.Name.split(' - ');
+                if (parts.size() > 2) {
+                    String numberPart = parts[parts.size() - 1];
+                    Integer num;
+                    try {
+                        num = Integer.valueOf(numberPart);
+                        if (num > maxNumber) {
+                            maxNumber = num;
+                        }
+                    } catch (Exception e) {
+                       
+                    }
+                }
+            }
+            // Add 1 to the highest number
+            evalName += (maxNumber + 1);
+        } else {
+            // Use the default number 1 if there is no existing Eval.
+            evalName += '1';
+        }
+
+        evalNameList.add(evalName);
+        return evalNameList;
+    }
+
     /**
      * [Method Description] 
      * Associate the saved File with the Evaluation.
@@ -394,5 +490,16 @@ public with sharing class EvaluationDpmrController {
         insert cv;
         
 
-}
+    }
+
+    public class Request {
+        @InvocableVariable(required=true)
+        public String recordId;
+        @InvocableVariable(required=true)
+        public Date contactDate;
+        @InvocableVariable(required=true)
+        public String division;
+        @InvocableVariable(required=true)
+        public String topic;
+    }
 }

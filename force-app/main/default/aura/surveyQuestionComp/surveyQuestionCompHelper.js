@@ -1,3 +1,17 @@
+/**
+ * Description: helper for surveyQuestionComp
+ * ----- Change Log -----
+ * Author : [Name] / [MM-DD-YYYY] / [Ticket #] / [Change Description] 
+ * Version      Date                Author               Ticket         Modification
+ * 1.0                              Dhiraj              DPM-4390        Created
+ * 1.1          10-20-2023          Minhee Kim          DPM-5069
+ * 1.2          11-20-2023          Minhee Kim          DPM-5149        Prevent a survey to be 'auto-completed'
+ * 1.3          10-20-2023          Minhee Kim          DPM-5069
+ * 1.4          02-19-2025          Minhee Kim          DPM-5871        Change from hardcoding to dynamic
+ * ---------------------------
+ */
+
+
 ({
     getRecordAccess: function(component, event, helper) {
         var action = component.get("c.getHasEditAccessToRecord");
@@ -250,21 +264,20 @@
      */
      saveWarrantyData:function(component,event,helper,warrantyStatus){        
         var isSave = helper.validateWarrantyData(component,event,helper);
-
         if(isSave){
-        
             var surveyWarrantyQuestionsToUpdate = [];
             var surveySectionQuestionsList = component.get("v.surveyWarrantyQuestionList");
 
             var surveyQuestion={};
-            surveyQuestion.Id = component.get("v.surveyId");
+            surveyQuestion.Survey__c = component.get("v.surveyId");
+            console.log('surveyId : '+surveyQuestion.Survey__c);
             surveyQuestion.Status__c =warrantyStatus;
            	surveyWarrantyQuestionsToUpdate.push(surveyQuestion);
 
 
             //Updating the Survey
             var action = component.get("c.updateWarrantySurveyQuestion");
-        	action.setParams({"questions": surveySectionQuestionsList, "surveyId" : surveyQuestion.Id, "surveyStatus": surveyQuestion.Status__c});
+        	action.setParams({"questions": surveySectionQuestionsList, "surveyId" : surveyQuestion.Survey__c, "surveyStatus": surveyQuestion.Status__c});
         	action.setCallback(this, function(response) { 
         		
                 if(response.getState()==="SUCCESS"){
@@ -281,7 +294,8 @@
                         component.set("v.hasEditAccess", false);
                     }
                 }else{
-                    console.log('Something wrong happen');
+                    console.log(response.errorMessage);
+                    
                 }
             });
             $A.enqueueAction(action);
@@ -576,69 +590,59 @@
     /**
      * Edited by [Minhee Kim] on [01.21.2025] for [DPM-5871] To use dynamic variable for survey questions
      */
-    validateWarrantyData:function(component,event,helper){
-        var warrantyQuestionList =component.get("v.surveyWarrantyQuestionList");
-        var customError = component.get("v.customError");
-        customError.length = surveyWarrantyQuestionList.length;
-        customError.fill("");
-        let firstNum = warrantyQuestionList[0].Response_Number_2__c;
-        let secInput = (warrantyQuestionList[1].Response_Number_2__c!==''||  warrantyQuestionList[1].Response_Number_2__c!==undefined) ? firstNum - warrantyQuestionList[1].Response_Number_2__c : firstNum;
-        var inputCompare = 0;
-            
-    	warrantyQuestionList.forEach((warQuestions, index)=>{
-            
-                if(firstNum>=0 && firstNum!='' && firstNum!=undefined){
-                    if(index==1){
-                        if(secInput>=0 && warQuestions.Response_Number_2__c>=0 && warQuestions.Response_Number_2__c!=='' && warQuestions.Response_Number_2__c!=undefined){
-                            warQuestions.Other_Response_Text__c = ((warQuestions.Response_Number_2__c/firstNum)*100).toString()+'%';
-                            //component.set('v.warQuestions.values.PercentageNUMBEROFROSWITHDATEMILEAGEDISCREPANCY',(warQuestions.values.NUMBEROFROSWITHOUTANYDISCREPANCIES/warQuestions.values.NUMBEROFROSREVIEWED)*100);
-                        }else{
-                            customError[index] ="Value must be less than Q1";
-                        }
-                        //Compare value    	                Q1                                          Q2
-                        inputCompare =  (warrantyQuestionList[1].Response_Number_2__c!==''||  warrantyQuestionList[1].Response_Number_2__c!==undefined) ?  firstNum-warrantyQuestionList[1].Response_Number_2__c : firstNum;
-                    }else if(index!==1 || index!==0){
-                        let tempInput=0; 
-                        if(warQuestions.Response_Number_2__c ==undefined ||warQuestions.Response_Number_2__c ==''){
-                            tempInput =inputCompare;
-                        }else{                                      //Q3
-                            tempInput =inputCompare - warQuestions.Response_Number_2__c;
-                        }
-                        if(tempInput>=0){
-                            if(warQuestions.Response_Number_2__c ==undefined || warQuestions.Response_Number_2__c==''){
-                                warQuestions.Other_Response_Text__c ='0%';
-                                }
-                            else{
-                                let percent = (warQuestions.Response_Number_2__c/firstNum)*100;
-                                warQuestions.Other_Response_Text__c =percent.toString()+'%';
-                                
-                            }
-                            customError[index] = ""; 
-                        }else{
-                            customError[index] = `Value must be less than or equal ${inputCompare}`;
-                        }
-                    }
-
-                }
-                else{
-                    customError[0] = "Please Enter Value";                     
-            }
+    validateWarrantyData: function(component, event, helper) {
+        console.log('validateWarrantyData started');
+        var warrantyQuestionList = component.get("v.surveyWarrantyQuestionList");
+        var customError = new Array(warrantyQuestionList.length).fill("");
     
-        });
-
-        component.set("v.surveyWarrantyQuestionList" , warrantyQuestionList);
-        component.set("v.customError",customError);
-
-        let noError=true;
-        customError.forEach(error=>{
-            if(error!=""){
-                noError=false;
-            }else if(!noError){
-                return noError;
+        let firstNum = warrantyQuestionList[0].Response_Number_2__c;
+        let secInput = (warrantyQuestionList[1].Response_Number_2__c !== '' && warrantyQuestionList[1].Response_Number_2__c !== undefined) 
+            ? firstNum - warrantyQuestionList[1].Response_Number_2__c 
+            : firstNum;
+        var inputCompare = 0;
+    
+        warrantyQuestionList.forEach((warQuestions, index) => {
+            if (firstNum >= 0 && firstNum !== '' && firstNum !== undefined) {
+                if (index === 1) {
+                    if (secInput >= 0 && warQuestions.Response_Number_2__c >= 0 && warQuestions.Response_Number_2__c !== '' && warQuestions.Response_Number_2__c !== undefined) {
+                        warQuestions.Other_Response_Text__c = ((warQuestions.Response_Number_2__c / firstNum) * 100).toString() + '%';
+                    } else {
+                        customError[index] = "Value must be less than Q1";
+                    }
+                    inputCompare = (warrantyQuestionList[1].Response_Number_2__c !== '' && warrantyQuestionList[1].Response_Number_2__c !== undefined) 
+                        ? firstNum - warrantyQuestionList[1].Response_Number_2__c 
+                        : firstNum;
+                } else if (index !== 1 && index !== 0) {
+                    let allowRange = (warQuestions.Response_Number_2__c === undefined || warQuestions.Response_Number_2__c === '') 
+                        ? inputCompare 
+                        : inputCompare - warQuestions.Response_Number_2__c;
+    
+                    if (allowRange >= 0) {
+                        warQuestions.Other_Response_Text__c = warQuestions.Response_Number_2__c === undefined || warQuestions.Response_Number_2__c === '' 
+                            ? '0%' 
+                            : ((warQuestions.Response_Number_2__c / firstNum) * 100).toString() + '%';
+                        customError[index] = ""; 
+                    } else if(customError[1]===""){
+                        customError[index] = `Value must be less than or equal to ${inputCompare}`;
+                    }
+                }
+            } else {
+                customError[0] = "Please enter a value";
             }
-        });		
+        });
+    
+        // Add ErrorMessage into each surveyMap 
+        warrantyQuestionList.forEach((warQuestions, index) => {
+            warQuestions.ErrorMessage = customError[index];
+        });
+    
+        component.set("v.surveyWarrantyQuestionList", warrantyQuestionList);
+    
+        let noError = customError.every(error => error === "");
+    
         return noError;
-	},
+    },
+    
 
     //Dhiraj Warranty Review DPM-4390
     /**
@@ -939,13 +943,13 @@
         action.setCallback(this, function(response) {
             
             var results = response.getReturnValue();
-            var surveyId = results[0].Id;
+            var surveyId = results[0].Survey__c;
             component.set("v.surveyId", surveyId);
             
             //Show Read Only permission checking
             var results = response.getReturnValue();
             if(results.length > 0) {
-                if(results[0].Status__c == 'Completed') {
+                if(results[0].Survey__r.Status__c == 'Completed') {
                     component.set("v.showReadonlyPage", true); 
                     component.set("v.isSurveyCompletion",true);
                 }
@@ -1548,7 +1552,12 @@
             
             surveyQuestionsForSection.forEach(surveyQuestion => {
 
-                var key = surveyQuestion.questionNumber + "-" + surveyQuestion.question;
+                //DPM-5871 trim the key by MinheeKim on 02-25-2025
+                var cleanQuestion = surveyQuestion.question.replace(/<[^>]+>/g, ''); 
+                var key = surveyQuestion.questionNumber + "-" + cleanQuestion;
+                key= key.replace(/<[^>]+>/g, ''); 
+                console.log('key: '+key);
+                //var key = surveyQuestion.questionNumber + "-" + surveyQuestion.question;
 
                 if(surveyQuestion.dependentquestionid == null) {
                 //Warranty Review 2022 Start
@@ -1577,6 +1586,7 @@
                 || surveyQuestion.howManyROsHadInsufficientTechNotes === undefined) {
                     var validationerrorsmap = {};
                     var indexoferrorquestion = errorquestions.indexOf(surveyQuestion.id);
+                    console.log('indexoferrorquestion: '+indexoferrorquestion);
                     if(indexoferrorquestion == -1) {
                         errorquestions.push(surveyQuestion.id);
                         validationerrorsmap.key = key;
@@ -1585,10 +1595,24 @@
                     }
                     else {
                         validationerrorsmap = validationerrorsmaplist[indexoferrorquestion];
-                        var errors = validationerrorsmap[key].values;
-                        errors.push('Missing '+component.get("v.warrantyReviewQuestionsMapTmp")[surveyQuestion.questionNumber]+' Value for ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question);
+                        /**DPM-5871 start : added exception */
+                        if (!validationerrorsmap[key]) {
+                            validationerrorsmap[key] = { values: [] };
+                        }
+                        
+                        if (!validationerrorsmap[key].values) {
+                            validationerrorsmap[key].values = [];
+                        }
+
+                        validationerrorsmap[key].values.push('Missing Value for ' + surveyQuestion.questionNumber + "-Remarks");
+                        /**DPM-5871 end */
+                        
+                        /**DPM-5871 change to comment
+                        var errors = validationerrorsmap[key].values; 
+                        errors.push('Missing '+component.get("v.warrantyReviewQuestionsMapTmp")[surveyQuestion.questionNumber]+' Value for ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question);  
                         validationerrorsmap[key].values = errors;
                         validationerrorsmaplist[indexoferrorquestion] = validationerrorsmap;
+                        DPM-5871 end*/
                     }
                 }
             }
@@ -1597,6 +1621,7 @@
                     if((surveyQuestion.response == "" || surveyQuestion.response == null || surveyQuestion.response == undefined) && surveyQuestion.dependentquestionid == null ) {
                         var validationerrorsmap = {};
                         var indexoferrorquestion = errorquestions.indexOf(surveyQuestion.id);
+                        console.log('indexoferrorquestion: '+indexoferrorquestion);
                         if(indexoferrorquestion == -1) {
                             errorquestions.push(surveyQuestion.id);
                             validationerrorsmap.key = key;
@@ -1605,10 +1630,24 @@
                         }
                         else {
                             validationerrorsmap = validationerrorsmaplist[indexoferrorquestion];
-                            var errors = validationerrorsmap[key].values;
-                            errors.push('Missing Value for ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question);
+                             /**DPM-5871 start : added exception */
+                            if (!validationerrorsmap[key]) {
+                                validationerrorsmap[key] = { values: [] };
+                            }
+                            
+                            if (!validationerrorsmap[key].values) {
+                                validationerrorsmap[key].values = [];
+                            }
+
+                            validationerrorsmap[key].values.push('Missing Value for ' + surveyQuestion.questionNumber + "-Remarks");
+                            /**DPM-5871 end */
+                            
+                            /**DPM-5871 change to comment
+                            var errors = validationerrorsmap[key].values; 
+                            errors.push('Missing '+component.get("v.warrantyReviewQuestionsMapTmp")[surveyQuestion.questionNumber]+' Value for ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question);  
                             validationerrorsmap[key].values = errors;
                             validationerrorsmaplist[indexoferrorquestion] = validationerrorsmap;
+                            DPM-5871 end*/
                         }
                     }
 
@@ -1616,6 +1655,7 @@
                     if(surveyQuestion.response == "No" && surveyQuestion.showremarks==true&& (surveyQuestion.remarks == undefined || surveyQuestion.remarks == "" || surveyQuestion.remarks == null)){
                         var validationerrorsmap = {};
                         var indexoferrorquestion = errorquestions.indexOf(surveyQuestion.id);
+                        console.log('indexoferrorquestion: '+indexoferrorquestion);
                         if(indexoferrorquestion == -1) {
                             errorquestions.push(surveyQuestion.id);
                             validationerrorsmap.key = key;
@@ -1624,10 +1664,24 @@
                         }
                         else {
                             validationerrorsmap = validationerrorsmaplist[indexoferrorquestion];
-                            var errors = validationerrorsmap[key].values;
-                            errors.push('Missing Value for ' + surveyQuestion.questionNumber + "-Remarks");
+                            /**DPM-5871 start : added exception */
+                            if (!validationerrorsmap[key]) {
+                                validationerrorsmap[key] = { values: [] };
+                            }
+                            
+                            if (!validationerrorsmap[key].values) {
+                                validationerrorsmap[key].values = [];
+                            }
+
+                            validationerrorsmap[key].values.push('Missing Value for ' + surveyQuestion.questionNumber + "-Remarks");
+                            /**DPM-5871 end */
+                            
+                            /**DPM-5871 change to comment
+                            var errors = validationerrorsmap[key].values; 
+                            errors.push('Missing '+component.get("v.warrantyReviewQuestionsMapTmp")[surveyQuestion.questionNumber]+' Value for ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question);  
                             validationerrorsmap[key].values = errors;
                             validationerrorsmaplist[indexoferrorquestion] = validationerrorsmap;
+                            DPM-5871 end*/
                         }
                     }
                     // added by Soyeon Kim for DPM-4873 remarks error ends
@@ -1635,10 +1689,11 @@
                     if(surveyQuestion.relatedDocuments.length < surveyQuestion.requiredimages  && surveyQuestion.requiredimages != undefined && surveyQuestion.requiredimages != null && surveyQuestion.requiredimages > 0 && surveyQuestion.failvalue != null && surveyQuestion.response != surveyQuestion.failvalue) {
                         var validationerrorsmap = {};
                         var indexoferrorquestion = errorquestions.indexOf(surveyQuestion.id);
+                        console.log('indexoferrorquestion: '+indexoferrorquestion);
                         if(indexoferrorquestion == -1) {
                             errorquestions.push(surveyQuestion.id);
                             validationerrorsmap.key = key;
-                            validationerrorsmap.values = ['Missing '+surveyQuestion.requiredimages+' File to Upload for question ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question];;
+                            validationerrorsmap.values = ['Missing '+surveyQuestion.requiredimages+' File to Upload for question ' + surveyQuestion.questionNumber + "-" + surveyQuestion.question];
                             validationerrorsmaplist.push(validationerrorsmap);
                         }
                         else {
@@ -1660,7 +1715,7 @@
                             if(inlinequestion.response == undefined || inlinequestion.response == null || inlinequestion.response == "") {
 
                                 var indexoferrorquestion = errorquestions.indexOf(surveyQuestion.id);
-
+                                console.log('indexoferrorquestion: '+indexoferrorquestion);
                                 if(indexoferrorquestion == -1) {
                                     errorquestions.push(surveyQuestion.id);
                                     validationerrorsmap.key = key;
@@ -1771,6 +1826,7 @@
 				
             }
             if(validationerrorsmaplist.length > 0) {
+                console.log('validationerrorsmaplist: '+validationerrorsmaplist);
 
                 component.set("v.validationErrorsMapList", validationerrorsmaplist);
                 
@@ -1893,7 +1949,7 @@
     
                     var action = component.get("c.updateSurveyQuestions");
                     var deletedFileMapData = component.get("v.deletedFileMapData"); //DPM-5302 Check whether the file is attached to the survey question
-                    console.log(submit);
+                    console.log('submit : '+submit);
             //        submit = true;
                     action.setParams({
                         "surveyQuestionsJSON": JSON.stringify(surveyQuestionsToUpdate, null, 5)
@@ -2074,6 +2130,8 @@
     },
 
     handleShowErrorsModal: function(component, event, helper) {
+        console.log('Entered handleShowErrorsModal');
+        console.log('component.get("v.validationErrorsMapList"): '+ JSON.stringify(component.get("v.validationErrorsMapList"), null, 2));
         var modalBody;
         var modalFooter;
         $A.createComponents([["c:surveyValidationErrors", {validationErrorsMapList : component.get("v.validationErrorsMapList")}], 

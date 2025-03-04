@@ -1,0 +1,3 @@
+<aura:component implements="lightning:isUrlAddressable,force:hasRecordId,force:lightningQuickAction" access="global">
+    <c:evaluationDpmrGmaSales recordId="{!v.recordId}" width="80%" />
+</aura:component>

@@ -1,6 +1,8 @@
 /*
  * Updated / 24.03.16 / inhokim / [CCSOM-25] skip autoprovisioing for SysAdmin role User / test: UserTriggerHandlerTest
  * Updated / 24.10.10 / inhokim / [CCSOM-67] comment out CCSOM-25 codes,  / test: UserTriggerHandlerTest
+ * Edited by [Minhee Kim] on [02-25-2025] for [DPM-6101] move update DML from inside of loop to outside
+ * Edited by [MinheeKim] on [02-28-2025] for [DPM-6118] - Add runByUserTrigger flag
 */
 public without sharing class UserTriggerHelper {
 
@@ -66,7 +68,6 @@ public without sharing class UserTriggerHelper {
     * Edited by MinheeKim on 02-12-2025 for DPM-6083 - Edit not to run the updateDNAMSRole logic
     */
     public static void updateAccessTypeOnContact(List<User> newUsersList, Map<Id,User> oldUsersMap){
-        ContactTriggerHandler.runByUserTrigger=true;
         System.debug('updateAccessTypeOnContact started');
         List<Id> listUserId = new List<Id>();
     
@@ -84,17 +85,18 @@ public without sharing class UserTriggerHelper {
                 }
         
             }    
-        
     }
 
     /** 
     * [Method Description]
     * Created by [Author] on [Date] for [#ticket]
     * Edited by [MinheeKim] on [02-12-2025] for [DPM-6083] - Edit not to run the updateDNAMSRole logic
+    * Edited by [MinheeKim] on [02-28-2025] for [DPM-6118] - Add runByUserTrigger flag
     */
     @Future
     public static void updateAccessType(List<Id> listUserId){
         System.debug('updateAccessType started');
+        ContactTriggerHandler.runByUserTrigger=true;//DPM-6118
         List<Contact> listConToUpd = new List<Contact>();
         
         if (listUserId != NULL && listUserId.size() > 0) {
@@ -195,6 +197,7 @@ public without sharing class UserTriggerHelper {
                 }
             }
         }
+        ContactTriggerHandler.runByUserTrigger=false; //DPM-6118
     }
 
     /**
@@ -879,6 +882,7 @@ public without sharing class UserTriggerHelper {
      * @author Vinit [27 May 2022] [IBM] Ticket DPM-177
      * Edited by Areum on 01-13-2025 for DPM-6005 - Check for DNAMS access in temporary dealer accounts and Skip
      * Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Consolidate DNAMS flag fields
+     * Edited by [Minhee Kim] on [02-25-2025] for [DPM-6101] move update DML from inside of loop to outside
      */
     @future
     public static void updateChanges(List < Id > listUserId) {
@@ -970,13 +974,19 @@ public without sharing class UserTriggerHelper {
                 }*/
     
                 listUserToUpdate.add(usr);
-        
-                if (listUserToUpdate.size() > 0) {
+                System.debug('UserRoleId, UserRole.Name: '+usr.UserRoleId+' '+ usr.UserRole.Name);
+                //DPM-6101 Change to comment and move to out of for loop
+                /**if (listUserToUpdate.size() > 0) {
                     update listUserToUpdate;
-                }
+                }*/
 
             }
-    
+            
+            //DPM-6101  moved from inside of loop to out of it
+            if (listUserToUpdate.size() > 0) {
+                    update listUserToUpdate;
+            }
+
         }
     }
     

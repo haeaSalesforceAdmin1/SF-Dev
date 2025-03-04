@@ -1,3 +1,18 @@
+/**
+* @Created date 
+* @Last updated date : 02-27-2025
+* @description 
+* History
+* 1.1 Created
+* 1.2 Edited by [Minhee Kim] on [12-12-2023] for [DPM-4454]
+* 1.3 Edited by [MinheeKim] on [2024-03-29] for [DPM-5469] change to prevent inactive DNAMS ACR
+* 1.4 Edited by [Minhee Kim] on [07-10-2024] for [DPM-5613] add logic to check the app type for each accesstype
+* 1.5 Edited by [Areum] on [11-01-2024] for [DNAMS PIR] / add DNAMS logic 
+* 1.6 Edited by [Minhee Kim] on [01-30-2025] for [DPM-5620] changed the logic to use Map<String,List<AccountContactRelation>> acrMap
+* 1.7 Edited by [Minhee Kim] on [02-10-2025] for [DPM-6020] Changed to comment not to run DNAMSUserProvisioningServiceQueueable
+* 1.8 Edited by [MinheeKim] on [02-12-2025] for [DPM-6083] pdate ACR's DNAMSRole field
+*/
+
 public without sharing class ContactTriggerHelper {
 
 

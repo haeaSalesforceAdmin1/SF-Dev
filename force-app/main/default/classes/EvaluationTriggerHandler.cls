@@ -1,8 +1,9 @@
 /**
  * Description: [EvaluationTriggerHandler]
  * ----- Change Log -----
- * Author : [JonghoonKim] / [10-07-2024] / [Ticket 5663] / [Created evaluationDPMRTopicChange Method] 
- * Author : [JonghoonKim] / [11-08-2024] / [Ticket 5924] / [Created preventDuplicateEvaluation Method]
+ * Edited by [JonghoonKim] / [10-07-2024] / [Ticket 5663] / [Created evaluationDPMRTopicChange Method] 
+ * Edited by [JonghoonKim] / [11-08-2024] / [Ticket 5924] / [Created preventDuplicateEvaluation Method]
+ * Edited by [MinheeKim] / [02-04-2025] / [Ticket 6017] / input the business last modified date
  * ---------------------------
  */
 public class EvaluationTriggerHandler extends Trigger_Framework.baseHandler {
