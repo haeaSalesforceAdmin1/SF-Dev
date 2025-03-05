@@ -2174,23 +2174,23 @@
         var recordId = component.get("v.recordId");
         console.log("5610 recordId => "+ recordId);  // Eval Obj
 
-        // $A.createComponents([
-        //     ["c:surveySubmittedModal", {"message": "You attached images exceeding 30MB in total, causing a failure to the PDF generation function. Please adjust the file size before you proceed to allow PDF generation."}],
-        //     ["c:surveySubmittedModalFooter", {}]
-        // ], function(components, status) {
-        //     //component.set("v.showSpinner", false);
-        //         if (status === "SUCCESS") {
-        //             modalBody = components[0];
-        //             modalFooter = components[1];
+        $A.createComponents([
+            ["c:surveySubmittedModal", {"message": "You attached images exceeding 30MB in total, causing a failure to the PDF generation function. Please adjust the file size before you proceed to allow PDF generation."}],
+            ["c:surveySubmittedModalFooter", {}]
+        ], function(components, status) {
+            //component.set("v.showSpinner", false);
+                if (status === "SUCCESS") {
+                    modalBody = components[0];
+                    modalFooter = components[1];
 
-        //             component.set("v.modalBody", modalBody);
-        //             component.set("v.modalFooter", modalFooter);
-        //         }
-        //         else {
-        //         }
-        // });
+                    component.set("v.modalBody", modalBody);
+                    component.set("v.modalFooter", modalFooter);
+                }
+                else {
+                }
+        });
 
-            /**DPM-5610 start by MinheeKim */
+            /**DPM-5610 start by MinheeKim //Changed to comment due to DPM-5871 on 03-04-2025
  
             var action = component.get("c.launchQueueableForEvaluationGeneration");
             action.setParams({ "surveyId" : component.get("v.surveyId")}); 
@@ -2230,24 +2230,24 @@
                 
             });
                 $A.enqueueAction(action);
-            /**DPM-5610 end by MinheeKim */
+            DPM-5610 end by MinheeKim */
 
         //DPM-5507 end
-        // var modalBody = component.get("v.modalBody");
-        // var modalFooter = component.get("v.modalFooter");
+        var modalBody = component.get("v.modalBody");
+        var modalFooter = component.get("v.modalFooter");
 
-        // component.find('overlayLib').showCustomModal({
-        //     header: "Confirm Complete Survey",
-        //     body: modalBody,
-        //     footer: modalFooter,
-        //     showCloseButton: true,
-        //     cssClass: "mymodal",
-        //     closeCallback: function() {
+        component.find('overlayLib').showCustomModal({
+            header: "Confirm Complete Survey",
+            body: modalBody,
+            footer: modalFooter,
+            showCloseButton: true,
+            cssClass: "mymodal",
+            closeCallback: function() {
                
-        //     }
-        // })
+            }
+        })
 
-        // component.set("v.showSpinner", false);//DPM-5507 added to prevent infinite loading by MinheeKim
+        component.set("v.showSpinner", false);//DPM-5507 added to prevent infinite loading by MinheeKim
 
     },
 

@@ -1008,8 +1008,9 @@ public without sharing class SurveyQuestionController {
     /**
          * [Method Description] 
          * Created by [MinheeKim] on [12-23-2024] for [DPM-5610]
+         * Edited by [Minhee Kim] on [03-23-2024] for [DPM-5871] change the method to comment not to be deployed
         */
-    @AuraEnabled
+    /**@AuraEnabled
     public static String getTotalFileSizeForSurveyInMB(Id surveyId) {
         Decimal totalSizeInMB = calculateTotalFileSizeForSurveyInMB(surveyId);
         String formattedSize = totalSizeInMB.setScale(1).format();
@@ -1053,14 +1054,15 @@ public without sharing class SurveyQuestionController {
         // Step 4: Convert to MB and return
         Decimal totalSizeInMB = totalSizeInBytes / 1024.0 / 1024.0; // Convert bytes to MB
         return totalSizeInMB;
-    }
+    }*/
     
 
     /**
          * [Method Description] test 2
          * Created by [MinheeKim] on [12-23-2024] for [DPM-5610]
+         * Edited by [Minhee Kim] on [03-23-2024] for [DPM-5871] change the method to comment not to be deployed
         */
-    @AuraEnabled
+    /**@AuraEnabled
     public static String launchQueueableForEvaluationGeneration(Id surveyId) {
         PageReference pageReference;
         DateTime currentTime = DateTime.now();
@@ -1096,6 +1098,6 @@ public without sharing class SurveyQuestionController {
         }
 
         return 'under 30MB';
-    } 
+    } */
 
 }

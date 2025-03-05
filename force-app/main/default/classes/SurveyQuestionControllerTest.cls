@@ -246,7 +246,7 @@ public without sharing class SurveyQuestionControllerTest {
         SurveyQuestionController.updateSurvey(JSON.serialize(listSurvey[0]));
         // Test for updateWarrantySurvey
         SurveyQuestionController.updateWarrantySurvey(JSON.serialize(listSurvey));
-        SurveyQuestionController.updateWarrantySurveyQuestion(JSON.serialize(listSurvey));
+        //SurveyQuestionController.updateWarrantySurveyQuestion(JSON.serialize(listSurvey)); //DPM-6118 change to comment
         
         // Test for getSurveyWarrantyReviewQuestions
         SurveyQuestionController.getSurveyWarrantyReviewQuestions(EvalId, true);
@@ -415,12 +415,31 @@ public without sharing class SurveyQuestionControllerTest {
         SurveyQuestionController.updateSurvey(JSON.serialize(listSurvey[0]));
         // Test for updateWarrantySurvey
         SurveyQuestionController.updateWarrantySurvey(JSON.serialize(listSurvey));
-        SurveyQuestionController.updateWarrantySurveyQuestion(JSON.serialize(listSurvey));
+        //SurveyQuestionController.updateWarrantySurveyQuestion(JSON.serialize(listSurvey)); //DPM-6118 change to comment
         
         // Test for getSurveyWarrantyReviewQuestions
         SurveyQuestionController.getSurveyWarrantyReviewQuestions(EvalId, true);
         SurveyQuestionController.getSurveyWarrantyReviewQuestions(SurveyId, false);
         SurveyQuestionController.getHasCompleteAccessToRecord(EvalId); //DPM-5399 added for test coverage by Minhee - 24.03.08
+        Test.stopTest();
+    }
+
+    /**
+     * Method Description : Test method for updateWarrantySurveyQuestion
+     * Created by [Minhee Kim] on [03.03.2025] for [DPM-5871] 
+     */
+    @IsTest
+    static void testUpdateWarrantySurveyQuestion(){
+        // Get data
+        Id EvalId = [SELECT Id FROM Evaluation__c LIMIT 1].Id;
+        Id QuestionsId = [SELECT Id FROM Survey_Question__c WHERE Response__c LIKE 'Yes' LIMIT 1].Id;
+        List<Survey_Question__c> listQuestions = [SELECT Id, Action_Plan__c, Response_Number_2__c, Other_Response_Text__c, Survey__c, Response__c FROM Survey_Question__c ];
+        Id SurveyId = [SELECT Id FROM Survey__c LIMIT 1].Id;
+        
+        // Set Data
+        Test.startTest();      
+        SurveyQuestionController.updateWarrantySurveyQuestion(listQuestions, String.valueOf(SurveyId) , 'Saved');  
+        SurveyQuestionController.updateWarrantySurveyQuestion(listQuestions, String.valueOf(SurveyId) , 'Completed');
         Test.stopTest();
     }
 

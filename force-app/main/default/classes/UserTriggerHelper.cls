@@ -984,8 +984,10 @@ public without sharing class UserTriggerHelper {
             
             //DPM-6101  moved from inside of loop to out of it
             if (listUserToUpdate.size() > 0) {
+                    UserTriggerHandler.run=false;// TBD on 03-04-2025
                     update listUserToUpdate;
-            }
+                    UserTriggerHandler.run=true;// TBD on 03-04-2025
+            } 
 
         }
     }

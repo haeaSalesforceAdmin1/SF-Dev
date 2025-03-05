@@ -662,6 +662,26 @@
                                                                             </div>
                                                                         </div>
                                                                     </div>
+                                                                    <!--DPM-5871 add to show remark in Warranty 2022-->
+                                                                    <div class="demo-only demo-only--sizing slds-grid slds-wrap" style="margin-top: 1%;">
+                                                                        <div class="slds-size_1-of-1">
+                                                                            <div class="slds-p-top_large">
+                                                                                <aura:if isTrue="{!surveyQuestion.showremarks}">
+                                                                                    <div class="slds-p-top_large">
+                                                                                        <aura:if isTrue="{!surveyQuestion.response == 'No'}">
+                                                                                            <div class="slds-text-heading_small" style="font-weight: bold;color: Red;display:inline-block;">*</div>
+                                                                                            <div class="slds-text-heading_small" style="font-weight: bold;display:inline-block;">Remarks</div>
+                                                                                                <lightning:inputRichText value="{!surveyQuestion.remarks}"></lightning:inputRichText>
+                                                                                        </aura:if>
+                                                                                        <aura:if isTrue="{!surveyQuestion.response != 'No'}">
+                                                                                            <div class="slds-text-heading_small" style="font-weight: bold;">Remarks</div>
+                                                                                            <lightning:inputRichText value="{!surveyQuestion.remarks}"></lightning:inputRichText>
+                                                                                        </aura:if>
+                                                                                    </div>
+                                                                                </aura:if>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div><!--DPM-5871 end-->
                                                                 </aura:if>
 
                                                                 <!-- input type like yes/no text number-->
@@ -828,7 +848,8 @@
 
                                                             <!-- Remarks text Box -->
                                                             <!--<div>{!surveyQuestion.remarks}</div>--> <!--DPM-5069 changed to comment--> 
-                                                            <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}">
+                                                        
+                                                            <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}"> <!--DPM-5871 temporarily changed to comment-->
                                                                 <aura:if isTrue="{!surveyQuestion.showremarks}">
                                                                     <div class="slds-p-top_large">
                                                                         <!--                                                                        <div class="slds-text-heading_small" style="font-weight: bold;">Remarks</div>-->
@@ -846,7 +867,8 @@
                                                                         <!-- added by Soyeon Kim for DPM-4873 ends-->
                                                                     </div>
                                                                 </aura:if>
-                                                            </aura:if>
+                                                            </aura:if><!--DPM-5871 temp-->
+                                                            
 
                                                             <aura:if isTrue="{!!and(surveyQuestion.warrantyReview2022)}">
                                                                 <div class="slds-p-left_x-small  slds-p-top_small">
